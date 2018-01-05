@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-01-05T00:46:52+01:00</updated><id>http://localhost:4000/</id><title type="html">sebi.io</title><subtitle>This is my corner of the internet. Tech makes me happy, so I try to note down and share my adventures here. I don't have a really specific plan on where I am going with this, so I'll use it as my notepad to jot down ideas, concepts, and tutorials, so that I and others will be able to revisit them whenever they'd like.</subtitle><entry><title type="html">The Case of Ashley Williams</title><link href="http://localhost:4000/general/2018/01/05/The-Case-of-Ashley-Williams.html" rel="alternate" type="text/html" title="The Case of Ashley Williams" /><published>2018-01-05T00:46:17+01:00</published><updated>2018-01-05T00:46:17+01:00</updated><id>http://localhost:4000/general/2018/01/05/The-Case-of-Ashley-Williams</id><content type="html" xml:base="http://localhost:4000/general/2018/01/05/The-Case-of-Ashley-Williams.html">&lt;p&gt;Check out the &lt;a href=&quot;https://www.reddit.com/r/node/comments/6whs2e/multiple_coc_violations_by_nodejs_board_member/&quot;&gt;Reddit thread&lt;/a&gt; in the meantime.&lt;/p&gt;</content><author><name></name></author><summary type="html">Check out the Reddit thread in the meantime.</summary></entry><entry><title type="html">Hexagonal Grids</title><link href="http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems.html" rel="alternate" type="text/html" title="Hexagonal Grids" /><published>2018-01-04T01:23:43+01:00</published><updated>2018-01-04T01:23:43+01:00</updated><id>http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems</id><content type="html" xml:base="http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems.html">&lt;p&gt;Amidst what seems like a heavy outage on the internet (with a very spotty connection), I managed to glue together a small demo after today’s coding session together with Alex in the Loretta Bar here in Munich. I was infatuated with the last task we worked on, the &lt;a href=&quot;http://adventofcode.com/2017/day/11&quot;&gt;Day 11&lt;/a&gt; challenge from Advent of Code 2017. I had already read a few articles regarding hexagonal grids, but none of them really made me understand the topic as well as just looking at a piece of paper (or even a napkin), scribbling around and trying to figure things out.&lt;/p&gt;
+
+&lt;p&gt;After I had managed to build an (albeit inefficient) solution for myself, I set out to understand more about the topic. When I managed to have somewhat of a breakthrough in understanding, and felt a lot better reasoning about the topic, I decided it would be time to improve upon the visualisations that I had seen on other blogs like &lt;a href=&quot;https://www.redblobgames.com/grids/hexagons/&quot;&gt;Redblobgames&lt;/a&gt;. They’re still a great read any heavily recommended, but I thought I’d try my hand at one of these as well.&lt;/p&gt;
+
+&lt;h3 id=&quot;interactive-demo&quot;&gt;Interactive demo&lt;/h3&gt;
+&lt;script src=&quot;http://localhost:4000/assets/unity_hexagons/TemplateData/UnityProgress.js&quot;&gt;&lt;/script&gt;
+
+&lt;script src=&quot;http://localhost:4000/assets/unity_hexagons/Build/UnityLoader.js&quot;&gt;&lt;/script&gt;
+
+&lt;script&gt;
+  var gameInstance = UnityLoader.instantiate(&quot;gameContainer&quot;, &quot;http://localhost:4000/assets/unity_hexagons/Build/newbuilds.json&quot;, {onProgress:UnityProgress});
+&lt;/script&gt;
+
+&lt;div class=&quot;webgl-content&quot;&gt;
+  &lt;div id=&quot;gameContainer&quot; style=&quot;width: 100%; height: 423px&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This demo was built on one evening after being kept awake by one too many please-allow-me-to-stay-here-longer-espressos in the café. Thanks for letting us stay!&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;TODO: FIX RENDERING ISSUE WITH CROPPED UI&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;on-hexagonal-grids&quot;&gt;On Hexagonal Grids&lt;/h3&gt;
+&lt;h4 id=&quot;coordinates-and-constraints&quot;&gt;Coordinates (and Constraints)&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Important constraint: x+y+z = 0 (also defines the plane)&lt;/li&gt;
+  &lt;li&gt;Play around for movement&lt;/li&gt;
+  &lt;li&gt;Switch the camera around&lt;/li&gt;
+  &lt;li&gt;Note that the equation x+y+z = 0 is always correct&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;distances&quot;&gt;Distances&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;3D representation allows us to easily reason about distances&lt;/li&gt;
+  &lt;li&gt;You can see that to each neighbouring cube the manhattan distance is 2 -&amp;gt; the grid distance is 1.&lt;/li&gt;
+  &lt;li&gt;
+    &lt;table&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;
+          &lt;td&gt;Formula&lt;/td&gt;
+          &lt;td&gt;x&lt;/td&gt;
+          &lt;td&gt;+&lt;/td&gt;
+          &lt;td&gt;y&lt;/td&gt;
+          &lt;td&gt;+&lt;/td&gt;
+          &lt;td&gt;z&lt;/td&gt;
+          &lt;td&gt;/2 = gridDist&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;the-obsolete-third-axis&quot;&gt;The obsolete third axis&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;The formula x+y+z=0 holds.&lt;/li&gt;
+  &lt;li&gt;Therefore, z = -(x+y)&lt;/li&gt;
+  &lt;li&gt;
+    &lt;table&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;
+          &lt;td&gt;Works even for the distance:&lt;/td&gt;
+          &lt;td&gt;x&lt;/td&gt;
+          &lt;td&gt;+&lt;/td&gt;
+          &lt;td&gt;y&lt;/td&gt;
+          &lt;td&gt;+&lt;/td&gt;
+          &lt;td&gt;-(x+y)&lt;/td&gt;
+          &lt;td&gt;/ 2 = gridDist&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;further-reading&quot;&gt;Further reading&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.redblobgames.com/grids/hexagons/&quot;&gt;Redblobgames&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/&quot;&gt;this&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;a few others, just google&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;how-this-demo-is-made&quot;&gt;How this demo is made&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Unity&lt;/li&gt;
+  &lt;li&gt;Boxes&lt;/li&gt;
+  &lt;li&gt;Changing materials when mousing over&lt;/li&gt;
+  &lt;li&gt;Drawing linerenderer in the correct positions&lt;/li&gt;
+  &lt;li&gt;Switching around axes because I don’t agree with Unitys Y axis&lt;/li&gt;
+  &lt;li&gt;Easter egg: my old hiwi office as backdrop&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;challenges-in-building-the-demo&quot;&gt;Challenges in building the demo&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Line renderer wouldn’t render color in WebGL export -&amp;gt; change material&lt;/li&gt;
+  &lt;li&gt;UI doesn’t properly scale on all devices (beginner’s problem in Unity)&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">Amidst what seems like a heavy outage on the internet (with a very spotty connection), I managed to glue together a small demo after today’s coding session together with Alex in the Loretta Bar here in Munich. I was infatuated with the last task we worked on, the Day 11 challenge from Advent of Code 2017. I had already read a few articles regarding hexagonal grids, but none of them really made me understand the topic as well as just looking at a piece of paper (or even a napkin), scribbling around and trying to figure things out.</summary></entry><entry><title type="html">An Evening of Munchkin</title><link href="http://localhost:4000/general/journal/2018/01/03/An-Evening-of-Munchkin.html" rel="alternate" type="text/html" title="An Evening of Munchkin" /><published>2018-01-03T00:09:40+01:00</published><updated>2018-01-03T00:09:40+01:00</updated><id>http://localhost:4000/general/journal/2018/01/03/An-Evening-of-Munchkin</id><content type="html" xml:base="http://localhost:4000/general/journal/2018/01/03/An-Evening-of-Munchkin.html">&lt;p&gt;When Samuel first introduced me to Munchkin (even on an abstract level, just in conversation), I was taken aback by the seeming complexity of the game.&lt;/p&gt;
+
+&lt;h3 id=&quot;what-is-munchkin&quot;&gt;What is Munchkin?&lt;/h3&gt;
+&lt;p&gt;Munchkin is a card game where you try to reach level 10 before anyone else does, by fighting monsters. But, you don’t only fight the monsters, other players can also influence the outcome of each individual spat by buffing the monsters or helping out the players. It becomes a crazy game of alliances, mind games, raging moments of unfairness and imbalance, and wonderful fun. If you’re interested, I suggest you check out the &lt;a href=&quot;https://en.wikipedia.org/wiki/Munchkin_(card_game)&quot;&gt;Wikipedia article&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;this-evening&quot;&gt;This evening&lt;/h3&gt;
+&lt;p&gt;So, after doing the &lt;a href=&quot;http://yearcompass.com&quot;&gt;YearCompass&lt;/a&gt; for 2018, and a failed electronics experiment due to a malfunctioning Raspberry Pi, I talked to Samuel, he complained about his new microphone, and we got a round of people going to play a round of Munchkin. What none of us knew at this point is that the round would take &lt;em&gt;four hours&lt;/em&gt;, with an extremely intense endgame. I was very lucky to come out on top, only enabled by my brother in arms Peter who promptly decided it was more important that &lt;em&gt;the other’s don’t win&lt;/em&gt;. With his support, I was buffed to a level where even the combined forces of four other players couldn’t defeat me anymore - though in all fairness, they already shot their bolts in the previous rounds, as did we all. It was a tough fight, people threw curses and monsters at each other left and right - probably one of the most memorable moments was Olly, a new guy I met just days before playing Uno on Tabletop Simulator, being defeated by a monster that took away virtually all his goods, and Gilbert playing a card to apply the same effects to Samuel; in a late game like ours, this was devastating.&lt;/p&gt;
+
+&lt;p&gt;It was extremely fun, and after the dust settled, I noticed my hot ears (from having headphones on throughout the whole intense session), a general sense of tiredness, but pride. I decided to go out for a 45 minute walk through the cold winter night. To be honest, I don’t really know where my in-ear headphones are right now, but instead of searching for them I decided I should just take a break from all the media bashing into my head, and just enjoy the calm gloom. So I did. It was a great evening, extremely enjoyable.&lt;/p&gt;
+
+&lt;h3 id=&quot;a-side-note-the-name-munchkin&quot;&gt;A Side Note: The name “Munchkin”&lt;/h3&gt;
+&lt;p&gt;Samuel told me about this, because I didn’t really spend too much time thinking about the name, but it actually comes from other Tabletop Roleplaying Games:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;In gaming, a munchkin is a player who plays what is intended to be a non-competitive game (usually a role-playing game) in an aggressively competitive manner. A munchkin seeks within the context of the game to amass the greatest power, score the most “kills”, and grab the most loot, no matter how detrimental their actions are to role-playing, the storyline, fairness, teamwork, or the other players’ enjoyment. The term is used almost exclusively as a pejorative and frequently is used in reference to powergamers.
+(Thanks, Wikipedia)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Suddenly, the whole setting, and the humorous cards all made a whole lot more sense to me.&lt;/p&gt;</content><author><name></name></author><summary type="html">When Samuel first introduced me to Munchkin (even on an abstract level, just in conversation), I was taken aback by the seeming complexity of the game.</summary></entry><entry><title type="html">The Dab Machine</title><link href="http://localhost:4000/general/2018/01/01/The-Dab-Machine.html" rel="alternate" type="text/html" title="The Dab Machine" /><published>2018-01-01T23:30:18+01:00</published><updated>2018-01-01T23:30:18+01:00</updated><id>http://localhost:4000/general/2018/01/01/The-Dab-Machine</id><content type="html" xml:base="http://localhost:4000/general/2018/01/01/The-Dab-Machine.html">&lt;p&gt;So I thought of something really stupid yesterday, I came across the &lt;a href=&quot;https://youtu.be/IcUq2PemRkU?t=1m35s&quot;&gt;Dab on them haters.exe&lt;/a&gt; video (timestamped for your convenience), and to be fair, I’ve found the whole dabbing meme quite funny in general. Which is why this would make…&lt;/p&gt;
+
+&lt;h3 id=&quot;a-great-electronics-project&quot;&gt;A Great Electronics Project&lt;/h3&gt;
+&lt;p&gt;Using two accelerometers (or, even easier, &lt;a href=&quot;https://www.adafruit.com/product/173&quot;&gt;tilt ball switches&lt;/a&gt;) attached to your arms, and a communication with a microcontroller sitting somewhere on your body, a cheap loudspeaker (powered by some kind of battery) on your back (or wherever else mounting is comfortable) fires out an as loud as possible low-frequency bass sound. Make sure the tilt ball switches are somehow attached to the sleeves and trigger in an about 30 degree upwards position.&lt;/p&gt;
+
+&lt;p&gt;And there you have it, whenever you dab, you make the appropriate bass boosted sound.&lt;/p&gt;
+
+&lt;p&gt;Am I going to build this? Probably not (though it feels like one of those inventions that could kickstart a &lt;a href=&quot;https://www.youtube.com/watch?v=Q8zC3-ZQFJI&quot;&gt;YouTube career&lt;/a&gt;…) - but it’s stupid enough to write down.&lt;/p&gt;</content><author><name></name></author><summary type="html">So I thought of something really stupid yesterday, I came across the Dab on them haters.exe video (timestamped for your convenience), and to be fair, I’ve found the whole dabbing meme quite funny in general. Which is why this would make…</summary></entry><entry><title type="html">Getting my 120Hz Monitor to work with MacOS High Sierra</title><link href="http://localhost:4000/general/2018/01/01/Getting-my-120Hz-Monitor-to-work-with-MacOS-High-Sierra.html" rel="alternate" type="text/html" title="Getting my 120Hz Monitor to work with MacOS High Sierra" /><published>2018-01-01T23:05:38+01:00</published><updated>2018-01-01T23:05:38+01:00</updated><id>http://localhost:4000/general/2018/01/01/Getting-my-120Hz-Monitor-to-work-with-MacOS-High-Sierra</id><content type="html" xml:base="http://localhost:4000/general/2018/01/01/Getting-my-120Hz-Monitor-to-work-with-MacOS-High-Sierra.html">&lt;p&gt;Today I discovered that by using &lt;a href=&quot;http://www.madrau.com&quot;&gt;SwitchResX&lt;/a&gt;, I am able to set my display’s framerate up to 120Hz. (Even though my display should support it, the option for 144Hz makes the display flicker like crazy). I also toyed around a little with the available HiDPI options and even defined my own after I thought the text was maybe a little hard to read (following the instructions by &lt;a href=&quot;https://medium.com/@ivan.ha/how-to-mimic-a-2k-monitor-as-retina-display-in-macos-sierra-using-hidpi-f53d87630c48&quot;&gt;Ivan&lt;/a&gt;) - However, using a 1920x1080 HiDPI resolution bloated the text up to a point where I felt the user interface lost some of its crisp. So I decided to roll back to defaults on this front.&lt;/p&gt;</content><author><name></name></author><summary type="html">Today I discovered that by using SwitchResX, I am able to set my display’s framerate up to 120Hz. (Even though my display should support it, the option for 144Hz makes the display flicker like crazy). I also toyed around a little with the available HiDPI options and even defined my own after I thought the text was maybe a little hard to read (following the instructions by Ivan) - However, using a 1920x1080 HiDPI resolution bloated the text up to a point where I felt the user interface lost some of its crisp. So I decided to roll back to defaults on this front.</summary></entry><entry><title type="html">Making my Fire HD 10 a YouTube machine</title><link href="http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine.html" rel="alternate" type="text/html" title="Making my Fire HD 10 a YouTube machine" /><published>2017-12-30T22:53:34+01:00</published><updated>2017-12-30T22:53:34+01:00</updated><id>http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine</id><content type="html" xml:base="http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine.html">&lt;p&gt;T’was the night of the 24th of december, I was sitting together with my family at my grandparent’s house and celebrated Christmas - and the &lt;a href=&quot;https://en.wikipedia.org/wiki/Christkind&quot;&gt;Christkind&lt;/a&gt; blessed me with a Fire HD 10 Tablet, freshly made by Amazon (or whoever manufactures these things). It should serve as a replacement device for my Sony Xperia Tablet Z which unfortunately had an unplanned rendezvous with the floor.&lt;/p&gt;
+
+&lt;p&gt;So I set out to make this thing my classic YouTube watching machine that I was used to before. Which is when I encountered…&lt;/p&gt;
+
+&lt;h3 id=&quot;the-shock&quot;&gt;The Shock&lt;/h3&gt;
+&lt;p&gt;Upon first booting the system, I was greeted with some familiar, some unfamiliar UI - While Amazons Fire HD 10 runs Android, it’s heavily modified and limited by Amazon, comes with their own App Store, and doesn’t have any support for any of the original apps. When I downloaded the YouTube app from the Amazon store, it looked as though it was an almost not-wrapped version of the mobile site. But I was used to a streamlined and proper mobile interface for the Android application. So I set out on a long-winded journey to &lt;strong&gt;restore full YouTube access&lt;/strong&gt;!&lt;/p&gt;
+
+&lt;h3 id=&quot;the-failure&quot;&gt;The Failure&lt;/h3&gt;
+&lt;p&gt;So, I thought, hey, just grab yourself an &lt;code class=&quot;highlighter-rouge&quot;&gt;apk&lt;/code&gt; file from one of the many mirrors and just install that - couldn’t be too hard, right? Well, either the app just crashed on boot, or it claimed that it required &lt;em&gt;Google Play Services&lt;/em&gt; to function (even though I could see the actual app loaded in the background… 😡). I searched the Amazon store for an alternative YouTube client that would suit my needs, but to no avail.&lt;/p&gt;
+
+&lt;p&gt;So I realized: If we require Google Play Services, sounds like we need to… Provide Google Play Services.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-success&quot;&gt;The Success&lt;/h3&gt;
+&lt;p&gt;Through some Google-Fu I found a super fresh article that &lt;a href=&quot;https://liliputing.com/2017/07/making-amazons-fire-hd-8-2017-googley-play-store-third-party-launchers.html&quot;&gt;describes how to googlify the Fire HD 8&lt;/a&gt; - 8, 10, what does it matter! The main takeaway from the article is the &lt;a href=&quot;https://forum.xda-developers.com/amazon-fire/general/how-to-install-google-play-store-fire-t3486603&quot;&gt;4 magic APKs&lt;/a&gt; that will install the Google Play Services on your device. So I installed them, and arrived at a point where I could finally use the YouTube app.&lt;/p&gt;
+
+&lt;p&gt;But there was one problem that remained for me: &lt;strong&gt;Ads&lt;/strong&gt;. I watch a lot of long-winded videos, sometimes to fall asleep to, or just to chill out. There is nothing worse than being interrupted by some loud noises (looking at you, ads for Instagram). So I decided to install &lt;a href=&quot;https://f-droid.org/en/packages/org.jak_linux.dns66/&quot;&gt;DNS66&lt;/a&gt;, an ad blocker that does not require root, yet allows you to system-wide block ads. &lt;em&gt;However, it is incapable of blocking ads in the YouTube app&lt;/em&gt;. So I set out on an even deeper journey, determined to get back my best viewing experience!&lt;/p&gt;
+
+&lt;h3 id=&quot;the-cherry-on-top&quot;&gt;The Cherry on Top&lt;/h3&gt;
+&lt;p&gt;Somebody on XDA Devs was kind enough to upload a &lt;a href=&quot;https://forum.xda-developers.com/moto-g4-plus/themes/app-youtube-red-background-screen-off-t3623852&quot;&gt;patched APK&lt;/a&gt; which contains:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Screen off playback&lt;/li&gt;
+  &lt;li&gt;No ads&lt;/li&gt;
+  &lt;li&gt;Dark mode&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When I installed this APK, I really felt like I hit the jackpot.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;When installing, make sure not to skip over the installation instructions, and install &lt;a href=&quot;http://www.mediafire.com/file/cn1b36jhjubgqhq/microG_for_YouTube_Vanced_0.2.4.apk&quot;&gt;microG&lt;/a&gt;!&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;The only thing left was to install &lt;a href=&quot;https://play.google.com/store/apps/details?id=eu.chainfire.lumen&amp;amp;hl=en&quot;&gt;CF.lumen&lt;/a&gt; for some warm tone colors. Even though it claims it needs some special accessibility options, it’ll work just fine out of the box. However, the actual custom driver requires &lt;em&gt;root&lt;/em&gt; - which is the one thing I haven’t gotten on my Fire HD 10 yet. Still holding out though!&lt;/p&gt;</content><author><name></name></author><summary type="html">T’was the night of the 24th of december, I was sitting together with my family at my grandparent’s house and celebrated Christmas - and the Christkind blessed me with a Fire HD 10 Tablet, freshly made by Amazon (or whoever manufactures these things). It should serve as a replacement device for my Sony Xperia Tablet Z which unfortunately had an unplanned rendezvous with the floor.</summary></entry><entry><title type="html">urlboi - My Bookmark Manager</title><link href="http://localhost:4000/general/2017/12/20/urlboi-My-Bookmark-Manager.html" rel="alternate" type="text/html" title="urlboi - My Bookmark Manager" /><published>2017-12-20T23:00:37+01:00</published><updated>2017-12-20T23:00:37+01:00</updated><id>http://localhost:4000/general/2017/12/20/urlboi---My-Bookmark-Manager</id><content type="html" xml:base="http://localhost:4000/general/2017/12/20/urlboi-My-Bookmark-Manager.html">&lt;p&gt;Hallelujah, a new pet project has spawned! I’ve been wanting to do this for a while, but this will be the first official document regarding &lt;strong&gt;urlboi&lt;/strong&gt; (pronounced &lt;em&gt;earl-boy&lt;/em&gt;). Alternative title &lt;strong&gt;URL Grey&lt;/strong&gt; (I don’t think this needs a note on how to pronounce).&lt;/p&gt;
+
+&lt;p&gt;Since this is supposed to be a real project, I thought it best to write down some of the basics before blindly jumping into the coding.&lt;/p&gt;</content><author><name></name></author><summary type="html">Hallelujah, a new pet project has spawned! I’ve been wanting to do this for a while, but this will be the first official document regarding urlboi (pronounced earl-boy). Alternative title URL Grey (I don’t think this needs a note on how to pronounce).</summary></entry><entry><title type="html">Why the way I consume the Internet is a problem</title><link href="http://localhost:4000/general/2017/12/20/Why-the-way-I-consume-the-Internet-is-a-problem.html" rel="alternate" type="text/html" title="Why the way I consume the Internet is a problem" /><published>2017-12-20T20:39:49+01:00</published><updated>2017-12-20T20:39:49+01:00</updated><id>http://localhost:4000/general/2017/12/20/Why-the-way-I-consume-the-Internet-is-a-problem</id><content type="html" xml:base="http://localhost:4000/general/2017/12/20/Why-the-way-I-consume-the-Internet-is-a-problem.html">&lt;p&gt;I’ve realised that I’ve been falling for something that I’d like to call a bit of an anti-pattern when it comes to how I consume the internet right now. A vicious cycle of endless refreshing, mindless browsing, with no clear goal, or productivity in mind. Let me elaborate on this for a bit. I’m just gonna note down how a typical day looks like in the matter of internet consumption.&lt;/p&gt;
+
+&lt;h2 id=&quot;a-daily-routine&quot;&gt;A Daily Routine&lt;/h2&gt;
+&lt;h3 id=&quot;morning&quot;&gt;Morning&lt;/h3&gt;
+&lt;p&gt;Even before standing up, the first thing is checking my messages, seeing what I missed during those &lt;em&gt;busy&lt;/em&gt; eight to twelve hours that I was gone from the surface of the ever-pulsating planet. This usually begins with me opening up whatever app has a red notification bubble; which is usually a nonempty subset of {Telegram, WhatsApp, Mail, iMessage, KakaoTalk}. Then, I open up my mobile browser, and navigate to a randomised sequence of Reddit (my regular frontpage), ProgrammingCircleJerk, Hacker News, and Twitter - not necessarily in this order. This can take me more than 20 minutes (…time that could’ve been wasted snoozing or actually getting the day started). I walk over to the bathroom, phone in hand, shove a toothbrush in my face, all while reading more comments (not to confuse with &lt;em&gt;articles&lt;/em&gt;) on Reddit and HN).&lt;/p&gt;
+
+&lt;h3 id=&quot;during-the-day&quot;&gt;During the Day&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;When in university&lt;/em&gt;, I usually use my bathroom breaks to check up on what I feel are the easiest distractions, again HN and Reddit comments jump to the help for a quick endorphin boost while keeping my mind off the thing that I was probably actually working at - where a step back and taking a different angle might have actually helped. Notably, even when I just arrived with the car, I’m still a bit sleepy, it’s cold out, it’s easy to snap the phone out of the holder in the car and just browse one, maybe two comment sections on Reddit, or quickly pull-to-refresh on Twitter.&lt;/p&gt;
+
+&lt;p&gt;Depending on whether the lecturer can actually keep my attention (hint: that can be very hard when you’re missing the &lt;a href=&quot;https://en.wikipedia.org/wiki/Flow_(psychology)&quot;&gt;flow&lt;/a&gt; on either side), it is easy to swipe to the side on an iPad Pro and quickly drift off into the cozy arms of people talking about cats or net neutrality, where the issues are black and white and I don’t have to remember jack shit.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;If I stay at home&lt;/em&gt;, it gets particularly bad: I usually set out to do some kind of task, but start by very cozily (read: lazily) making myself some breakfast. And breakfast at home means I get to watch a YouTube video, right? Yeah, and then I might end up clicking on a “dank memery” playlist (not linked here for a good reason, otherwise I’d probably have to kiss an hour or two goodbye just by reading this article…), and I waste a lot of time on that. And thanks to the brain being on autopilot, now it just suddenly feels a lot harder to actually get going with whatever I set out to rather than to just maybe refresh the YouTube front page again (&lt;em&gt;I mean, I didn’t spend all the time training the YouTube recommendation algorithm for nothing, right?&lt;/em&gt;), and see, maybe it’s going to recommend to me another video from the &lt;a href=&quot;https://youtu.be/fRj34o4hN4I?t=17s&quot;&gt;Boston Dynamics&lt;/a&gt; guys? I can be happy if I get maybe two, or three hours of actual work done - funnily enough it’s often not as stressful as it feels - when you compare it with watching videos about robots doing backflips, that is.&lt;/p&gt;
+
+&lt;h3 id=&quot;in-the-afternoon&quot;&gt;In the Afternoon&lt;/h3&gt;
+&lt;p&gt;Coming home from uni (or just being at home), it’s almost a reflex that once I switch from my “work machine”, the macbook, to my “free time machine”, the beast of a tower PC I got sitting in my room, I immediately open a few tabs of YouTube, HN, and Reddit. If I’ve been in university, it’s easy to say that “I’ve been working all day” (That may or may not be true, see the paragraph above), so I’ve “earned a break”. However, recently I’ve made the observations that these &lt;em&gt;breaks&lt;/em&gt; sometimes expand to fill all the time until I feel too tired to actually start work again (…but some YouTube would be fine though). Which brings me to…&lt;/p&gt;
+
+&lt;h3 id=&quot;at-night&quot;&gt;At Night&lt;/h3&gt;
+&lt;p&gt;So, during the day, I usually have this (very underwhelming) fantasy of living those two lives, of being the good student through the day, getting all my work out the way, and then being the &lt;em&gt;rockstar software engineer&lt;/em&gt; (what a stupid term, but that warrants its own article &lt;em&gt;someday&lt;/em&gt;™) at night times, building my own cool projects, everything that I’ve been dreaming of (surprisingly realistic dreams for the most part, if I can just get myself to actually building the thing). This would double benefit me, as I would make a lot of use of my time during the day, and spend whatever energy is left in the evening on my own projects. However, in the moment, YouTube, watching something really mindless because &lt;em&gt;this day was particularly hard&lt;/em&gt; and &lt;em&gt;tomorrow’s another day&lt;/em&gt; is a mentality that I’ve caught myself using as an excuse more frequently recently, and it worries me. When a new show comes out on Netflix, I often binge watch it, sometimes even with the half-screwed logic that I’m not going to get anything done until I’ve seen all of it anyways, because I’d just procrastinate until I could watch the show again (that’s some magic ass backwards logic right there, but it’s apparently enough to convince myself, so hey)&lt;/p&gt;
+
+&lt;h2 id=&quot;analysing-the-problem&quot;&gt;Analysing the problem&lt;/h2&gt;
+&lt;p&gt;While I am not a huge fan of TED Talks (they are usually very wishy-washy motivational stuff or people telling you things so generic you could never apply them, but I digress), one talk that has always stuck with me was &lt;a href=&quot;https://www.youtube.com/watch?v=Lp7E973zozc&quot;&gt;this talk&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;You’re never going to feel like it. Ever. […] Scientists call it activation energy.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I’ve also come across another &lt;a href=&quot;https://www.ted.com/talks/manoush_zomorodi_how_boredom_can_lead_to_your_most_brilliant_ideas#t-107031&quot;&gt;TED talk&lt;/a&gt; which talks about how we have great ideas when we perform the most mundane tasks - as long as our brains has some leftover capacity (i.e. we’re bored).&lt;/p&gt;
+
+&lt;p&gt;Reintroducing boredom in my life seems like something important. Everyone is always stressing out around me, and I feel that in a way distracting myself is a way of just shoving all the problems away, disregarding them, and in return achieving nothing - not my personal goals, not my academic goals (I am talking on a small scale here; say, finish a homework problem early).&lt;/p&gt;
+
+&lt;h3 id=&quot;content-consumption-hell&quot;&gt;Content consumption hell&lt;/h3&gt;
+
+&lt;p&gt;It’s &lt;em&gt;incredibly easy&lt;/em&gt; to get somewhat high quality entertainment content wherever you are at any time. It’s easy to text people all the time. There’s just no end to it!&lt;/p&gt;
+
+&lt;h3 id=&quot;on-escapism-and-being-grounded-in-the-real-world&quot;&gt;On escapism and being grounded in the real world&lt;/h3&gt;
+&lt;p&gt;Did I already mention that I am like, super into watching Netflix? I’ve completely transcended movies and moved on to series (in an exaggerated fashion: &lt;em&gt;why would I spend all the time and energy on getting to know some characters only to have them interact maybe two hours on screen?&lt;/em&gt; - the mileage in series seems way better here), which once again is a huge time sink, but makes for some great conversation stuff, and is a great filler for whenever you have the slightest feeling of “I don’t know what to do with this time” (a feeling that I should start embracing, see above).&lt;/p&gt;
+
+&lt;h2 id=&quot;how-to-fix-this&quot;&gt;How to fix this?&lt;/h2&gt;
+&lt;p&gt;Gee, I am really asking myself the &lt;em&gt;difficult and obvious&lt;/em&gt; questions here, aren’t I.&lt;/p&gt;
+
+&lt;h3 id=&quot;recalling-an-old-experiment&quot;&gt;Recalling an old experiment&lt;/h3&gt;
+&lt;p&gt;At some point I channeled enough willpower to actually achieve at least parts of what an ideal time would look like. I used a &lt;a href=&quot;https://www.youtube.com/watch?v=hbkZrOU1Zag&quot;&gt;motivational alarm clock&lt;/a&gt;, which cut down my standing up time from 20 to three minutes. In the summers, I used to shower cold for extra focus and increased circulation. I’ve done my fair share of watching my calories, eating healthy, and focusing at work. However, it’s always been hard combining multiple of these things at the same time - a few of them at a time are usually not so hard, but combining all of them often leaves me with the problem that while I feel like I’m on the right track, I don’t get things done and use that to (behind my own back) procrastinate once more - just this time in the morning instead of in the afternoon.&lt;/p&gt;
+
+&lt;p&gt;However, what I realised is that it is easier for me to actually be productive for my day job (university) when I do it during the day, not during the afternoon or in the evening. It’s fine to extend longer tasks far into the night, but if I don’t get started in the mornings, on some days it feels like I might have just not started at all - it’s demotivating for me to see that it’s already so late, that the thing I set out to do during the day isn’t going to be done any time before the day is more that 80% done - which is unnecessarily disheartening.&lt;/p&gt;
+
+&lt;h3 id=&quot;formulating-a-new-experiment&quot;&gt;Formulating a new experiment&lt;/h3&gt;
+&lt;p&gt;With christmas coming up, self-control is probably going to be at an all time low: It’s dark outside, it’s cozy under the blankets, hot beverages are available en masse, creating a cozy (and lazy) atmosphere wherever they are up for sale. Long shirts and sweaters make it all to easy to recline into some soft pillows on a chair and just, y’know, &lt;em&gt;chill&lt;/em&gt;. But, I still pledge to do my best to uphold a few new standards that should make it easier on myself to maximise the quality of the next few weeks. In this case, &lt;em&gt;quality&lt;/em&gt; refers to multiple things:&lt;/p&gt;
+
+&lt;h3 id=&quot;goals-for-the-new-strategy&quot;&gt;Goals for the new strategy&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Family Commitments&lt;/strong&gt;: Having a nice Christmas with my family, not being in a stressed out position, seeing things for what they are&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Work&lt;/strong&gt;: Properly preparing myself for the upcoming exams. Dedicating a significant chunk of my &lt;em&gt;good&lt;/em&gt; wake time to further my academic career. This is going to be one of the main goals to achieve, but also, in turn, probably one of the hardest ones.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Motivation&lt;/strong&gt;: While sounding a bit fluffy, when trying to do a medium-term &lt;em&gt;strategy&lt;/em&gt; (as compared to a short-term &lt;em&gt;tactic&lt;/em&gt;), it is important that I can keep motivation on a high level. This facilitates me being able to stay on track with my goals and not burning out (i.e. overthrowing my self-imposed regime)&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Fun&lt;/strong&gt;: Not only because it’s the holidays, it’s an important secondary factor to &lt;em&gt;motivation&lt;/em&gt;. I think it is almost self-explanatory that the more &lt;em&gt;enjoyable&lt;/em&gt; I can make the time for myself, the better it will be. This also means deliberately making room for own projects and the things that I enjoy.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Health&lt;/strong&gt;: Overworking, overeating, and too little sleep are all great short-term ways of &lt;em&gt;getting a thing done&lt;/em&gt;, but always come at the expense of the next day, week, or month. The strategy has to focus on creating a sustainable healthy lifestyle, which I plan to introduce as evolutionary changes.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Social&lt;/strong&gt;: It is important to stay in touch with people, allow time to hang out and exchange, and refill the social life batteries of myself.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;tools-for-the-new-strategy&quot;&gt;Tools for the new strategy&lt;/h3&gt;
+
+&lt;h4 id=&quot;sleep-hygiene&quot;&gt;Sleep Hygiene&lt;/h4&gt;
+&lt;p&gt;For regular days, aim for a &lt;strong&gt;sleep time of 8 hours&lt;/strong&gt; with a &lt;strong&gt;bed time of 9 hours&lt;/strong&gt; (this includes falling asleep and waking up). On a regular day, the recommended sleep time is &lt;strong&gt;23:00 - 7:00&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Even for New Year’s, try for &lt;strong&gt;2:00 - 9:30&lt;/strong&gt;, as to not turn the whole sleep cycle around.&lt;/p&gt;
+
+&lt;h4 id=&quot;food-intake&quot;&gt;Food Intake&lt;/h4&gt;
+&lt;p&gt;Limit yourself to three regular-sized meals per day. Unless portions are extremely small, refrain from taking seconds or having two meals in one. Feel free to skip dinner if you’re not feeling hungry (this does not apply to breakfast and lunch, as they provide the fuel for your daily work). While meaty dishes are usually appealing, if given the option, take a &lt;em&gt;more veggie approach&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Substitute snacking with chewing gum. The main part why you snack is because your mouth gets bored and you want to chew on something, so let’s take the zero calorie choice. Alternatives are of course frozen grapes or other extremely low-cal snacks.&lt;/p&gt;
+
+&lt;h4 id=&quot;drink-intake&quot;&gt;Drink Intake&lt;/h4&gt;
+&lt;p&gt;Try to limit your intake on wine and other alcoholic beverages to a minimum (that is not to say that &lt;em&gt;social situations&lt;/em&gt; can’t allow you to have a glass of wine). Limiting consumption of alcoholic beverages helps with standing up the next morning (especially if your body for some magical reason is actually trying to &lt;em&gt;burn&lt;/em&gt; the goddamn alcohol).&lt;/p&gt;
+
+&lt;h4 id=&quot;planning-without-overplanning&quot;&gt;Planning without overplanning&lt;/h4&gt;
+&lt;p&gt;For being able to properly lay out what to do, it is important to &lt;em&gt;figure out what there is to do&lt;/em&gt; - that is step zero. From there, make a coarse plan of how much time (in days) which subject gets allocated. The actual day planning is a &lt;em&gt;tactic&lt;/em&gt; - unless studying with other people, adapt this as necessary on a day-to-day basis.&lt;/p&gt;
+
+&lt;h4 id=&quot;meditation-and-mindfulness&quot;&gt;Meditation and Mindfulness&lt;/h4&gt;
+&lt;p&gt;I was contemplating for a long while whether I should include this, but I feel that it is necessary. Keep in mind for yourself that this isn’t the clice “Zen Buddha Om” type of thing. It simply means taking time away from the creation and consumption process, and just being. I’d probably allow music in the background, but staying away from screens, computers, phones is the main point. Introducing boredom, allowing a space for reflection and immediate adjustment is necessary. Try to spend at least 15 minutes per day consciously separated from what you’ve been doing the whole day.&lt;/p&gt;
+
+&lt;h4 id=&quot;reflection&quot;&gt;Reflection&lt;/h4&gt;
+&lt;p&gt;Spend some time writing down things that worked well and things that didn’t go well. Be brutally honest - only if you are aware that a problem exists, you can fix it. This can be either on a blog, in handwriting (like I’ve done a couple of times on my iPad), or somewhere completely different. This is up to you and most likely also depends on the situation.&lt;/p&gt;
+
+&lt;h4 id=&quot;using-the-social-circle&quot;&gt;Using the social circle&lt;/h4&gt;
+&lt;p&gt;Talk to people. Tell them ideas. Be inspired by what they have to say. Ask questions.&lt;/p&gt;
+
+&lt;h4 id=&quot;allowing-time-for-the-things-you-enjoy&quot;&gt;Allowing time for the things you enjoy&lt;/h4&gt;
+&lt;p&gt;It’s not motivating waking up and knowing that the whole day will be spent working on really hard problems that you have a hard time solving. Instead, think of a day as a harmony between the things you have to do and the things you want to do - and hopefully, be able to blur the lines. Find enjoyment in the things for academia, let yourself be consumed by the material at hand, realise and then suppress the upcoming feeling of wanting to do something else.&lt;/p&gt;
+
+&lt;h4 id=&quot;the-role-of-social-events&quot;&gt;The role of social events&lt;/h4&gt;
+&lt;p&gt;I have not touched on the role of social events in this essay, because I believe that that is something for other times. Social events are in a state of flux for me, and until stuff has settled more (which it may or may not do within the near future), I don’t see much of a point in overanalysing stuff.&lt;/p&gt;
+
+&lt;p&gt;I will do my best to use this new strategy in the upcoming weeks. Regardless of the outcome, I shall reflect on this after an implementation attempt sometime in the future.&lt;/p&gt;</content><author><name></name></author><summary type="html">I’ve realised that I’ve been falling for something that I’d like to call a bit of an anti-pattern when it comes to how I consume the internet right now. A vicious cycle of endless refreshing, mindless browsing, with no clear goal, or productivity in mind. Let me elaborate on this for a bit. I’m just gonna note down how a typical day looks like in the matter of internet consumption.</summary></entry><entry><title type="html">Why I write emails</title><link href="http://localhost:4000/general/2017/12/20/why-i-write-emails.html" rel="alternate" type="text/html" title="Why I write emails" /><published>2017-12-20T16:21:41+01:00</published><updated>2017-12-20T16:21:41+01:00</updated><id>http://localhost:4000/general/2017/12/20/why-i-write-emails</id><content type="html" xml:base="http://localhost:4000/general/2017/12/20/why-i-write-emails.html">&lt;p&gt;There’s a thing I do for which sometimes people look at me in a funny way, but I truly believe it’s one of the few, free things you can do to make the world a little better.&lt;/p&gt;
+
+&lt;p&gt;I write emails to people.&lt;/p&gt;
+
+&lt;p&gt;If you are an indie game studio, and I really enjoyed your last game, chances are you’ll find an email from me in your inbox someday. If I saw your talk online or in person and I haven’t had a chance to come to you in person, you can bet that some day afterwards, you’ll find a short message in your inbox either on your YouTube channel, on your Twitter or wherever else I can seem to reach you. If your open source project (that has like 2 stars on GitHub) which I magically came across after a long Google search, on like, page 5, actually helped me, I’ll go out of my way to find your email address (via your commits, via your profile, however) - and I’ll let you know you helped me out.&lt;/p&gt;
+
+&lt;h3 id=&quot;but-why&quot;&gt;But… why?&lt;/h3&gt;
+&lt;p&gt;Now, we all stive to do things for the sake of doing them - because we believe in them, because we think it’s the right thing to do, because it is our civic duty. There’s a ton of reasons why people do it, any many try to steer away from the one subject that you’re not allowed to speak out loud: to get approval by your peers. I always feel like it’s a great confidence boost when somebody stars my repositories on GitHub. It tells me that someone actually looked at my work, maybe downloaded it, and tried it out. It means that whatever I spent my time on, &lt;em&gt;it made an impact&lt;/em&gt;, no matter how little. It gives me a way to rationalise contuining to work on things like this - and I believe that other people must feel the same.&lt;/p&gt;
+
+&lt;p&gt;I’ve been doing this for more than a year now, and I’ve gotten nothing but positive responses - people are overwhelmed that their pet project made it around the whole globe, that somebody decided to reach out, that they inspire others - getting feedback like this is something that not enough people experience, which is why I’ve made it my mission to spend that extra minute and shoot people a short message.&lt;/p&gt;</content><author><name></name></author><summary type="html">There’s a thing I do for which sometimes people look at me in a funny way, but I truly believe it’s one of the few, free things you can do to make the world a little better.</summary></entry><entry><title type="html">Setting up a CUPS / AirPrint Server on Raspberry Pi</title><link href="http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server.html" rel="alternate" type="text/html" title="Setting up a CUPS / AirPrint Server on Raspberry Pi" /><published>2017-12-18T00:00:00+01:00</published><updated>2017-12-18T00:00:00+01:00</updated><id>http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server.html">&lt;p&gt;Even though I’ve switched almost my whole office experience to paperless, my parents are still very much heavy users of the printer. However, with the recent diversification of even their technology, and the growing need to print from a Windows machine, a Macbook and an iPad, I knew it was necessary to find a unified way to print from all those devices. The answer proved to be a &lt;em&gt;CUPS (formerly Common UNIX Printing System)&lt;/em&gt; server on a Raspberry Pi that I had lying around.&lt;/p&gt;
+
+&lt;h3 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h3&gt;
+&lt;p&gt;I set up my Raspberry Pi with the latest version of Raspbian. I made sure the packages &lt;code class=&quot;highlighter-rouge&quot;&gt;vim&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;git&lt;/code&gt; are installed on the device (if they are not, you can simply install them via your old friend &lt;code class=&quot;highlighter-rouge&quot;&gt;apt-get&lt;/code&gt;).&lt;/p&gt;
+
+&lt;h3 id=&quot;installation&quot;&gt;Installation&lt;/h3&gt;
+&lt;p&gt;First, we check whether our printer is actually being recognized by the system (the main prerequisite for the rest of the tutorial to work)&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;lsusb&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now that we’ve verified this, we can run&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install cups&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;and install the CUPS server and its dependencies. This can take a while.&lt;/p&gt;
+
+&lt;p&gt;Next, we modify the user account to properly function with the CUPS authentication:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;usermod &lt;span class=&quot;nt&quot;&gt;-aG&lt;/span&gt; lpadmin pi&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This concludes the installation. Now all we need to do is to configure the web frontend to be accessible.&lt;/p&gt;
+
+&lt;h3 id=&quot;configuration&quot;&gt;Configuration&lt;/h3&gt;
+&lt;p&gt;Now, it’s time to set up the cofiguration of your CUPS service to be available outside of localhost. So, fire up your favorite text editor (in my case &lt;code class=&quot;highlighter-rouge&quot;&gt;vim&lt;/code&gt;, but feel free to go full &lt;code class=&quot;highlighter-rouge&quot;&gt;emacs&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;nano&lt;/code&gt; if you prefer), and open &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/cups/cupsd.conf&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Find the line that says&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Listen localhost:631
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and replace it with&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Port 631
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At the first block, set&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;WebInterface Yes
+ServerAlias *
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;afterwards, set all the &lt;code class=&quot;highlighter-rouge&quot;&gt;Allow @local&lt;/code&gt; annotations for the locations block, like so:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt; Location / &amp;gt;
+	# Restrict access to the server...
+	Order allow,deny
+	Allow @local
+	&amp;lt; /Location &amp;gt;
+	
+	&amp;lt; Location /admin &amp;gt;
+	# Restrict access to the admin pages...
+	Order allow,deny
+	Allow @local
+	&amp;lt; /Location &amp;gt;
+	
+	&amp;lt; Location /admin/conf &amp;gt;
+	AuthType Default
+	Require user @SYSTEM
+	
+	# Restrict access to the configuration files...
+	Order allow,deny
+	Allow @local
+	&amp;lt; /Location &amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you’ve followed the steps above, you’re pretty much done with your installation; restart the CUPS server by invoking &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo /etc/init.d/cups restart&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;You can now add the printer via the webinterface; the login will be the same as it is for your Raspbian installation.&lt;/p&gt;
+
+&lt;h3 id=&quot;but-what-about-airprint&quot;&gt;But what about AirPrint?&lt;/h3&gt;
+
+&lt;p&gt;To setup AirPrint, we need to install another package called &lt;code class=&quot;highlighter-rouge&quot;&gt;avahi-discover&lt;/code&gt;:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install avahi-discover&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;And we are done… kind of.&lt;/p&gt;
+
+&lt;h3 id=&quot;troubleshooting-rgb-printer-issues&quot;&gt;Troubleshooting RGB Printer Issues&lt;/h3&gt;
+
+&lt;p&gt;In my case, when printing some documents, the printer would just not run. A short investigation in the web interface would reveal the issue:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;(urftopdf) die(Invalid ColorSpace, only RGB 24BIT type 1 is supported) [Success]&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Nothing like a &lt;code class=&quot;highlighter-rouge&quot;&gt;[Success]&lt;/code&gt; error message, am I right? I dug deep into some ancient forums and figured out that the &lt;code class=&quot;highlighter-rouge&quot;&gt;urftopdf&lt;/code&gt; that comes bundled with CUPS apparently is not the most current version, and that it lacks the support for the color space I was requiring. So, I decided to &lt;em&gt;compile my own urftopdf&lt;/em&gt;! What might sound daunting at first is actually quite straightforward and can be done with the few commands below:&lt;/p&gt;
+
+&lt;p&gt;First, we grab ourselves a version of urftopdf which actually supports the colorspace we need:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;git clone https://github.com/superna9999/urftopdf&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Then, we install a few dependencies without which the compilation is destined to fail:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get install libhpdf-dev libcups2-dev libcupsimage2-dev g++ cups-client&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now, we &lt;code class=&quot;highlighter-rouge&quot;&gt;cd&lt;/code&gt; into the &lt;code class=&quot;highlighter-rouge&quot;&gt;urftopdf&lt;/code&gt; folder and execute the &lt;code class=&quot;highlighter-rouge&quot;&gt;make&lt;/code&gt; command. Now, all that is left is to back up our old &lt;code class=&quot;highlighter-rouge&quot;&gt;urftopdf&lt;/code&gt; installation and replace it with the new one, which is merely two lines to enter:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;mv /usr/lib/cups/filter/urftopdf /usr/lib/cups/filter/urftopdf.old
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;cp urftopdf /usr/lib/cups/filter&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This should take effect immediately - if it doesn’t, restart CUPS using the command mentioned above, and everything should be great.&lt;/p&gt;
+
+&lt;p&gt;Installing the printers under Windows and Mac should be a breeze, iOS devices should autodiscover the devices.&lt;/p&gt;
+
+&lt;h3 id=&quot;advantages-and-drawbacks&quot;&gt;Advantages and Drawbacks&lt;/h3&gt;
+&lt;p&gt;After having deployed this solution for a while, I’ve noticed a few drawbacks, but also advantages. Printing from a Windows machine &lt;em&gt;flies&lt;/em&gt;, it is the same speed as if you would just have the printer attached to the machine directly. From Apple based devices, the CUPS server has to do some recomputations, which take a long time. When printing a page that is only 5 pages long and does not have too many complex SVG shapes, this is fine - so if your main use case is just printing out an email or an excerpt from Wikipedia. However, when printing very complex documents (e.g. a mindmap you drew on your iPad) that has a lot of small individual shapes, or a document that is very long (if you’re on a tree killing spree and print out your ebooks), you’ll have an unfeasibly long wait time.&lt;/p&gt;</content><author><name></name></author><summary type="html">Even though I’ve switched almost my whole office experience to paperless, my parents are still very much heavy users of the printer. However, with the recent diversification of even their technology, and the growing need to print from a Windows machine, a Macbook and an iPad, I knew it was necessary to find a unified way to print from all those devices. The answer proved to be a CUPS (formerly Common UNIX Printing System) server on a Raspberry Pi that I had lying around.</summary></entry></feed>
