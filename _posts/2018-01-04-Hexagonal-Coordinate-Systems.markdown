@@ -44,7 +44,16 @@ So what does this tell us? Since the \\(z\\) coordinate is merely a function of 
 
 $$d = \frac{|x|+|y|+ |-(x+y)|}{2} = \frac{|x|+|y|+ |x+y|}{2}$$
 
+If we go back to the graphical representation again (after having developed some intuition for it), we can see that this makes an extreme amount of sense. Observe how each \\(x,y\\) coordinate pair already uniquely identifies a cube on our plane. The formula for \\(z\\) also holds; again, staring intently at the cubes and axis offsets should give you an intuitive understanding to why that is (_Looking at it from the default camera perspective, you should realise that moving one cube away from the camera (into the space) always has to increment the \\(z\\) coordinate by one due to the staircase like nature of our plane; conversely, you need to decrease your \\(z\\) coordinate whenever you move towards the camera_)
+
 So, we can store all grid coordinates in only two dimensions - that's going to make building implementations a lot easier!
+
+#### A demo implementation
+In my [Advent of Code](https://github.com/SebastianAigner/advent-of-code-2017-ocaml/blob/master/day11/Day11.kt) repository, you can find two implementations for the `HexVector` interface which I decided needed to be implemented in order to solve the task given by the AoC challenge. The first version, `HexVector3`, is a quite low performance prototype that I came up with then and there in the café. It uses a process of _coordinate normalisation_ (leveraging the fact that certain pairs of distances can be fused together into other coordinates, as to always obtain the correct manhattan distance).
+
+The second version, `HexVector2`, implements the same interface using only two coordinates, while also allowing a conversion to `HexVector3`.
+
+It's coding challenge code, so it's not the most polished thing in the world, but I'm sure it'll get the point across 😁
 
 #### Further reading
 This is by no means a complete guide on how to work with hex grids, and it's obviously not supposed to be. It should merely serve as some additional material for those who enjoy interactive visualisations. Hope it helps some of you! If you want to know more about hexagonal grids, I suggest you have a look at these two resources (amongst whatever else you will find on your quest):
