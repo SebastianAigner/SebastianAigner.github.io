@@ -16,9 +16,9 @@ Coupled with the simplicity and convenience offered by Heroku's platform and dat
 
 So, grab a [free Heroku account](https://signup.heroku.com/), grab your [IntelliJ](https://www.jetbrains.com/idea/) installation and let's dive in!
 
-![final_app_screenshot](/assets/kotlin_on_heroku/final_app_screenshot.png)
-
 ![log_tail](/assets/kotlin_on_heroku/log_tail.png)
+
+![final_app_screenshot](/assets/kotlin_on_heroku/final_app_screenshot.png)
 _<center>The final app chugging along</center>_
 
 #### Mini Disclaimer
