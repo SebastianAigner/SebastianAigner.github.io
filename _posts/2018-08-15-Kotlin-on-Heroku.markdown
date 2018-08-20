@@ -378,7 +378,7 @@ So, these instructions might seem long and daunting – but: the final program i
   - Simple "Publish to GitHub" functionality
 - And of course: How we can use Heroku to deliver value quickly and with high iteration speed to customers and users.
 
-If you don't feel like walking through all the steps above yourself, the **final project** can be found on my GitHub. You can run it on Heroku by cloning it, creating the application as described in the article, and executing a `git push heroku master`.
+If you don't feel like walking through all the steps above yourself, the **[final project](https://github.com/SebastianAigner/herokuBook)** can be found on my GitHub. You can run it on Heroku by cloning it, creating the application as described in the article, and executing a `git push heroku master`.
 
 There are a lot of topics that were just mentioned in passing, and not fully expanded upon. I hope that this article was interesting enough to make you **seek out more information** about this and adjacent topics.
 
