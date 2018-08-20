@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Hexagonal Grids</title>
-  <meta name="description" content="Amidst what seems like a heavy outage on the internet (with a very spotty connection), I managed to glue together a small demo after today’s coding session t...">
+  <meta name="description" content="">
 
   <link rel="stylesheet" href="/assets/main.css">
   <link rel="canonical" href="http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems.html">
@@ -80,9 +80,9 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>Amidst what seems like a heavy outage on the internet (with a very spotty connection), I managed to glue together a small demo after today’s coding session together with Alex in the Loretta Bar here in Munich. I was infatuated with the last task we worked on, the <a href="http://adventofcode.com/2017/day/11">Day 11</a> challenge from Advent of Code 2017. I had already read a few articles regarding hexagonal grids, but none of them really made me understand the topic as well as just looking at a piece of paper (or even a napkin), scribbling around and trying to figure things out.</p>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-<p>After I had managed to build an (albeit inefficient) solution for myself, I set out to understand more about the topic. When I managed to have somewhat of a breakthrough in understanding, and felt a lot better reasoning about the topic, I decided it would be time to improve upon the visualisations that I had seen on other blogs like <a href="https://www.redblobgames.com/grids/hexagons/">Redblobgames</a>. They’re still a great read any heavily recommended, but I thought I’d try my hand at one of these as well.</p>
+<p>I was spending one of the recent days in the Loretta Bar here in Munich together with Alex, and we worked on a few tasks of the 2017 edition of Advent of Code. I was infatuated with the last task we worked on, the <a href="http://adventofcode.com/2017/day/11">Day 11</a> challenge. You are supposed to find the distance of a position in a <a href="https://en.wikipedia.org/wiki/Hexagonal_tiling">Hex Grid</a> based on a path description. I had already read a few articles regarding hexagonal grids, because I feel it is one of the less intuitive data structures, but none of them really made me understand the topic extremely well. I decided to just grab a pen and doodle away at a napkin and (later on) a few pieces of paper, scribbling around and trying to figure things out. After I had managed to build an (albeit inefficient) solution for myself, I set out to understand more about the topic. When I managed to have somewhat of a personal breakthrough in understanding, and felt a lot better reasoning about the topic, I decided it would be time to improve upon the visualisations that I had seen on other blogs like <a href="https://www.redblobgames.com/grids/hexagons/">Redblobgames</a>. They’re still a great read any heavily recommended, but I thought I’d try my hand at one of these as well. So, amidst what seems like a heavy outage on the internet (with a very spotty connection), I managed to glue together a small demo. Because we all love interactivity, I’m going to throw the demo in first, and the rest of the text later.</p>
 
 <h3 id="interactive-demo">Interactive demo</h3>
 <script src="http://localhost:4000/assets/unity_hexagons/TemplateData/UnityProgress.js"></script>
@@ -98,81 +98,55 @@
 </div>
 <p>This demo was built on one evening after being kept awake by one too many please-allow-me-to-stay-here-longer-espressos in the café. Thanks for letting us stay!</p>
 
-<p><strong>TODO: FIX RENDERING ISSUE WITH CROPPED UI</strong></p>
-
 <h3 id="on-hexagonal-grids">On Hexagonal Grids</h3>
+<p>Unlike regular grids, I’ve struggled a bit at first with understanding how I would map hexagons to arrays. I’ve since realised that you can easily map hexagons into 3 dimensions, and even two dimensions isn’t a problem. The general idea that this approach is following is cube coordinates. If you play around with the demo (and maybe switch the camera), you’ll quickly see that looked at from the right angle, a diagonal “plane” of 3d cubes looks an awful lot like a hex grid. This is what we are going to use to reason about how to distribute coordinates, measure distances, and so on.</p>
 <h4 id="coordinates-and-constraints">Coordinates (and Constraints)</h4>
-<ul>
-  <li>Important constraint: x+y+z = 0 (also defines the plane)</li>
-  <li>Play around for movement</li>
-  <li>Switch the camera around</li>
-  <li>Note that the equation x+y+z = 0 is always correct</li>
-</ul>
+<p>To make our lives a little easier, we choose the plane that satisfies the basic constraint</p>
+
+<script type="math/tex; mode=display">x + y + z = 0</script>
+
+<p>If you play around with the interactive widget up there, you’ll quickly realize that all coordinates on the plane displayed fulfill exactly that equation. It should also give you an intuitive idea what parameters should change when you perform a move in a direction.</p>
 
 <h4 id="distances">Distances</h4>
-<ul>
-  <li>3D representation allows us to easily reason about distances</li>
-  <li>You can see that to each neighbouring cube the manhattan distance is 2 -&gt; the grid distance is 1.</li>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>Formula</td>
-          <td>x</td>
-          <td>+</td>
-          <td>y</td>
-          <td>+</td>
-          <td>z</td>
-          <td>/2 = gridDist</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
-</ul>
+<p>The 3D representation allows us to easily reason about distances in the grid. You can see that to each neighbouring <em>cube</em>, the manhattan distance is 2. In the <em>hex grid</em>, the distance would be one. Check for yourself that this is correct for all neighbours of the initial \(0,0,0\) coordinate.</p>
+
+<p>Thus, we quickly arrive at a concise formula for determining distances of hexagons in the grid in relation to the origin:</p>
+
+<script type="math/tex; mode=display">d = \frac{|x|+|y|+|z|}{2}</script>
 
 <h4 id="the-obsolete-third-axis">The obsolete third axis</h4>
-<ul>
-  <li>The formula x+y+z=0 holds.</li>
-  <li>Therefore, z = -(x+y)</li>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>Works even for the distance:</td>
-          <td>x</td>
-          <td>+</td>
-          <td>y</td>
-          <td>+</td>
-          <td>-(x+y)</td>
-          <td>/ 2 = gridDist</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
-</ul>
+<p>But, we can go even further. If we can assume that the formula \(x+y+z = 0\) holds for all our cubes, can simply do some middle school maths and arrive at</p>
+
+<script type="math/tex; mode=display">z = -(x+y)</script>
+
+<p>So what does this tell us? Since the \(z\) coordinate is merely a function of \(x\) and \(y\), it does not need to be saved in memory, but can be calculated on demand (when it makes sense). This also means that our distance is only dependent on the values of \(x\) and \(y\):</p>
+
+<script type="math/tex; mode=display">d = \frac{|x|+|y|+ |-(x+y)|}{2} = \frac{|x|+|y|+ |x+y|}{2}</script>
+
+<p>If we go back to the graphical representation again (after having developed some intuition for it), we can see that this makes an extreme amount of sense. Observe how each \(x,y\) coordinate pair already uniquely identifies a cube on our plane. The formula for \(z\) also holds; again, staring intently at the cubes and axis offsets should give you an intuitive understanding to why that is (<em>Looking at it from the default camera perspective, you should realise that moving one cube away from the camera (into the space) always has to increment the \(z\) coordinate by one due to the staircase like nature of our plane; conversely, you need to decrease your \(z\) coordinate whenever you move towards the camera</em>)</p>
+
+<p>So, we can store all grid coordinates in only two dimensions - that’s going to make building implementations a lot easier!</p>
+
+<h4 id="a-demo-implementation">A demo implementation</h4>
+<p>In my <a href="https://github.com/SebastianAigner/advent-of-code-2017-ocaml/blob/master/day11/Day11.kt">Advent of Code</a> repository, you can find two implementations for the <code class="highlighter-rouge">HexVector</code> interface which I decided needed to be implemented in order to solve the task given by the AoC challenge. The first version, <code class="highlighter-rouge">HexVector3</code>, is a quite low performance prototype that I came up with then and there in the café. It uses a process of <em>coordinate normalisation</em> (leveraging the fact that certain pairs of distances can be fused together into other coordinates, as to always obtain the correct manhattan distance).</p>
+
+<p>The second version, <code class="highlighter-rouge">HexVector2</code>, implements the same interface using only two coordinates, while also allowing a conversion to <code class="highlighter-rouge">HexVector3</code>.</p>
+
+<p>It’s coding challenge code, so it’s not the most polished thing in the world, but I’m sure it’ll get the point across 😁</p>
 
 <h4 id="further-reading">Further reading</h4>
+<p>This is by no means a complete guide on how to work with hex grids, and it’s obviously not supposed to be. It should merely serve as some additional material for those who enjoy interactive visualisations. Hope it helps some of you! If you want to know more about hexagonal grids, I suggest you have a look at these two resources (amongst whatever else you will find on your quest):</p>
 <ul>
   <li><a href="https://www.redblobgames.com/grids/hexagons/">Redblobgames</a></li>
-  <li><a href="http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/">this</a></li>
-  <li>a few others, just google</li>
+  <li><a href="http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/">Keekerdc</a></li>
 </ul>
 
-<h3 id="how-this-demo-is-made">How this demo is made</h3>
-<ul>
-  <li>Unity</li>
-  <li>Boxes</li>
-  <li>Changing materials when mousing over</li>
-  <li>Drawing linerenderer in the correct positions</li>
-  <li>Switching around axes because I don’t agree with Unitys Y axis</li>
-  <li>Easter egg: my old hiwi office as backdrop</li>
-</ul>
+<h3 id="how-this-demo-is-made">How this Demo is made</h3>
+<p>I first wanted to have a non-interactive 3D model so I could just have a look at it properly (looking on crumpled papers with lines all over the place trying to indicate the third dimension got tiring after a while), so I fired up blender, which is when I had the idea that I could also use a realtime 3D game engine to visualise what I had in mind. I’d already played around with Unity a bit beforehand, and a demo world was quickly assembled. I grabbed myself a camera controller script that allows orbiting and zooming, and built a script that would highlight the cube/hex that the mouse is currently resting on. I’ve had some trouble getting the line renderer to work (which is responsible for drawing the coordinates), but after a short change in the materials setting, that worked as well. After that, I only had to figure out how to properly scale the UI, and was able to export once and for all!</p>
 
-<h3 id="challenges-in-building-the-demo">Challenges in building the demo</h3>
-<ul>
-  <li>Line renderer wouldn’t render color in WebGL export -&gt; change material</li>
-  <li>UI doesn’t properly scale on all devices (beginner’s problem in Unity)</li>
-</ul>
+<p>Unity is probably a bit overkill for the amount of things that are actually happening in the demo, but it allowed me to do some very rapid and caffeine driven prototyping. ☕</p>
+
+<p>Also, as a small easter egg: the backdrop/skybox is my old office where I worked at TUM - just if anybody is interested in that 😊.</p>
 
   </div>
 
@@ -197,7 +171,7 @@
             
             </li>
             
-            <li><a href="mailto:your-email@example.com">your-email@example.com</a></li>
+            <li><a href="mailto:[firstname] döt [lastname]@me.com">[firstname] döt [lastname]@me.com</a></li>
             
         </ul>
       </div>

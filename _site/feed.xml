@@ -1,6 +1,554 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-01-05T00:46:52+01:00</updated><id>http://localhost:4000/</id><title type="html">sebi.io</title><subtitle>This is my corner of the internet. Tech makes me happy, so I try to note down and share my adventures here. I don't have a really specific plan on where I am going with this, so I'll use it as my notepad to jot down ideas, concepts, and tutorials, so that I and others will be able to revisit them whenever they'd like.</subtitle><entry><title type="html">The Case of Ashley Williams</title><link href="http://localhost:4000/general/2018/01/05/The-Case-of-Ashley-Williams.html" rel="alternate" type="text/html" title="The Case of Ashley Williams" /><published>2018-01-05T00:46:17+01:00</published><updated>2018-01-05T00:46:17+01:00</updated><id>http://localhost:4000/general/2018/01/05/The-Case-of-Ashley-Williams</id><content type="html" xml:base="http://localhost:4000/general/2018/01/05/The-Case-of-Ashley-Williams.html">&lt;p&gt;Check out the &lt;a href=&quot;https://www.reddit.com/r/node/comments/6whs2e/multiple_coc_violations_by_nodejs_board_member/&quot;&gt;Reddit thread&lt;/a&gt; in the meantime.&lt;/p&gt;</content><author><name></name></author><summary type="html">Check out the Reddit thread in the meantime.</summary></entry><entry><title type="html">Hexagonal Grids</title><link href="http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems.html" rel="alternate" type="text/html" title="Hexagonal Grids" /><published>2018-01-04T01:23:43+01:00</published><updated>2018-01-04T01:23:43+01:00</updated><id>http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems</id><content type="html" xml:base="http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems.html">&lt;p&gt;Amidst what seems like a heavy outage on the internet (with a very spotty connection), I managed to glue together a small demo after today’s coding session together with Alex in the Loretta Bar here in Munich. I was infatuated with the last task we worked on, the &lt;a href=&quot;http://adventofcode.com/2017/day/11&quot;&gt;Day 11&lt;/a&gt; challenge from Advent of Code 2017. I had already read a few articles regarding hexagonal grids, but none of them really made me understand the topic as well as just looking at a piece of paper (or even a napkin), scribbling around and trying to figure things out.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-08-20T14:55:45+02:00</updated><id>http://localhost:4000/</id><title type="html">sebi.io</title><subtitle>This is my corner of the internet. Tech makes me happy, so I try to note down and share my adventures here. I don't have a really specific plan on where I am going with this, so I'll use it as my notepad to jot down ideas, concepts, and tutorials, so that I and others will be able to revisit them whenever they'd like.</subtitle><entry><title type="html">Kotlin, Ktor and Exposed on Heroku</title><link href="http://localhost:4000/general/2018/08/15/Kotlin-on-Heroku.html" rel="alternate" type="text/html" title="Kotlin, Ktor and Exposed on Heroku" /><published>2018-08-15T09:16:31+02:00</published><updated>2018-08-15T09:16:31+02:00</updated><id>http://localhost:4000/general/2018/08/15/Kotlin-on-Heroku</id><content type="html" xml:base="http://localhost:4000/general/2018/08/15/Kotlin-on-Heroku.html">&lt;p&gt;When developing web applications, be it at a hackathon, as a side project or as a business venture, &lt;strong&gt;&lt;em&gt;getting the application into the hands of people&lt;/em&gt;&lt;/strong&gt; and onto the web is one of the key steps for &lt;strong&gt;early success&lt;/strong&gt;.&lt;/p&gt;
 
-&lt;p&gt;After I had managed to build an (albeit inefficient) solution for myself, I set out to understand more about the topic. When I managed to have somewhat of a breakthrough in understanding, and felt a lot better reasoning about the topic, I decided it would be time to improve upon the visualisations that I had seen on other blogs like &lt;a href=&quot;https://www.redblobgames.com/grids/hexagons/&quot;&gt;Redblobgames&lt;/a&gt;. They’re still a great read any heavily recommended, but I thought I’d try my hand at one of these as well.&lt;/p&gt;
+&lt;p&gt;Today, I want to show you how you can get your &lt;strong&gt;Kotlin app&lt;/strong&gt; powered by &lt;strong&gt;Ktor&lt;/strong&gt; and &lt;strong&gt;Exposed&lt;/strong&gt; running on the Heroku PaaS in no time, &lt;strong&gt;without having to worry&lt;/strong&gt; about updating your JVM, configuring your HTTP server, operating security updates, or doing complex database maintenance tasks. And the best thing: &lt;strong&gt;It’s free&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;If you haven’t heard of &lt;strong&gt;Ktor&lt;/strong&gt; and &lt;strong&gt;Exposed&lt;/strong&gt; before, they’re a way of building server-side applications in a similar fashion as you would in, say, Python using &lt;a href=&quot;http://flask.pocoo.org/&quot;&gt;Flask&lt;/a&gt;, or Ruby using &lt;a href=&quot;http://sinatrarb.com/&quot;&gt;Sinatra&lt;/a&gt;. Ktor being powered by Kotlin however has the wonderful advantage of &lt;strong&gt;static typing&lt;/strong&gt; and &lt;strong&gt;sensible error messages&lt;/strong&gt;, and with it, some extremely &lt;strong&gt;powerful IDE integration&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Coupled with the simplicity and convenience offered by Heroku’s platform and database offerings, we get a wonderful &lt;strong&gt;synergy&lt;/strong&gt; that allows you to get &lt;strong&gt;stable and fast web applications&lt;/strong&gt; into the hands of your users quickly.&lt;/p&gt;
+
+&lt;p&gt;So, grab a &lt;a href=&quot;https://signup.heroku.com/&quot;&gt;free Heroku account&lt;/a&gt;, grab your &lt;a href=&quot;https://www.jetbrains.com/idea/&quot;&gt;IntelliJ&lt;/a&gt; installation and let’s dive in!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/final_app_screenshot.png&quot; alt=&quot;final_app_screenshot&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/log_tail.png&quot; alt=&quot;log_tail&quot; /&gt;
+&lt;em&gt;&lt;center&gt;The final app chugging along&lt;/center&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;mini-disclaimer&quot;&gt;Mini Disclaimer&lt;/h4&gt;
+
+&lt;p&gt;This is &lt;strong&gt;not&lt;/strong&gt; supposed to be &lt;strong&gt;a tutorial on&lt;/strong&gt; how to use &lt;strong&gt;Ktor or Exposed&lt;/strong&gt;, but &lt;em&gt;how to deploy your application to the cloud&lt;/em&gt;. You should be able to follow along this tutorial even if you haven’t used Ktor and Exposed before, but you are not going to walk away an expert in the two frameworks. I do hope to whet the appetite for these frameworks though, and prove to you that they’re worth having an in-depth look at.&lt;/p&gt;
+
+&lt;p&gt;I strongly encourage you to check out the &lt;strong&gt;great documentation&lt;/strong&gt; you can find for &lt;a href=&quot;http://ktor.io/&quot;&gt;Ktor&lt;/a&gt;, and familiarise yourself with the &lt;a href=&quot;https://github.com/JetBrains/Exposed/blob/master/README.md&quot;&gt;Exposed Readme&lt;/a&gt; as well as their &lt;a href=&quot;https://github.com/JetBrains/Exposed/wiki/DAO&quot;&gt;Wiki&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Also, for conciseness, imports are left out when presenting code snippets in this post. When you follow the instructions, all your problems should go away by pressing &lt;code class=&quot;highlighter-rouge&quot;&gt;⌥⏎&lt;/code&gt; (Alt-Enter) until everything has been auto-resolved by IntelliJ.&lt;/p&gt;
+
+&lt;h3 id=&quot;what-will-we-build&quot;&gt;What will we build?&lt;/h3&gt;
+
+&lt;p&gt;We will build a &lt;strong&gt;super-simple CRUD app&lt;/strong&gt;, the classic &lt;em&gt;Guestbook&lt;/em&gt; application that many a PHP developer has built for their first exercise: A simple page with an input form that allows people to submit comments that are then shown in order. This will serve as an example on how to provision an application on the Heroku platform and connect a PostgreSQL database.&lt;/p&gt;
+
+&lt;h3 id=&quot;intro-to-heroku&quot;&gt;Intro to Heroku&lt;/h3&gt;
+
+&lt;p&gt;Quick and painless deployment and provisioning have made Heroku my platform of choice when it comes to deploying applications in the cloud. Gone are the days of manually configuring &lt;code class=&quot;highlighter-rouge&quot;&gt;nginx&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;lighttpd&lt;/code&gt; and manually keeping your linux box up to date (power to those who do, but I find it a bit tedious after having gone through it for a few times.)&lt;/p&gt;
+
+&lt;p&gt;Heroku offers a &lt;a href=&quot;https://www.heroku.com/free&quot;&gt;&lt;strong&gt;free plan&lt;/strong&gt;&lt;/a&gt; to get started, which is more than enough to build your app and deploy it to the cloud – all without adding a credit card or giving up some other payment information. It does come with some &lt;a href=&quot;https://devcenter.heroku.com/articles/limits&quot;&gt;limitations&lt;/a&gt;, especially in regards to the &lt;a href=&quot;https://devcenter.heroku.com/articles/free-dyno-hours&quot;&gt;Free Dyno Hours&lt;/a&gt;. Should your application require more resources than allotted on a free account, upgrading to paid instances is still relatively inexpensive (though you’ll obviously pay a slight premium for the no-fuss PaaS in comparison to, say, a self-managed virtual server).&lt;/p&gt;
+
+&lt;p&gt;A wide variety of &lt;a href=&quot;https://elements.heroku.com/addons&quot;&gt;Add-ons&lt;/a&gt; is available on the Heroku platform that allow you to &lt;strong&gt;plug-and-play functionality&lt;/strong&gt; like OAuth, databases and analytics into your app. Many of these add-ons offer a free tier which is more than enough if you’re building an application for a small user base.&lt;/p&gt;
+
+&lt;h3 id=&quot;set-up&quot;&gt;Set up&lt;/h3&gt;
+
+&lt;h4 id=&quot;heroku-command-line-tools&quot;&gt;Heroku Command Line Tools&lt;/h4&gt;
+
+&lt;p&gt;In order to work with Heroku locally, we first install the command line tools. Follow the super quick instructions at the &lt;a href=&quot;https://devcenter.heroku.com/articles/heroku-cli#download-and-install&quot;&gt;Heroku CLI page&lt;/a&gt; to &lt;strong&gt;install the tools locally&lt;/strong&gt;. This slightly differs from operating system to operating system, but should be rather straightforward all in all.&lt;/p&gt;
+
+&lt;p&gt;Execute the &lt;code class=&quot;highlighter-rouge&quot;&gt;heroku&lt;/code&gt; command &lt;strong&gt;at least once&lt;/strong&gt; so that you get a chance to enter your credentials.&lt;/p&gt;
+
+&lt;h4 id=&quot;local-postgresql-database&quot;&gt;Local PostgreSQL Database&lt;/h4&gt;
+
+&lt;p&gt;Since we are going to be building an application that uses a PostgreSQL database, we need to run a &lt;strong&gt;development database instance&lt;/strong&gt; on our local machine. The easiest way to achieve this on macOS is to download and run &lt;a href=&quot;https://postgresapp.com/&quot;&gt;Postgres.app&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Alternative ways include using &lt;a href=&quot;https://hub.docker.com/_/postgres/&quot;&gt;Docker&lt;/a&gt; (if you are familiar with it) or the &lt;a href=&quot;https://www.postgresql.org/download/windows/&quot;&gt;Windows installers&lt;/a&gt; available on the official PostgreSQL website – though I have not tried these, so you may have to adapt things like the JDBC connection to your platform.&lt;/p&gt;
+
+&lt;p&gt;Once we have a database setup locally, we can finally start by setting up our IntelliJ for success.&lt;/p&gt;
+
+&lt;h4 id=&quot;the-project&quot;&gt;The Project&lt;/h4&gt;
+
+&lt;p&gt;The easiest way to create a new Ktor project is by using the &lt;a href=&quot;https://plugins.jetbrains.com/plugin/10823-ktor&quot;&gt;Ktor plugin for IntelliJ&lt;/a&gt;. If you haven’t yet, download and install it on your machine. Create a new project using the wizard in IntelliJ. Make sure to &lt;strong&gt;check &lt;em&gt;HTML DSL&lt;/em&gt;&lt;/strong&gt; for templating, as we will be using it later.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/new_project.png&quot; alt=&quot;new_project&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I have named my application &lt;code class=&quot;highlighter-rouge&quot;&gt;herokuBook&lt;/code&gt;. When you see this name, you know it’s referring to the project name.&lt;/p&gt;
+
+&lt;p&gt;When you finish up, check &lt;em&gt;Use auto-import&lt;/em&gt; (you can read what it does &lt;a href=&quot;https://blog.jetbrains.com/idea/2013/04/gradle-improvements-at-121/&quot;&gt;here&lt;/a&gt;). Wait for the Gradle daemon to set up your application, and launch the app by clicking the green arrow.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/run_app.png&quot; alt=&quot;run_app&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Give the application a few moments to start up and be hypnotized by the debug information scrolling by in the console window. Open your local address &lt;a href=&quot;http://0.0.0.0:8080&quot;&gt;http://0.0.0.0:8080&lt;/a&gt;, and marvel at the beauty of what you have just created 🤩:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/hello_world.png&quot; alt=&quot;hello_world&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Congratulations, we now have a Ktor web application running on our local machine. Now, it’s time to &lt;strong&gt;ascend&lt;/strong&gt; into the cloud! 🌥&lt;/p&gt;
+
+&lt;h3 id=&quot;running-ktor-in-the-cloud&quot;&gt;Running Ktor in the Cloud&lt;/h3&gt;
+
+&lt;p&gt;Heroku uses &lt;code class=&quot;highlighter-rouge&quot;&gt;git&lt;/code&gt; as its primary mechanism to deploy applications. This also means that our &lt;strong&gt;local application&lt;/strong&gt; should be &lt;strong&gt;inside a git repository&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;We can use the integrated Version Control functionality of IntelliJ to set up our git repository without ever having to leave our IDE! Simply select “VCS” – “&lt;strong&gt;Enable Version Control Integration&lt;/strong&gt;”:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/enable_vcs.png&quot; alt=&quot;enable_vcs&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can also directly &lt;strong&gt;commit&lt;/strong&gt; our current state. We first add our files and then commit using the context menu:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/commit_directory.png&quot; alt=&quot;commit_directory&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/finish_commit.png&quot; alt=&quot;finish_commit&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you’d like to learn more about how to use &lt;strong&gt;git integration in IntelliJ&lt;/strong&gt;, I suggest checking out the &lt;a href=&quot;https://www.jetbrains.com/help/idea/set-up-a-git-repository.html&quot;&gt;official documentation&lt;/a&gt;!&lt;/p&gt;
+
+&lt;p&gt;Now that our project has a git repo attached to it, we can finally &lt;strong&gt;create our Heroku application&lt;/strong&gt;. Open the built-in terminal (either by clicking &lt;em&gt;Terminal&lt;/em&gt;  in the bottom of the IDE or hitting &lt;code class=&quot;highlighter-rouge&quot;&gt;⌥F12&lt;/code&gt; on Mac) or navigate to your project folder using a terminal emulator of your choice. We execute&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;heroku create
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you have a name for your project, feel free to execute &lt;code class=&quot;highlighter-rouge&quot;&gt;heroku create yourName&lt;/code&gt; instead. Keep in mind that &lt;strong&gt;your application will be reachable&lt;/strong&gt; at &lt;code class=&quot;highlighter-rouge&quot;&gt;yourName.herokuapp.com&lt;/code&gt;, though.&lt;/p&gt;
+
+&lt;p&gt;If everything went well, you’ll see your application on your personal &lt;a href=&quot;https://dashboard.heroku.com/&quot;&gt;dashboard&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;To move your code up into the cloud, all you have to do is &lt;em&gt;push&lt;/em&gt; your local repository to &lt;em&gt;heroku&lt;/em&gt;. You can do this directly from within IntelliJ by hitting &lt;code class=&quot;highlighter-rouge&quot;&gt;⇧⌘K&lt;/code&gt;, or navigating to “VCS” – “Git” - “Push…”. (Alternatively, you can run &lt;code class=&quot;highlighter-rouge&quot;&gt;git push heroku master&lt;/code&gt; in a terminal):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/initial_push.png&quot; alt=&quot;initial_push&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;However, due to the nature Heroku handles applications, this push will be &lt;strong&gt;rejected&lt;/strong&gt;. We can see what went wrong by opening the &lt;strong&gt;Version Control Tool Window&lt;/strong&gt; via the “View” – “Tool Windows” option or by hitting &lt;code class=&quot;highlighter-rouge&quot;&gt;⌘9&lt;/code&gt;. The error message indicates a missing Gradle &lt;code class=&quot;highlighter-rouge&quot;&gt;stage&lt;/code&gt; task. If you want to learn more about it, check out the &lt;a href=&quot;https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku#overview&quot;&gt;Heroku DevCenter article&lt;/a&gt; about it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/unsuccessful_deploy.png&quot; alt=&quot;unsuccessful_deploy&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;staging-task--procfile&quot;&gt;Staging Task &amp;amp; Procfile&lt;/h4&gt;
+
+&lt;p&gt;So, we still need to make small adjustments to our application for it to run in the cloud. The &lt;strong&gt;stage task must exist&lt;/strong&gt;, which is why we add the following line to our &lt;code class=&quot;highlighter-rouge&quot;&gt;build.gradle&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-groovy highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;task&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;dependsOn:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'installDist'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Would you commit and push this change, you’d still be faced with an error. This is because Heroku doesn’t know &lt;strong&gt;what file to execute as a web process&lt;/strong&gt;. To communicate this to the platform, Heroku uses a so-called &lt;a href=&quot;https://devcenter.heroku.com/articles/procfile&quot;&gt;Procfile&lt;/a&gt;, which is pretty simple in our case.&lt;/p&gt;
+
+&lt;p&gt;Create a new file named &lt;code class=&quot;highlighter-rouge&quot;&gt;Procfile&lt;/code&gt; (and also add it to Version Control) in the root of the project and fill it with&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;web: ./build/install/herokuBook/bin/herokuBook
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This path is not chosen randomly; if you execute the &lt;code class=&quot;highlighter-rouge&quot;&gt;stage&lt;/code&gt; task by opening the Gradle Tool Window and selecting “Other” – “&lt;strong&gt;stage&lt;/strong&gt;”, you can see that this task generates a &lt;strong&gt;startup script&lt;/strong&gt; in this exact location:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/stage_script.png&quot; alt=&quot;stage_script&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, it is time for another commit and push. Back in the Version Control Console, we can see that our build was &lt;strong&gt;successfully deployed&lt;/strong&gt; ✅:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/successful_deploy.png&quot; alt=&quot;successful_deploy&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Clicking the link will bring us just about as much joy as that first &lt;strong&gt;magical&lt;/strong&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;HELLO WORLD&lt;/code&gt; &lt;strong&gt;moment&lt;/strong&gt; just five minutes ago:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/hello_cloud.png&quot; alt=&quot;hello_cloud&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This concludes the first part of this excursion into Kotlin and Ktor on Heroku. 👌🏼 Next, we will cover usage of the &lt;strong&gt;Exposed framework&lt;/strong&gt; in conjunction with &lt;strong&gt;Heroku Postgres&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;setting-up-the-exposed-sql-framework&quot;&gt;Setting up the Exposed SQL Framework&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;em&gt;Exposed&lt;/em&gt; is a prototype for a lightweight SQL library written over JDBC driver for &lt;a href=&quot;https://github.com/JetBrains/kotlin&quot;&gt;Kotlin&lt;/a&gt; language. It does have two layers of database access: typesafe SQL wrapping DSL and lightweight data access objects.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We will use the Data Access Objects (DAO) API in this example, hook it up to our local and later on remote PostgreSQL database. This way, we can easily persist data in a structured manner.&lt;/p&gt;
+
+&lt;h4 id=&quot;required-dependencies&quot;&gt;Required Dependencies&lt;/h4&gt;
+
+&lt;p&gt;In order to use Exposed with PostgreSQL, we need to add the &lt;strong&gt;Exposed repository&lt;/strong&gt;, &lt;strong&gt;Exposed&lt;/strong&gt; &lt;strong&gt;itself&lt;/strong&gt; as well as the &lt;strong&gt;PostgreSQL JDBC&lt;/strong&gt; &lt;strong&gt;driver&lt;/strong&gt;. So, in your &lt;code class=&quot;highlighter-rouge&quot;&gt;build.gradle&lt;/code&gt;, add&lt;/p&gt;
+
+&lt;div class=&quot;language-groovy highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;repositories&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;maven&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;https://dl.bintray.com/kotlin/exposed&quot;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+	&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+    
+&lt;span class=&quot;n&quot;&gt;dependencies&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'org.jetbrains.exposed:exposed:0.10.4'&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'org.postgresql:postgresql:42.2.4.jre7'&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;em&gt;Make sure you grab the &lt;strong&gt;freshest version&lt;/strong&gt; of Exposed:&lt;/em&gt; &lt;img src=&quot;https://api.bintray.com/packages/kotlin/exposed/exposed/images/download.svg&quot; alt=&quot;Download&quot; /&gt;&lt;em&gt;, and check for any updates of the JDBC driver &lt;a href=&quot;https://mvnrepository.com/artifact/org.postgresql/postgresql&quot;&gt;here&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;database-connection&quot;&gt;Database Connection&lt;/h4&gt;
+
+&lt;p&gt;For now, we will keep it simple and run on a &lt;strong&gt;single database connection&lt;/strong&gt;. This could potentially become a bottleneck once your application has hundreds of users. If you’re interested in tackling this issue, let me refer you to &lt;a href=&quot;https://github.com/JetBrains/Exposed/issues/135&quot;&gt;Connection Pooling&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;To connect to the database, we simply add the following line to the top of our &lt;code class=&quot;highlighter-rouge&quot;&gt;Application.module()&lt;/code&gt; (substituting our own username):&lt;/p&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Database&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getenv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;JDBC_DATABASE_URL&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;org.postgresql.Driver&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Configure local environment variables&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;While Heroku will eventually take care of the &lt;strong&gt;JDBC Database URL&lt;/strong&gt; in &lt;em&gt;production&lt;/em&gt;, we still have to set up the &lt;strong&gt;environment variable&lt;/strong&gt; for our local &lt;em&gt;development&lt;/em&gt; machine.&lt;/p&gt;
+
+&lt;p&gt;Select the run configuration corresponding to the &lt;code class=&quot;highlighter-rouge&quot;&gt;main&lt;/code&gt; function (not the one relating to the &lt;em&gt;stage&lt;/em&gt; task!) in the top right corner and click &lt;code class=&quot;highlighter-rouge&quot;&gt;Edit Configuration&lt;/code&gt;. Under &lt;code class=&quot;highlighter-rouge&quot;&gt;Environment Variables&lt;/code&gt;, add the following.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;JDBC_DATABASE_URL		jdbc:postgresql:sebastian?user=sebastian
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This environment variable will be set by Heroku once we deploy to production and attach their database backend.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/environment_variables.png&quot; alt=&quot;environment_variables&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;defining-our-database-model&quot;&gt;Defining our Database Model&lt;/h4&gt;
+
+&lt;p&gt;What follows is some basic code for Exposed using the &lt;a href=&quot;https://github.com/JetBrains/Exposed/wiki/DAO&quot;&gt;DAO&lt;/a&gt; API. I do not want to go to deep into detail here, but: We create a simple &lt;strong&gt;typesafe data model&lt;/strong&gt; for our guestbook entries with two columns.&lt;/p&gt;
+
+&lt;p&gt;On the top level of our &lt;code class=&quot;highlighter-rouge&quot;&gt;application.kt&lt;/code&gt; (or in a separate file, if you prefer), add:&lt;/p&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GuestbookEntries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IntIdTable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;varchar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;text&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;creation&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;creation&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GuestbookEntry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EntityID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;):&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IntEntity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;companion&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IntEntityClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GuestbookEntry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GuestbookEntries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;by&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GuestbookEntries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;creation&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;by&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GuestbookEntries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;creation&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you’d like to &lt;strong&gt;understand more&lt;/strong&gt; about how Exposed works, check out &lt;a href=&quot;https://github.com/JetBrains/Exposed/&quot;&gt;their repository&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;automatic-database-setup&quot;&gt;Automatic Database Setup&lt;/h4&gt;
+
+&lt;p&gt;When we first run the application, we want to &lt;strong&gt;make sure&lt;/strong&gt; that our database &lt;strong&gt;schema already exists&lt;/strong&gt;. We can do this by adding a simple transaction to our &lt;code class=&quot;highlighter-rouge&quot;&gt;Application.module()&lt;/code&gt; function (after the database connection has been established), which creates and fills the table with demo data:&lt;/p&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GuestbookEntries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GuestbookEntry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;GuestbookEntry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Thank you for stopping by!&quot;&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;creation&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DateTime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+		&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When running the application now, it’ll be hard to spot a difference with all the debug info flowing by in the console. However, a keen eye can now spot entries such as the one below, indicating that our &lt;strong&gt;connection and transaction were successful&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;34&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;19&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;064&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DEBUG&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Exposed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;SELECT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;COUNT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;guestbookentries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;guestbookentries&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;inspecting-the-schema&quot;&gt;Inspecting the Schema&lt;/h4&gt;
+
+&lt;p&gt;We can check that our database schema has actually been generated correctly by having a look at our local PostgreSQL database. And here’s the craziest thing: &lt;strong&gt;We don’t even have to leave IntelliJ to do that.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Database Tools are an IntelliJ IDEA Ultimate feature. If you’re a student, check out &lt;a href=&quot;https://www.jetbrains.com/student/&quot;&gt;jetbrains.com/student&lt;/a&gt; and grab a free Ultimate license! 👨🏻‍🎓&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Let’s wire up the local Postgres database. To do this, open the “Database” Tool Window by clicking “View” – “Tool Windows” – “&lt;strong&gt;Database&lt;/strong&gt;”. Select the context menu option to add a &lt;strong&gt;PostgreSQL database&lt;/strong&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/add_database.png&quot; alt=&quot;add_database&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you haven’t used this functionality before, IntelliJ might prompt you to &lt;strong&gt;download missing driver files&lt;/strong&gt;, which only takes a single click. Directly plug in the &lt;strong&gt;JDBC connection URL&lt;/strong&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;jdbc:postgresql:sebastian?user=sebastian&lt;/code&gt; and hit &lt;code class=&quot;highlighter-rouge&quot;&gt;Test Connection&lt;/code&gt; before closing the window with an &lt;code class=&quot;highlighter-rouge&quot;&gt;OK&lt;/code&gt; press. Fold open the hierarchy on the right-hand side until you strike gold, and double click!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/database_inspection.png&quot; alt=&quot;database_inspection&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, we have successfully &lt;strong&gt;defined and autogenerated the SQL schema&lt;/strong&gt; from a &lt;strong&gt;class definition in Kotlin&lt;/strong&gt;. You can from now on use the Data Sources tab to check what your application is doing inside your database 🕵🏻‍♂️&lt;/p&gt;
+
+&lt;h3 id=&quot;making-the-app-interactive&quot;&gt;Making the App Interactive&lt;/h3&gt;
+
+&lt;p&gt;Before we move our database functionality to the cloud, instead of just rendering a plain &lt;code class=&quot;highlighter-rouge&quot;&gt;HELLO WORLD&lt;/code&gt; text, let’s actually plug in the functionality that allows users to &lt;strong&gt;submit a new guest book entry&lt;/strong&gt;. We also want to  &lt;strong&gt;show the existing guest book entries&lt;/strong&gt; from the database.&lt;/p&gt;
+
+&lt;p&gt;We use &lt;strong&gt;Typesafe HTML Builders&lt;/strong&gt; provided by &lt;a href=&quot;https://github.com/Kotlin/kotlinx.html&quot;&gt;kotlinx.html&lt;/a&gt; to construct our little more complex HTML response. This topic is a bit too large to explain in passing, but the format of the code snippets should be clear enough to read and understand what’s going on.&lt;/p&gt;
+
+&lt;p&gt;These Typesafe HTML Builders ensure that only properties that are actually valid in their context can be used in our Markup – essentially giving us &lt;strong&gt;all the benefits of a statically typed language for HTML&lt;/strong&gt;. Note that it is the typesafety of our HTML templates that &lt;strong&gt;immediately prevent XSS attacks&lt;/strong&gt; on our application, as every string is &lt;strong&gt;automatically escaped&lt;/strong&gt; instead of being interpreted as HTML.&lt;/p&gt;
+
+&lt;p&gt;For more reasoning about why an HTML &lt;strong&gt;DSL in Kotlin&lt;/strong&gt; makes sense, check out two minutes of &lt;a href=&quot;https://youtu.be/gPH9XnvpoXE?t=4m6s&quot;&gt;this talk&lt;/a&gt; by Eugene Petrenko, and read the article on &lt;a href=&quot;https://kotlinlang.org/docs/reference/type-safe-builders.html&quot;&gt;Type-Safe Builders&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Within &lt;code class=&quot;highlighter-rouge&quot;&gt;application.kt&lt;/code&gt;, &lt;strong&gt;replace&lt;/strong&gt; the existing &lt;code class=&quot;highlighter-rouge&quot;&gt;routing { ... } &lt;/code&gt; block with the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;routing&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;kd&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;entries&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GuestbookEntry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;all&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;respondHtml&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+					&lt;span class=&quot;n&quot;&gt;form&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FormEncType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;multipartFormData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FormMethod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+					&lt;span class=&quot;n&quot;&gt;acceptCharset&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;
+					&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+						&lt;span class=&quot;n&quot;&gt;label&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Add a new entry!&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+						&lt;span class=&quot;n&quot;&gt;textInput&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;entry&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+					&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+					&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+						&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InputType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;submit&lt;/span&gt;
+					&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+				&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+				&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+				&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+					&lt;span class=&quot;p&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;At ${i.creation}: ${i.text}&quot;&lt;/span&gt;
+				&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+			&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+		&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;kd&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;multipart&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;receiveMultipart&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+		&lt;span class=&quot;kd&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;formItems&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;multipart&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readAllParts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filterIsInstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PartData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FormItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;()&lt;/span&gt;
+		&lt;span class=&quot;kd&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;myMap&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;formItems&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;it&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;myMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;entry&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;?.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;-&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+				&lt;span class=&quot;n&quot;&gt;GuestbookEntries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;insert&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+					&lt;span class=&quot;n&quot;&gt;it&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ent&lt;/span&gt;
+					&lt;span class=&quot;n&quot;&gt;it&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;creation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DateTime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+				&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+			&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+		&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;respondRedirect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Take a moment to ponder the code above before moving on.&lt;/p&gt;
+
+&lt;p&gt;Since we encode the form using &lt;code class=&quot;highlighter-rouge&quot;&gt;multipart&lt;/code&gt;, its handling looks a bit odd when you see it the first time. If you would like to learn more about it, check out the &lt;a href=&quot;http://ktor.io/samples/post.html&quot;&gt;forms example&lt;/a&gt; on the Ktor homepage.&lt;/p&gt;
+
+&lt;p&gt;To make the typesafe HTML DSL more readable for those folks who haven’t gotten in touch with it yet, this is the analogous code that the final site renders:&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;form&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;action=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;enctype=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;multipart/form-data&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;method=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;post&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;accept-charset=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;p&amp;gt;&amp;lt;label&amp;gt;&lt;/span&gt;Add a new entry!&lt;span class=&quot;nt&quot;&gt;&amp;lt;/label&amp;gt;&amp;lt;input&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;text&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;entry&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;input&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;submit&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/form&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;p&amp;gt;&lt;/span&gt;At 2018-08-15T00:00:00.000Z: Thank you for stopping by!&lt;span class=&quot;nt&quot;&gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;p&amp;gt;&lt;/span&gt;At 2018-08-15T00:00:00.000Z: Welcome to my page!&lt;span class=&quot;nt&quot;&gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/final_app_screenshot.png&quot; alt=&quot;final_app_screenshot&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Besides the lack of angle brackets, it becomes obvious pretty quickly that one of them was generated by the other.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;working-with-heroku-postgres&quot;&gt;Working with Heroku Postgres&lt;/h3&gt;
+
+&lt;p&gt;Now, let’s make our application work with Heroku Postgres.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.heroku.com/postgres&quot;&gt;Heroku Postgres&lt;/a&gt; is an easy way to &lt;strong&gt;attach a database to your application running on Heroku&lt;/strong&gt;. The free tier does come with some &lt;a href=&quot;https://elements.heroku.com/addons/heroku-postgresql#pricing&quot;&gt;limitations&lt;/a&gt;, most notably a &lt;strong&gt;maximum of 10’000 rows&lt;/strong&gt; within the database. For your average hackathon project or private experiment, ten thousand rows should probably still be enough – unless you’re scraping all of &lt;a href=&quot;https://old.reddit.com/r/CatsInSinks/top/?sort=top&amp;amp;t=all&quot;&gt;Reddit’s cat pictures&lt;/a&gt;. If you’re willing to spend $9/mo, you can up yourself to the &lt;em&gt;Hobby Basic&lt;/em&gt; tier and store up to 10 million rows – and I’d argue that’s enough feline imagery.&lt;/p&gt;
+
+&lt;p&gt;Getting the database to play nice with our application only requires &lt;strong&gt;a few clicks&lt;/strong&gt; on the &lt;a href=&quot;https://dashboard.heroku.com/apps&quot;&gt;dashboard&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;provisioning--connecting-to-the-database&quot;&gt;Provisioning &amp;amp; Connecting to the Database&lt;/h4&gt;
+
+&lt;p&gt;Select your application in the dashboard, and click on “Configure Add-ons” in the left column. In the bottom search bar, type and select &lt;code class=&quot;highlighter-rouge&quot;&gt;Heroku Postgres&lt;/code&gt;. Keep the selection at &lt;code class=&quot;highlighter-rouge&quot;&gt;Hobby Dev – Free&lt;/code&gt; for now and hit the big &lt;strong&gt;&lt;em&gt;Provision&lt;/em&gt; button&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/provision_db.png&quot; alt=&quot;provision_db&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;And boom, you’re done!&lt;/strong&gt; Thanks to us not hardcoding the JDBC connection, but instead using environment variables, our application needs no further setup – and thanks to Exposed, the SQL schema is automatically set up on deployment! 🚀🎉&lt;/p&gt;
+
+&lt;h3 id=&quot;bonus-using-github-for-automatic-deployments-&quot;&gt;Bonus: Using GitHub for Automatic Deployments 🤖&lt;/h3&gt;
+
+&lt;p&gt;When you are &lt;strong&gt;working in a team&lt;/strong&gt;, you usually wouldn’t host your repository on your local machine. Instead, you would use a service like &lt;strong&gt;GitHub&lt;/strong&gt; where the efforts of the team can flow together.&lt;/p&gt;
+
+&lt;p&gt;Awesomely enough, we can use &lt;strong&gt;GitHub in conjunction with Heroku&lt;/strong&gt; to automate our deployments even when &lt;strong&gt;multiple people&lt;/strong&gt; are working on the project!&lt;/p&gt;
+
+&lt;p&gt;If you’ve followed along so far and would like to make the conversion to &lt;strong&gt;GitHub&lt;/strong&gt;, the &lt;strong&gt;integration in IntelliJ&lt;/strong&gt; will make this a breeze. Simply select “VCS” – “Import into Version Control” – “&lt;strong&gt;Share Project on GitHub&lt;/strong&gt;”. Authenticate yourself against the GitHub platform and create the new repository as prompted in the dialogue. If you’re not ready to share your repository with the public yet, make sure to tick &lt;em&gt;Private&lt;/em&gt; in the settings.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;If you didn’t know yet, you can grab &lt;strong&gt;free private repositories&lt;/strong&gt; and much more by getting &lt;a href=&quot;https://education.github.com/pack&quot;&gt;GitHub Education&lt;/a&gt;!&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kotlin_on_heroku/share_on_github.png&quot; alt=&quot;share_on_github&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, all that is left is to tell Heroku that upon a &lt;strong&gt;new commit&lt;/strong&gt; to the &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; branch, the application should be &lt;strong&gt;redeployed&lt;/strong&gt; with the new version. You can do this by navigating to the “Deploy” tab for your application in the dashboard, and switching from &lt;em&gt;Heroku Git&lt;/em&gt; to &lt;em&gt;GitHub&lt;/em&gt;. If you have few GitHub repositories, pressing Enter when searching for a repo name will show you all your repositories.&lt;/p&gt;
+
+&lt;p&gt;Click “Connect” for the correct repository. You can now perform a manual deploy, or &lt;strong&gt;enable automatic deploys&lt;/strong&gt; whenever a new commit lands on the &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; branch or a branch of your choice.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;Important!&lt;/strong&gt; As the Heroku page suggests: “be sure that this branch is always in a deployable state and any tests have passed before you push.”&lt;/p&gt;
+
+  &lt;p&gt;Now would be a great time to introduce and adhere to a &lt;strong&gt;proper branching model&lt;/strong&gt; such as &lt;a href=&quot;https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow&quot;&gt;Git Flow&lt;/a&gt; – or a &lt;a href=&quot;https://medium.com/goodtogoat/simplified-git-flow-5dc37ba76ea8&quot;&gt;simplified version&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;So, these instructions might seem long and daunting – but: the final program is &lt;strong&gt;less than 100 lines of code, though&lt;/strong&gt;. Throughout this crash course, we’ve seen:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;How to setup Ktor and Exposed locally&lt;/li&gt;
+  &lt;li&gt;How to configure the JDBC connection using environment variables so that they can get used by Heroku&lt;/li&gt;
+  &lt;li&gt;How we can use type-safe builders to declare HTML while reaping the benefits of static typing&lt;/li&gt;
+  &lt;li&gt;How IntelliJ provides:
+    &lt;ul&gt;
+      &lt;li&gt;Graphical integration with databases&lt;/li&gt;
+      &lt;li&gt;Graphical integration with git&lt;/li&gt;
+      &lt;li&gt;Simple “Publish to GitHub” functionality&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;And of course: How we can use Heroku to deliver value quickly and with high iteration speed to customers and users.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If you don’t feel like walking through all the steps above yourself, the &lt;strong&gt;final project&lt;/strong&gt; can be found on my GitHub. You can run it on Heroku by cloning it, creating the application as described in the article, and executing a &lt;code class=&quot;highlighter-rouge&quot;&gt;git push heroku master&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;There are a lot of topics that were just mentioned in passing, and not fully expanded upon. I hope that this article was interesting enough to make you &lt;strong&gt;seek out more information&lt;/strong&gt; about this and adjacent topics.&lt;/p&gt;
+
+&lt;h3 id=&quot;nano-cheat-sheet&quot;&gt;Nano Cheat Sheet&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Run &lt;code class=&quot;highlighter-rouge&quot;&gt;heroku create&lt;/code&gt; on your local git repo containing your Ktor app&lt;/li&gt;
+  &lt;li&gt;Add staging task: &lt;code class=&quot;highlighter-rouge&quot;&gt;task stage(dependsOn: ['installDist'])&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Add procfile: &lt;code class=&quot;highlighter-rouge&quot;&gt;web ./build/install/ktorio/bin/ktorio&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Use &lt;code class=&quot;highlighter-rouge&quot;&gt;System.getenv(&quot;JDBC_DATABASE_URL&quot;)&lt;/code&gt; in order to connect to Postgres database.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;questions-comments-hit-me-up&quot;&gt;Questions? Comments? Hit me up!&lt;/h3&gt;
+
+&lt;p&gt;Whoa, what a long article. There’s a good chance you’re not leaving here without a &lt;strong&gt;few questions&lt;/strong&gt;. While I of course encourage you to &lt;strong&gt;go out and explore&lt;/strong&gt;, if you have any questions regarding my article, or would like to just have a chat, please feel free to &lt;strong&gt;shoot me a Tweet&lt;/strong&gt; &lt;a href=&quot;https://twitter.com/TrueSebi&quot;&gt;@TrueSebi&lt;/a&gt; or &lt;strong&gt;contact me via email&lt;/strong&gt;. Cheers! 🙌🏼&lt;/p&gt;</content><author><name></name></author><summary type="html">When developing web applications, be it at a hackathon, as a side project or as a business venture, getting the application into the hands of people and onto the web is one of the key steps for early success.</summary></entry><entry><title type="html">Developing for Raspberry Pi using IntelliJ Deployment</title><link href="http://localhost:4000/general/2018/08/13/Developing-for-Raspberry-Pi.html" rel="alternate" type="text/html" title="Developing for Raspberry Pi using IntelliJ Deployment" /><published>2018-08-13T16:17:02+02:00</published><updated>2018-08-13T16:17:02+02:00</updated><id>http://localhost:4000/general/2018/08/13/Developing%20for%20Raspberry%20Pi</id><content type="html" xml:base="http://localhost:4000/general/2018/08/13/Developing-for-Raspberry-Pi.html">&lt;p&gt;So a few days ago I published the &lt;a href=&quot;https://github.com/SebastianAigner/Thermal-Kotlin&quot;&gt;Thermal-Kotlin&lt;/a&gt; library which allows use of thermal printers in conjunction with a Raspberry Pi. That library and the way I developed it will get its own article soon, but I wanted to pick out one part that was particularily interesting for me: &lt;strong&gt;Automatic Deployment using IntelliJ&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;When prototyping the library, I had to run it on the Raspberry Pi often, in order to figure out the exact workings of the protocol used by the printer and even try out timings that wouldn’t prevent the printer’s buffer from overflowing. At first I tried running IntelliJ on the Raspberry Pi to little success (unfortuantely the Pi isn’t nearly beefy enough to run a fully fledged IDE at a comfortable speed), but I didn’t want to miss out on all the great autocompletion and refactoring features that I have become so used to in IntelliJ.&lt;/p&gt;
+
+&lt;p&gt;So, I searched for a way to &lt;strong&gt;write code on my Macbook, and execute it on the Raspberry Pi&lt;/strong&gt;. I quickly found that the &lt;em&gt;Deployment&lt;/em&gt; functionality in IntelliJ IDEA Ultimate is the ideal way to achieve this.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Remote Deployment is an IntelliJ IDEA Ultimate feature. If you’re a student, check out &lt;a href=&quot;https://www.jetbrains.com/student/&quot;&gt;jetbrains.com/student&lt;/a&gt; and grab a free Ultimate license! 👨🏻‍🎓&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We will be using &lt;em&gt;Kotlin&lt;/em&gt; and &lt;em&gt;Gradle&lt;/em&gt; for the project. With a few adjustments, it should be no problem to get a similar setup with a different language of your choice!&lt;/p&gt;
+
+&lt;p&gt;I have used the Raspbian installation that comes with the NOOBS SD card. If you have a different operating system, some of the commands illustrated might differ slightly.&lt;/p&gt;
+
+&lt;p&gt;For the example, we will create a simple &lt;code class=&quot;highlighter-rouge&quot;&gt;Hello Pi&lt;/code&gt; application that we will &lt;strong&gt;write completely on our workstation&lt;/strong&gt;, and &lt;strong&gt;automatically deploy to our Raspberry Pi&lt;/strong&gt; whenever we change code. &lt;strong&gt;This way, our test cycles become shorter and we can increase our productivity.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;setting-up-the-kotlingradle-project-for-easy-execution&quot;&gt;Setting up the Kotlin/Gradle Project for Easy Execution&lt;/h3&gt;
+
+&lt;p&gt;In order to make our lives a bit easier down the line, we create our project using &lt;em&gt;Gradle&lt;/em&gt;. This means that we will be able to use the Gradle wrapper &lt;code class=&quot;highlighter-rouge&quot;&gt;gradlew&lt;/code&gt; which will make life on the Pi easier for us. Since Kotlin is my favorite JVM language, I will also set it up accordingly.&lt;/p&gt;
+
+&lt;p&gt;We create the project as usual, giving it a &lt;code class=&quot;highlighter-rouge&quot;&gt;GroupId&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;ArtifactId&lt;/code&gt; that is to our liking.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/project_creation.png&quot; alt=&quot;project_creation&quot; /&gt;As soon as you click finish, Gradle will start downloading all your dependencies.&lt;/p&gt;
+
+&lt;p&gt;Since our example doesn’t focus on any application logic, but rather the configuration, we can simply create a small &lt;code class=&quot;highlighter-rouge&quot;&gt;Hello.kt&lt;/code&gt; script in the &lt;code class=&quot;highlighter-rouge&quot;&gt;src/main/kotlin&lt;/code&gt; directory so graciously provided by our IntelliJ.&lt;/p&gt;
+
+&lt;p&gt;Typing &lt;code class=&quot;highlighter-rouge&quot;&gt;psvm&lt;/code&gt; (a handy shortcut for generating the &lt;code class=&quot;highlighter-rouge&quot;&gt;public static void main&lt;/code&gt; from Java or its Kotlin equivalent &lt;code class=&quot;highlighter-rouge&quot;&gt;fun main&lt;/code&gt;) and filling out the blanks with little creativity leaves us with:&lt;/p&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fun&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Hello Pi!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;…and that already concludes the coding part of the tutorial! 😉&lt;/p&gt;
+
+&lt;p&gt;We also want to tell Gradle that our &lt;code class=&quot;highlighter-rouge&quot;&gt;main&lt;/code&gt; method should be called when we execute the &lt;code class=&quot;highlighter-rouge&quot;&gt;run&lt;/code&gt; task in gradle. Thankfully, Gradle provides a plugin called &lt;code class=&quot;highlighter-rouge&quot;&gt;application&lt;/code&gt; which makes this super easy. So, add to your &lt;code class=&quot;highlighter-rouge&quot;&gt;build.gradle&lt;/code&gt; file the following snippet:&lt;/p&gt;
+
+&lt;div class=&quot;language-groovy highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;apply&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;plugin:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'application'&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mainClassName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'HelloKt'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This tells Gradle that the &lt;code class=&quot;highlighter-rouge&quot;&gt;run&lt;/code&gt; task executes the application by invoking the main method from the (&lt;a href=&quot;https://kotlinlang.org/docs/reference/java-to-kotlin-interop.html#package-level-functions&quot;&gt;auto-generated&lt;/a&gt;) &lt;code class=&quot;highlighter-rouge&quot;&gt;HelloKt&lt;/code&gt; class stemming from the equally named &lt;code class=&quot;highlighter-rouge&quot;&gt;.kt&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;p&gt;Now that our project is ready to be run via Gradle, let’s configure our IDE so that whenever a change is made to the local code, this change is automatically transferred to the device we actually would like to run it on, i.e. the Raspberry Pi.&lt;/p&gt;
+
+&lt;h3 id=&quot;setting-up-automatic-deployment&quot;&gt;Setting up Automatic Deployment&lt;/h3&gt;
+
+&lt;p&gt;Now that we have our local project set up and ready to go, it’s time for us to configure IntelliJ so that changes to the files will be automatically synchronized with the files on the Raspberry Pi.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;It is important to check that you can connect via SSH to your Raspberry Pi, as otherwise none of the steps below will work. If you’re not sure about how to set up SSH, consult the &lt;a href=&quot;https://www.raspberrypi.org/documentation/remote-access/ssh/&quot;&gt;official tutorials&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In order to automatically deploy to the Raspberry Pi, we set up a &lt;em&gt;Deployment Configuration&lt;/em&gt; by selecting the corresponding menu item in the &lt;code class=&quot;highlighter-rouge&quot;&gt;Tools&lt;/code&gt; bar.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/tools_deployment_configuration.png&quot; alt=&quot;tools_deployment_configuration&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We click the &lt;code class=&quot;highlighter-rouge&quot;&gt;+&lt;/code&gt; icon to generate a new configuration, give it an apt and ideally punny name, and choose &lt;code class=&quot;highlighter-rouge&quot;&gt;SFTP&lt;/code&gt; as type:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/add_server.png&quot; alt=&quot;add_server&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Set up the config as you would expect. You can set up a root path either by typing out what you want the path to be (though it should already exist on the target system), or click on the triple-dots (ideally after filling out the authenticiation section).&lt;/p&gt;
+
+&lt;p&gt;Before continuing the configuration for the mappings, hit the ‘Test SFTP connection’ to make sure that stuff works well. Unless you’re working with an actual webapp, you can ignore the &lt;em&gt;Web Server Root URL&lt;/em&gt; part for now.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/deployment_config.png&quot; alt=&quot;deployment_config&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you have validated that your connection works fine, we can move on to the &lt;em&gt;Mappings&lt;/em&gt; tab.&lt;/p&gt;
+
+&lt;p&gt;Now, due to the way the application is structured, we need three mappings. IntelliJ is rather helpful after filling out the most straightforward mapping:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/Deployment_Mapping.png&quot; alt=&quot;Deployment_Mapping&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Press the little &lt;em&gt;Fix&lt;/em&gt; button on the bottom to auto-generate the unmapped configurations, and fill them out in the most straightforward way imaginable:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/content_root_mapping.png&quot; alt=&quot;content_root_mapping&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you’ve filled everything in correctly, you shouldn’t see any warnings at the bottom of the page. And hey, that’s actually the biggest part of the configuration done!&lt;/p&gt;
+
+&lt;p&gt;Hit ‘OK’ and take a moment to celebrate your achievement.&lt;/p&gt;
+
+&lt;h3 id=&quot;testing-deployment&quot;&gt;Testing Deployment&lt;/h3&gt;
+
+&lt;p&gt;We can try out the magic we have just set up by right clicking the root of our project in the explorer and choosing &lt;em&gt;Deployment/Upload to…&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/upload_to_berry.png&quot; alt=&quot;upload_to_berry&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If everything has been done right, the in-application console will happily acknowledge success:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[13/08/2018, 17:21] Upload to Himbeere
+[13/08/2018, 17:21] Upload to Himbeere completed in less than a minute: 15 files transferred (232.8 kbit/s)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In case of an error (such as when the path you specified does not exist), we might be greeted with an error message like the one below.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[13/08/2018, 17:20] Upload to Himbeere
+[13/08/2018, 17:20] Upload to Himbeere failed: could not change to work directory &quot;/home/pi/Desktop/exampleProject&quot;. (No such file)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Changing the path or creating the path on the remote machine fixes this problem.&lt;/p&gt;
+
+&lt;h3 id=&quot;automating-deployment&quot;&gt;Automating Deployment&lt;/h3&gt;
+
+&lt;p&gt;Before we actually execute our application for the first time on the remote host, let’s spare our right mouse button some hard work by automating the upload functionality. Navigate to the &lt;em&gt;Options&lt;/em&gt; menu for the &lt;em&gt;Deployment&lt;/em&gt; functionality:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/deployment_options.png&quot; alt=&quot;deployment_options&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Feel free to adjust all of these options to your liking. We are especially looking at &lt;em&gt;Upload changed files automatically to the default server&lt;/em&gt; right now. Either choose &lt;em&gt;Always&lt;/em&gt; or &lt;em&gt;On explicit save action&lt;/em&gt; depending on your preference:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/upload_changed_files.png&quot; alt=&quot;upload_changed_files&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hit the OK button to save your settings, perform a save action or change some code and watch IntelliJ automatically upload the changes.&lt;/p&gt;
+
+&lt;h3 id=&quot;running-on-raspberry-pi&quot;&gt;Running on Raspberry Pi&lt;/h3&gt;
+
+&lt;p&gt;Now let’s get our application actually running on the Raspberry Pi. To do this, we go through a few quick steps in a terminal emulator of our choice.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Connect to the Raspberry Pi using SSH: &lt;code class=&quot;highlighter-rouge&quot;&gt;ssh pi@himbeere&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Navigate to your project folder: &lt;code class=&quot;highlighter-rouge&quot;&gt;cd ~/Desktop/exampleProject&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;List the output of the folder: &lt;code class=&quot;highlighter-rouge&quot;&gt;ls&lt;/code&gt; – you should be presented with the same files you see in IntelliJ on your development machine&lt;/li&gt;
+  &lt;li&gt;Alllow &lt;code class=&quot;highlighter-rouge&quot;&gt;gradlew&lt;/code&gt; to be an executable: &lt;code class=&quot;highlighter-rouge&quot;&gt;chmod +x ./gradlew&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Execute our application: &lt;code class=&quot;highlighter-rouge&quot;&gt;./gradlew run&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The first startup can take a while, as &lt;code class=&quot;highlighter-rouge&quot;&gt;gradlew&lt;/code&gt; downloads a gradle distribution and starts up a gradle daemon. Apart from a lot of download bars scrolling by, you should be greeted by your application running successfully!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/remote_dev/run_application.png&quot; alt=&quot;run_application&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;We have seen that IntelliJ IDEA Ultimate’s Deployment functionality is a great way to keep a project that you develop locally in sync with a (maybe less powered) host system that is connected via network. It serves as a useful tool when access to the other machine is cumbersome, or outright impossible (in the case of server, for example).&lt;/p&gt;
+
+&lt;p&gt;I hope that you’re now well equipped to use the Deployment functionality in your next project!&lt;/p&gt;</content><author><name></name></author><summary type="html">So a few days ago I published the Thermal-Kotlin library which allows use of thermal printers in conjunction with a Raspberry Pi. That library and the way I developed it will get its own article soon, but I wanted to pick out one part that was particularily interesting for me: Automatic Deployment using IntelliJ.</summary></entry><entry><title type="html">Fixing PAGE_FAULT_IN_NONPAGED_AREA after Windows 10 Creators Update</title><link href="http://localhost:4000/general/2018/07/16/How-to-Fix-PAGE_FAULT_IN_NONPAGED_AREA.html" rel="alternate" type="text/html" title="Fixing PAGE_FAULT_IN_NONPAGED_AREA after Windows 10 Creators Update" /><published>2018-07-16T21:26:55+02:00</published><updated>2018-07-16T21:26:55+02:00</updated><id>http://localhost:4000/general/2018/07/16/How-to-Fix-PAGE_FAULT_IN_NONPAGED_AREA</id><content type="html" xml:base="http://localhost:4000/general/2018/07/16/How-to-Fix-PAGE_FAULT_IN_NONPAGED_AREA.html">&lt;p&gt;After the last unsolicited update from Microsoft, the Creators Update for 2018, instead of a seamless upgrade, I was greeted by&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;PAGE_FAULT_IN_NONPAGED AREA. Cause of Error: SbieDrv.Sys&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;This was combined with Windows frantically trying to restart multiple times, trying to roll back the changes it had made, all to no avail. As I was sitting in front of the computer, beeping with every restart, I started researching on my phone in order to take matters into my own hands.&lt;/p&gt;
+
+&lt;h3 id=&quot;sbiedrvsys&quot;&gt;SbieDrv.sys&lt;/h3&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Sandboxie is a sandbox-based program that provides an isolated environment for applications to run. SbieDrv.sys is a kernel-mode driver that belongs to the Sandboxie program. This is not an essential Windows process and can be disabled if known to create problems.
+– file.net&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;So, I had found the culprit! However, Windows on its own, with all its self-repair measures, couldn’t quite figure out that not loading the problematic kernel driver for once might be a good idea.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-oldest-fix-in-the-book&quot;&gt;The oldest fix in the book&lt;/h3&gt;
+&lt;p&gt;After Windows gave up on another iteration of the self-fix marathon, it presented me with the restoration options. Here’s what I did to get my machine back up running.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Click on “Advanced Options” until you see an option to open up the Command Prompt. Execute it.&lt;/li&gt;
+  &lt;li&gt;You will find that the default drive that is mounted is &lt;code class=&quot;highlighter-rouge&quot;&gt;X:/Windows&lt;/code&gt;. Since this is kind of a “live” system running from RAM, the drive lettering is going to be different.&lt;/li&gt;
+  &lt;li&gt;Type &lt;code class=&quot;highlighter-rouge&quot;&gt;C:&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;D:&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;...&lt;/code&gt; until you find the drive that actually has your Windows installation (or more importantly, your &lt;code class=&quot;highlighter-rouge&quot;&gt;Program Files&lt;/code&gt; folder on it). Type &lt;code class=&quot;highlighter-rouge&quot;&gt;dir&lt;/code&gt; to see contents of the drive.&lt;/li&gt;
+  &lt;li&gt;Once you know which one is your drive, navigate to &lt;code class=&quot;highlighter-rouge&quot;&gt;:/Program Files/Sandboxie/&lt;/code&gt; and locate &lt;code class=&quot;highlighter-rouge&quot;&gt;SbieDrv.sys&lt;/code&gt;. Use &lt;code class=&quot;highlighter-rouge&quot;&gt;ren SbieDrv.sys SbieDrv.sys.bad&lt;/code&gt; to rename the problematic driver.&lt;/li&gt;
+  &lt;li&gt;Restart your machine. It will now boot up properly.&lt;/li&gt;
+  &lt;li&gt;Uninstall the Sandboxie version you have currently running. If you are an active user of Sandboxie, consider installing a new version afterwards.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">After the last unsolicited update from Microsoft, the Creators Update for 2018, instead of a seamless upgrade, I was greeted by</summary></entry><entry><title type="html">Hexagonal Grids</title><link href="http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems.html" rel="alternate" type="text/html" title="Hexagonal Grids" /><published>2018-01-04T01:23:43+01:00</published><updated>2018-01-04T01:23:43+01:00</updated><id>http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems</id><content type="html" xml:base="http://localhost:4000/general/2018/01/04/Hexagonal-Coordinate-Systems.html">&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;I was spending one of the recent days in the Loretta Bar here in Munich together with Alex, and we worked on a few tasks of the 2017 edition of Advent of Code. I was infatuated with the last task we worked on, the &lt;a href=&quot;http://adventofcode.com/2017/day/11&quot;&gt;Day 11&lt;/a&gt; challenge. You are supposed to find the distance of a position in a &lt;a href=&quot;https://en.wikipedia.org/wiki/Hexagonal_tiling&quot;&gt;Hex Grid&lt;/a&gt; based on a path description. I had already read a few articles regarding hexagonal grids, because I feel it is one of the less intuitive data structures, but none of them really made me understand the topic extremely well. I decided to just grab a pen and doodle away at a napkin and (later on) a few pieces of paper, scribbling around and trying to figure things out. After I had managed to build an (albeit inefficient) solution for myself, I set out to understand more about the topic. When I managed to have somewhat of a personal breakthrough in understanding, and felt a lot better reasoning about the topic, I decided it would be time to improve upon the visualisations that I had seen on other blogs like &lt;a href=&quot;https://www.redblobgames.com/grids/hexagons/&quot;&gt;Redblobgames&lt;/a&gt;. They’re still a great read any heavily recommended, but I thought I’d try my hand at one of these as well. So, amidst what seems like a heavy outage on the internet (with a very spotty connection), I managed to glue together a small demo. Because we all love interactivity, I’m going to throw the demo in first, and the rest of the text later.&lt;/p&gt;
 
 &lt;h3 id=&quot;interactive-demo&quot;&gt;Interactive demo&lt;/h3&gt;
 &lt;script src=&quot;http://localhost:4000/assets/unity_hexagons/TemplateData/UnityProgress.js&quot;&gt;&lt;/script&gt;
@@ -16,106 +564,55 @@
 &lt;/div&gt;
 &lt;p&gt;This demo was built on one evening after being kept awake by one too many please-allow-me-to-stay-here-longer-espressos in the café. Thanks for letting us stay!&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;TODO: FIX RENDERING ISSUE WITH CROPPED UI&lt;/strong&gt;&lt;/p&gt;
-
 &lt;h3 id=&quot;on-hexagonal-grids&quot;&gt;On Hexagonal Grids&lt;/h3&gt;
+&lt;p&gt;Unlike regular grids, I’ve struggled a bit at first with understanding how I would map hexagons to arrays. I’ve since realised that you can easily map hexagons into 3 dimensions, and even two dimensions isn’t a problem. The general idea that this approach is following is cube coordinates. If you play around with the demo (and maybe switch the camera), you’ll quickly see that looked at from the right angle, a diagonal “plane” of 3d cubes looks an awful lot like a hex grid. This is what we are going to use to reason about how to distribute coordinates, measure distances, and so on.&lt;/p&gt;
 &lt;h4 id=&quot;coordinates-and-constraints&quot;&gt;Coordinates (and Constraints)&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Important constraint: x+y+z = 0 (also defines the plane)&lt;/li&gt;
-  &lt;li&gt;Play around for movement&lt;/li&gt;
-  &lt;li&gt;Switch the camera around&lt;/li&gt;
-  &lt;li&gt;Note that the equation x+y+z = 0 is always correct&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;To make our lives a little easier, we choose the plane that satisfies the basic constraint&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x + y + z = 0&lt;/script&gt;
+
+&lt;p&gt;If you play around with the interactive widget up there, you’ll quickly realize that all coordinates on the plane displayed fulfill exactly that equation. It should also give you an intuitive idea what parameters should change when you perform a move in a direction.&lt;/p&gt;
 
 &lt;h4 id=&quot;distances&quot;&gt;Distances&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;3D representation allows us to easily reason about distances&lt;/li&gt;
-  &lt;li&gt;You can see that to each neighbouring cube the manhattan distance is 2 -&amp;gt; the grid distance is 1.&lt;/li&gt;
-  &lt;li&gt;
-    &lt;table&gt;
-      &lt;tbody&gt;
-        &lt;tr&gt;
-          &lt;td&gt;Formula&lt;/td&gt;
-          &lt;td&gt;x&lt;/td&gt;
-          &lt;td&gt;+&lt;/td&gt;
-          &lt;td&gt;y&lt;/td&gt;
-          &lt;td&gt;+&lt;/td&gt;
-          &lt;td&gt;z&lt;/td&gt;
-          &lt;td&gt;/2 = gridDist&lt;/td&gt;
-        &lt;/tr&gt;
-      &lt;/tbody&gt;
-    &lt;/table&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;The 3D representation allows us to easily reason about distances in the grid. You can see that to each neighbouring &lt;em&gt;cube&lt;/em&gt;, the manhattan distance is 2. In the &lt;em&gt;hex grid&lt;/em&gt;, the distance would be one. Check for yourself that this is correct for all neighbours of the initial \(0,0,0\) coordinate.&lt;/p&gt;
+
+&lt;p&gt;Thus, we quickly arrive at a concise formula for determining distances of hexagons in the grid in relation to the origin:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;d = \frac{|x|+|y|+|z|}{2}&lt;/script&gt;
 
 &lt;h4 id=&quot;the-obsolete-third-axis&quot;&gt;The obsolete third axis&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;The formula x+y+z=0 holds.&lt;/li&gt;
-  &lt;li&gt;Therefore, z = -(x+y)&lt;/li&gt;
-  &lt;li&gt;
-    &lt;table&gt;
-      &lt;tbody&gt;
-        &lt;tr&gt;
-          &lt;td&gt;Works even for the distance:&lt;/td&gt;
-          &lt;td&gt;x&lt;/td&gt;
-          &lt;td&gt;+&lt;/td&gt;
-          &lt;td&gt;y&lt;/td&gt;
-          &lt;td&gt;+&lt;/td&gt;
-          &lt;td&gt;-(x+y)&lt;/td&gt;
-          &lt;td&gt;/ 2 = gridDist&lt;/td&gt;
-        &lt;/tr&gt;
-      &lt;/tbody&gt;
-    &lt;/table&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;But, we can go even further. If we can assume that the formula \(x+y+z = 0\) holds for all our cubes, can simply do some middle school maths and arrive at&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;z = -(x+y)&lt;/script&gt;
+
+&lt;p&gt;So what does this tell us? Since the \(z\) coordinate is merely a function of \(x\) and \(y\), it does not need to be saved in memory, but can be calculated on demand (when it makes sense). This also means that our distance is only dependent on the values of \(x\) and \(y\):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;d = \frac{|x|+|y|+ |-(x+y)|}{2} = \frac{|x|+|y|+ |x+y|}{2}&lt;/script&gt;
+
+&lt;p&gt;If we go back to the graphical representation again (after having developed some intuition for it), we can see that this makes an extreme amount of sense. Observe how each \(x,y\) coordinate pair already uniquely identifies a cube on our plane. The formula for \(z\) also holds; again, staring intently at the cubes and axis offsets should give you an intuitive understanding to why that is (&lt;em&gt;Looking at it from the default camera perspective, you should realise that moving one cube away from the camera (into the space) always has to increment the \(z\) coordinate by one due to the staircase like nature of our plane; conversely, you need to decrease your \(z\) coordinate whenever you move towards the camera&lt;/em&gt;)&lt;/p&gt;
+
+&lt;p&gt;So, we can store all grid coordinates in only two dimensions - that’s going to make building implementations a lot easier!&lt;/p&gt;
+
+&lt;h4 id=&quot;a-demo-implementation&quot;&gt;A demo implementation&lt;/h4&gt;
+&lt;p&gt;In my &lt;a href=&quot;https://github.com/SebastianAigner/advent-of-code-2017-ocaml/blob/master/day11/Day11.kt&quot;&gt;Advent of Code&lt;/a&gt; repository, you can find two implementations for the &lt;code class=&quot;highlighter-rouge&quot;&gt;HexVector&lt;/code&gt; interface which I decided needed to be implemented in order to solve the task given by the AoC challenge. The first version, &lt;code class=&quot;highlighter-rouge&quot;&gt;HexVector3&lt;/code&gt;, is a quite low performance prototype that I came up with then and there in the café. It uses a process of &lt;em&gt;coordinate normalisation&lt;/em&gt; (leveraging the fact that certain pairs of distances can be fused together into other coordinates, as to always obtain the correct manhattan distance).&lt;/p&gt;
+
+&lt;p&gt;The second version, &lt;code class=&quot;highlighter-rouge&quot;&gt;HexVector2&lt;/code&gt;, implements the same interface using only two coordinates, while also allowing a conversion to &lt;code class=&quot;highlighter-rouge&quot;&gt;HexVector3&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;It’s coding challenge code, so it’s not the most polished thing in the world, but I’m sure it’ll get the point across 😁&lt;/p&gt;
 
 &lt;h4 id=&quot;further-reading&quot;&gt;Further reading&lt;/h4&gt;
+&lt;p&gt;This is by no means a complete guide on how to work with hex grids, and it’s obviously not supposed to be. It should merely serve as some additional material for those who enjoy interactive visualisations. Hope it helps some of you! If you want to know more about hexagonal grids, I suggest you have a look at these two resources (amongst whatever else you will find on your quest):&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.redblobgames.com/grids/hexagons/&quot;&gt;Redblobgames&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/&quot;&gt;this&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;a few others, just google&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/&quot;&gt;Keekerdc&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&quot;how-this-demo-is-made&quot;&gt;How this demo is made&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Unity&lt;/li&gt;
-  &lt;li&gt;Boxes&lt;/li&gt;
-  &lt;li&gt;Changing materials when mousing over&lt;/li&gt;
-  &lt;li&gt;Drawing linerenderer in the correct positions&lt;/li&gt;
-  &lt;li&gt;Switching around axes because I don’t agree with Unitys Y axis&lt;/li&gt;
-  &lt;li&gt;Easter egg: my old hiwi office as backdrop&lt;/li&gt;
-&lt;/ul&gt;
+&lt;h3 id=&quot;how-this-demo-is-made&quot;&gt;How this Demo is made&lt;/h3&gt;
+&lt;p&gt;I first wanted to have a non-interactive 3D model so I could just have a look at it properly (looking on crumpled papers with lines all over the place trying to indicate the third dimension got tiring after a while), so I fired up blender, which is when I had the idea that I could also use a realtime 3D game engine to visualise what I had in mind. I’d already played around with Unity a bit beforehand, and a demo world was quickly assembled. I grabbed myself a camera controller script that allows orbiting and zooming, and built a script that would highlight the cube/hex that the mouse is currently resting on. I’ve had some trouble getting the line renderer to work (which is responsible for drawing the coordinates), but after a short change in the materials setting, that worked as well. After that, I only had to figure out how to properly scale the UI, and was able to export once and for all!&lt;/p&gt;
 
-&lt;h3 id=&quot;challenges-in-building-the-demo&quot;&gt;Challenges in building the demo&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Line renderer wouldn’t render color in WebGL export -&amp;gt; change material&lt;/li&gt;
-  &lt;li&gt;UI doesn’t properly scale on all devices (beginner’s problem in Unity)&lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><summary type="html">Amidst what seems like a heavy outage on the internet (with a very spotty connection), I managed to glue together a small demo after today’s coding session together with Alex in the Loretta Bar here in Munich. I was infatuated with the last task we worked on, the Day 11 challenge from Advent of Code 2017. I had already read a few articles regarding hexagonal grids, but none of them really made me understand the topic as well as just looking at a piece of paper (or even a napkin), scribbling around and trying to figure things out.</summary></entry><entry><title type="html">An Evening of Munchkin</title><link href="http://localhost:4000/general/journal/2018/01/03/An-Evening-of-Munchkin.html" rel="alternate" type="text/html" title="An Evening of Munchkin" /><published>2018-01-03T00:09:40+01:00</published><updated>2018-01-03T00:09:40+01:00</updated><id>http://localhost:4000/general/journal/2018/01/03/An-Evening-of-Munchkin</id><content type="html" xml:base="http://localhost:4000/general/journal/2018/01/03/An-Evening-of-Munchkin.html">&lt;p&gt;When Samuel first introduced me to Munchkin (even on an abstract level, just in conversation), I was taken aback by the seeming complexity of the game.&lt;/p&gt;
+&lt;p&gt;Unity is probably a bit overkill for the amount of things that are actually happening in the demo, but it allowed me to do some very rapid and caffeine driven prototyping. ☕&lt;/p&gt;
 
-&lt;h3 id=&quot;what-is-munchkin&quot;&gt;What is Munchkin?&lt;/h3&gt;
-&lt;p&gt;Munchkin is a card game where you try to reach level 10 before anyone else does, by fighting monsters. But, you don’t only fight the monsters, other players can also influence the outcome of each individual spat by buffing the monsters or helping out the players. It becomes a crazy game of alliances, mind games, raging moments of unfairness and imbalance, and wonderful fun. If you’re interested, I suggest you check out the &lt;a href=&quot;https://en.wikipedia.org/wiki/Munchkin_(card_game)&quot;&gt;Wikipedia article&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;this-evening&quot;&gt;This evening&lt;/h3&gt;
-&lt;p&gt;So, after doing the &lt;a href=&quot;http://yearcompass.com&quot;&gt;YearCompass&lt;/a&gt; for 2018, and a failed electronics experiment due to a malfunctioning Raspberry Pi, I talked to Samuel, he complained about his new microphone, and we got a round of people going to play a round of Munchkin. What none of us knew at this point is that the round would take &lt;em&gt;four hours&lt;/em&gt;, with an extremely intense endgame. I was very lucky to come out on top, only enabled by my brother in arms Peter who promptly decided it was more important that &lt;em&gt;the other’s don’t win&lt;/em&gt;. With his support, I was buffed to a level where even the combined forces of four other players couldn’t defeat me anymore - though in all fairness, they already shot their bolts in the previous rounds, as did we all. It was a tough fight, people threw curses and monsters at each other left and right - probably one of the most memorable moments was Olly, a new guy I met just days before playing Uno on Tabletop Simulator, being defeated by a monster that took away virtually all his goods, and Gilbert playing a card to apply the same effects to Samuel; in a late game like ours, this was devastating.&lt;/p&gt;
-
-&lt;p&gt;It was extremely fun, and after the dust settled, I noticed my hot ears (from having headphones on throughout the whole intense session), a general sense of tiredness, but pride. I decided to go out for a 45 minute walk through the cold winter night. To be honest, I don’t really know where my in-ear headphones are right now, but instead of searching for them I decided I should just take a break from all the media bashing into my head, and just enjoy the calm gloom. So I did. It was a great evening, extremely enjoyable.&lt;/p&gt;
-
-&lt;h3 id=&quot;a-side-note-the-name-munchkin&quot;&gt;A Side Note: The name “Munchkin”&lt;/h3&gt;
-&lt;p&gt;Samuel told me about this, because I didn’t really spend too much time thinking about the name, but it actually comes from other Tabletop Roleplaying Games:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;In gaming, a munchkin is a player who plays what is intended to be a non-competitive game (usually a role-playing game) in an aggressively competitive manner. A munchkin seeks within the context of the game to amass the greatest power, score the most “kills”, and grab the most loot, no matter how detrimental their actions are to role-playing, the storyline, fairness, teamwork, or the other players’ enjoyment. The term is used almost exclusively as a pejorative and frequently is used in reference to powergamers.
-(Thanks, Wikipedia)&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Suddenly, the whole setting, and the humorous cards all made a whole lot more sense to me.&lt;/p&gt;</content><author><name></name></author><summary type="html">When Samuel first introduced me to Munchkin (even on an abstract level, just in conversation), I was taken aback by the seeming complexity of the game.</summary></entry><entry><title type="html">The Dab Machine</title><link href="http://localhost:4000/general/2018/01/01/The-Dab-Machine.html" rel="alternate" type="text/html" title="The Dab Machine" /><published>2018-01-01T23:30:18+01:00</published><updated>2018-01-01T23:30:18+01:00</updated><id>http://localhost:4000/general/2018/01/01/The-Dab-Machine</id><content type="html" xml:base="http://localhost:4000/general/2018/01/01/The-Dab-Machine.html">&lt;p&gt;So I thought of something really stupid yesterday, I came across the &lt;a href=&quot;https://youtu.be/IcUq2PemRkU?t=1m35s&quot;&gt;Dab on them haters.exe&lt;/a&gt; video (timestamped for your convenience), and to be fair, I’ve found the whole dabbing meme quite funny in general. Which is why this would make…&lt;/p&gt;
-
-&lt;h3 id=&quot;a-great-electronics-project&quot;&gt;A Great Electronics Project&lt;/h3&gt;
-&lt;p&gt;Using two accelerometers (or, even easier, &lt;a href=&quot;https://www.adafruit.com/product/173&quot;&gt;tilt ball switches&lt;/a&gt;) attached to your arms, and a communication with a microcontroller sitting somewhere on your body, a cheap loudspeaker (powered by some kind of battery) on your back (or wherever else mounting is comfortable) fires out an as loud as possible low-frequency bass sound. Make sure the tilt ball switches are somehow attached to the sleeves and trigger in an about 30 degree upwards position.&lt;/p&gt;
-
-&lt;p&gt;And there you have it, whenever you dab, you make the appropriate bass boosted sound.&lt;/p&gt;
-
-&lt;p&gt;Am I going to build this? Probably not (though it feels like one of those inventions that could kickstart a &lt;a href=&quot;https://www.youtube.com/watch?v=Q8zC3-ZQFJI&quot;&gt;YouTube career&lt;/a&gt;…) - but it’s stupid enough to write down.&lt;/p&gt;</content><author><name></name></author><summary type="html">So I thought of something really stupid yesterday, I came across the Dab on them haters.exe video (timestamped for your convenience), and to be fair, I’ve found the whole dabbing meme quite funny in general. Which is why this would make…</summary></entry><entry><title type="html">Getting my 120Hz Monitor to work with MacOS High Sierra</title><link href="http://localhost:4000/general/2018/01/01/Getting-my-120Hz-Monitor-to-work-with-MacOS-High-Sierra.html" rel="alternate" type="text/html" title="Getting my 120Hz Monitor to work with MacOS High Sierra" /><published>2018-01-01T23:05:38+01:00</published><updated>2018-01-01T23:05:38+01:00</updated><id>http://localhost:4000/general/2018/01/01/Getting-my-120Hz-Monitor-to-work-with-MacOS-High-Sierra</id><content type="html" xml:base="http://localhost:4000/general/2018/01/01/Getting-my-120Hz-Monitor-to-work-with-MacOS-High-Sierra.html">&lt;p&gt;Today I discovered that by using &lt;a href=&quot;http://www.madrau.com&quot;&gt;SwitchResX&lt;/a&gt;, I am able to set my display’s framerate up to 120Hz. (Even though my display should support it, the option for 144Hz makes the display flicker like crazy). I also toyed around a little with the available HiDPI options and even defined my own after I thought the text was maybe a little hard to read (following the instructions by &lt;a href=&quot;https://medium.com/@ivan.ha/how-to-mimic-a-2k-monitor-as-retina-display-in-macos-sierra-using-hidpi-f53d87630c48&quot;&gt;Ivan&lt;/a&gt;) - However, using a 1920x1080 HiDPI resolution bloated the text up to a point where I felt the user interface lost some of its crisp. So I decided to roll back to defaults on this front.&lt;/p&gt;</content><author><name></name></author><summary type="html">Today I discovered that by using SwitchResX, I am able to set my display’s framerate up to 120Hz. (Even though my display should support it, the option for 144Hz makes the display flicker like crazy). I also toyed around a little with the available HiDPI options and even defined my own after I thought the text was maybe a little hard to read (following the instructions by Ivan) - However, using a 1920x1080 HiDPI resolution bloated the text up to a point where I felt the user interface lost some of its crisp. So I decided to roll back to defaults on this front.</summary></entry><entry><title type="html">Making my Fire HD 10 a YouTube machine</title><link href="http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine.html" rel="alternate" type="text/html" title="Making my Fire HD 10 a YouTube machine" /><published>2017-12-30T22:53:34+01:00</published><updated>2017-12-30T22:53:34+01:00</updated><id>http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine</id><content type="html" xml:base="http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine.html">&lt;p&gt;T’was the night of the 24th of december, I was sitting together with my family at my grandparent’s house and celebrated Christmas - and the &lt;a href=&quot;https://en.wikipedia.org/wiki/Christkind&quot;&gt;Christkind&lt;/a&gt; blessed me with a Fire HD 10 Tablet, freshly made by Amazon (or whoever manufactures these things). It should serve as a replacement device for my Sony Xperia Tablet Z which unfortunately had an unplanned rendezvous with the floor.&lt;/p&gt;
+&lt;p&gt;Also, as a small easter egg: the backdrop/skybox is my old office where I worked at TUM - just if anybody is interested in that 😊.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Making my Fire HD 10 a YouTube machine</title><link href="http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine.html" rel="alternate" type="text/html" title="Making my Fire HD 10 a YouTube machine" /><published>2017-12-30T22:53:34+01:00</published><updated>2017-12-30T22:53:34+01:00</updated><id>http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine</id><content type="html" xml:base="http://localhost:4000/general/2017/12/30/Making-my-Kindle-HD-10-a-YouTube-machine.html">&lt;p&gt;T’was the night of the 24th of december, I was sitting together with my family at my grandparent’s house and celebrated Christmas - and the &lt;a href=&quot;https://en.wikipedia.org/wiki/Christkind&quot;&gt;Christkind&lt;/a&gt; blessed me with a Fire HD 10 Tablet, freshly made by Amazon (or whoever manufactures these things). It should serve as a replacement device for my Sony Xperia Tablet Z which unfortunately had an unplanned rendezvous with the floor.&lt;/p&gt;
 
 &lt;p&gt;So I set out to make this thing my classic YouTube watching machine that I was used to before. Which is when I encountered…&lt;/p&gt;
 
@@ -145,109 +642,7 @@
 
 &lt;p&gt;&lt;strong&gt;When installing, make sure not to skip over the installation instructions, and install &lt;a href=&quot;http://www.mediafire.com/file/cn1b36jhjubgqhq/microG_for_YouTube_Vanced_0.2.4.apk&quot;&gt;microG&lt;/a&gt;!&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;The only thing left was to install &lt;a href=&quot;https://play.google.com/store/apps/details?id=eu.chainfire.lumen&amp;amp;hl=en&quot;&gt;CF.lumen&lt;/a&gt; for some warm tone colors. Even though it claims it needs some special accessibility options, it’ll work just fine out of the box. However, the actual custom driver requires &lt;em&gt;root&lt;/em&gt; - which is the one thing I haven’t gotten on my Fire HD 10 yet. Still holding out though!&lt;/p&gt;</content><author><name></name></author><summary type="html">T’was the night of the 24th of december, I was sitting together with my family at my grandparent’s house and celebrated Christmas - and the Christkind blessed me with a Fire HD 10 Tablet, freshly made by Amazon (or whoever manufactures these things). It should serve as a replacement device for my Sony Xperia Tablet Z which unfortunately had an unplanned rendezvous with the floor.</summary></entry><entry><title type="html">urlboi - My Bookmark Manager</title><link href="http://localhost:4000/general/2017/12/20/urlboi-My-Bookmark-Manager.html" rel="alternate" type="text/html" title="urlboi - My Bookmark Manager" /><published>2017-12-20T23:00:37+01:00</published><updated>2017-12-20T23:00:37+01:00</updated><id>http://localhost:4000/general/2017/12/20/urlboi---My-Bookmark-Manager</id><content type="html" xml:base="http://localhost:4000/general/2017/12/20/urlboi-My-Bookmark-Manager.html">&lt;p&gt;Hallelujah, a new pet project has spawned! I’ve been wanting to do this for a while, but this will be the first official document regarding &lt;strong&gt;urlboi&lt;/strong&gt; (pronounced &lt;em&gt;earl-boy&lt;/em&gt;). Alternative title &lt;strong&gt;URL Grey&lt;/strong&gt; (I don’t think this needs a note on how to pronounce).&lt;/p&gt;
-
-&lt;p&gt;Since this is supposed to be a real project, I thought it best to write down some of the basics before blindly jumping into the coding.&lt;/p&gt;</content><author><name></name></author><summary type="html">Hallelujah, a new pet project has spawned! I’ve been wanting to do this for a while, but this will be the first official document regarding urlboi (pronounced earl-boy). Alternative title URL Grey (I don’t think this needs a note on how to pronounce).</summary></entry><entry><title type="html">Why the way I consume the Internet is a problem</title><link href="http://localhost:4000/general/2017/12/20/Why-the-way-I-consume-the-Internet-is-a-problem.html" rel="alternate" type="text/html" title="Why the way I consume the Internet is a problem" /><published>2017-12-20T20:39:49+01:00</published><updated>2017-12-20T20:39:49+01:00</updated><id>http://localhost:4000/general/2017/12/20/Why-the-way-I-consume-the-Internet-is-a-problem</id><content type="html" xml:base="http://localhost:4000/general/2017/12/20/Why-the-way-I-consume-the-Internet-is-a-problem.html">&lt;p&gt;I’ve realised that I’ve been falling for something that I’d like to call a bit of an anti-pattern when it comes to how I consume the internet right now. A vicious cycle of endless refreshing, mindless browsing, with no clear goal, or productivity in mind. Let me elaborate on this for a bit. I’m just gonna note down how a typical day looks like in the matter of internet consumption.&lt;/p&gt;
-
-&lt;h2 id=&quot;a-daily-routine&quot;&gt;A Daily Routine&lt;/h2&gt;
-&lt;h3 id=&quot;morning&quot;&gt;Morning&lt;/h3&gt;
-&lt;p&gt;Even before standing up, the first thing is checking my messages, seeing what I missed during those &lt;em&gt;busy&lt;/em&gt; eight to twelve hours that I was gone from the surface of the ever-pulsating planet. This usually begins with me opening up whatever app has a red notification bubble; which is usually a nonempty subset of {Telegram, WhatsApp, Mail, iMessage, KakaoTalk}. Then, I open up my mobile browser, and navigate to a randomised sequence of Reddit (my regular frontpage), ProgrammingCircleJerk, Hacker News, and Twitter - not necessarily in this order. This can take me more than 20 minutes (…time that could’ve been wasted snoozing or actually getting the day started). I walk over to the bathroom, phone in hand, shove a toothbrush in my face, all while reading more comments (not to confuse with &lt;em&gt;articles&lt;/em&gt;) on Reddit and HN).&lt;/p&gt;
-
-&lt;h3 id=&quot;during-the-day&quot;&gt;During the Day&lt;/h3&gt;
-&lt;p&gt;&lt;em&gt;When in university&lt;/em&gt;, I usually use my bathroom breaks to check up on what I feel are the easiest distractions, again HN and Reddit comments jump to the help for a quick endorphin boost while keeping my mind off the thing that I was probably actually working at - where a step back and taking a different angle might have actually helped. Notably, even when I just arrived with the car, I’m still a bit sleepy, it’s cold out, it’s easy to snap the phone out of the holder in the car and just browse one, maybe two comment sections on Reddit, or quickly pull-to-refresh on Twitter.&lt;/p&gt;
-
-&lt;p&gt;Depending on whether the lecturer can actually keep my attention (hint: that can be very hard when you’re missing the &lt;a href=&quot;https://en.wikipedia.org/wiki/Flow_(psychology)&quot;&gt;flow&lt;/a&gt; on either side), it is easy to swipe to the side on an iPad Pro and quickly drift off into the cozy arms of people talking about cats or net neutrality, where the issues are black and white and I don’t have to remember jack shit.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;If I stay at home&lt;/em&gt;, it gets particularly bad: I usually set out to do some kind of task, but start by very cozily (read: lazily) making myself some breakfast. And breakfast at home means I get to watch a YouTube video, right? Yeah, and then I might end up clicking on a “dank memery” playlist (not linked here for a good reason, otherwise I’d probably have to kiss an hour or two goodbye just by reading this article…), and I waste a lot of time on that. And thanks to the brain being on autopilot, now it just suddenly feels a lot harder to actually get going with whatever I set out to rather than to just maybe refresh the YouTube front page again (&lt;em&gt;I mean, I didn’t spend all the time training the YouTube recommendation algorithm for nothing, right?&lt;/em&gt;), and see, maybe it’s going to recommend to me another video from the &lt;a href=&quot;https://youtu.be/fRj34o4hN4I?t=17s&quot;&gt;Boston Dynamics&lt;/a&gt; guys? I can be happy if I get maybe two, or three hours of actual work done - funnily enough it’s often not as stressful as it feels - when you compare it with watching videos about robots doing backflips, that is.&lt;/p&gt;
-
-&lt;h3 id=&quot;in-the-afternoon&quot;&gt;In the Afternoon&lt;/h3&gt;
-&lt;p&gt;Coming home from uni (or just being at home), it’s almost a reflex that once I switch from my “work machine”, the macbook, to my “free time machine”, the beast of a tower PC I got sitting in my room, I immediately open a few tabs of YouTube, HN, and Reddit. If I’ve been in university, it’s easy to say that “I’ve been working all day” (That may or may not be true, see the paragraph above), so I’ve “earned a break”. However, recently I’ve made the observations that these &lt;em&gt;breaks&lt;/em&gt; sometimes expand to fill all the time until I feel too tired to actually start work again (…but some YouTube would be fine though). Which brings me to…&lt;/p&gt;
-
-&lt;h3 id=&quot;at-night&quot;&gt;At Night&lt;/h3&gt;
-&lt;p&gt;So, during the day, I usually have this (very underwhelming) fantasy of living those two lives, of being the good student through the day, getting all my work out the way, and then being the &lt;em&gt;rockstar software engineer&lt;/em&gt; (what a stupid term, but that warrants its own article &lt;em&gt;someday&lt;/em&gt;™) at night times, building my own cool projects, everything that I’ve been dreaming of (surprisingly realistic dreams for the most part, if I can just get myself to actually building the thing). This would double benefit me, as I would make a lot of use of my time during the day, and spend whatever energy is left in the evening on my own projects. However, in the moment, YouTube, watching something really mindless because &lt;em&gt;this day was particularly hard&lt;/em&gt; and &lt;em&gt;tomorrow’s another day&lt;/em&gt; is a mentality that I’ve caught myself using as an excuse more frequently recently, and it worries me. When a new show comes out on Netflix, I often binge watch it, sometimes even with the half-screwed logic that I’m not going to get anything done until I’ve seen all of it anyways, because I’d just procrastinate until I could watch the show again (that’s some magic ass backwards logic right there, but it’s apparently enough to convince myself, so hey)&lt;/p&gt;
-
-&lt;h2 id=&quot;analysing-the-problem&quot;&gt;Analysing the problem&lt;/h2&gt;
-&lt;p&gt;While I am not a huge fan of TED Talks (they are usually very wishy-washy motivational stuff or people telling you things so generic you could never apply them, but I digress), one talk that has always stuck with me was &lt;a href=&quot;https://www.youtube.com/watch?v=Lp7E973zozc&quot;&gt;this talk&lt;/a&gt;.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;You’re never going to feel like it. Ever. […] Scientists call it activation energy.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;I’ve also come across another &lt;a href=&quot;https://www.ted.com/talks/manoush_zomorodi_how_boredom_can_lead_to_your_most_brilliant_ideas#t-107031&quot;&gt;TED talk&lt;/a&gt; which talks about how we have great ideas when we perform the most mundane tasks - as long as our brains has some leftover capacity (i.e. we’re bored).&lt;/p&gt;
-
-&lt;p&gt;Reintroducing boredom in my life seems like something important. Everyone is always stressing out around me, and I feel that in a way distracting myself is a way of just shoving all the problems away, disregarding them, and in return achieving nothing - not my personal goals, not my academic goals (I am talking on a small scale here; say, finish a homework problem early).&lt;/p&gt;
-
-&lt;h3 id=&quot;content-consumption-hell&quot;&gt;Content consumption hell&lt;/h3&gt;
-
-&lt;p&gt;It’s &lt;em&gt;incredibly easy&lt;/em&gt; to get somewhat high quality entertainment content wherever you are at any time. It’s easy to text people all the time. There’s just no end to it!&lt;/p&gt;
-
-&lt;h3 id=&quot;on-escapism-and-being-grounded-in-the-real-world&quot;&gt;On escapism and being grounded in the real world&lt;/h3&gt;
-&lt;p&gt;Did I already mention that I am like, super into watching Netflix? I’ve completely transcended movies and moved on to series (in an exaggerated fashion: &lt;em&gt;why would I spend all the time and energy on getting to know some characters only to have them interact maybe two hours on screen?&lt;/em&gt; - the mileage in series seems way better here), which once again is a huge time sink, but makes for some great conversation stuff, and is a great filler for whenever you have the slightest feeling of “I don’t know what to do with this time” (a feeling that I should start embracing, see above).&lt;/p&gt;
-
-&lt;h2 id=&quot;how-to-fix-this&quot;&gt;How to fix this?&lt;/h2&gt;
-&lt;p&gt;Gee, I am really asking myself the &lt;em&gt;difficult and obvious&lt;/em&gt; questions here, aren’t I.&lt;/p&gt;
-
-&lt;h3 id=&quot;recalling-an-old-experiment&quot;&gt;Recalling an old experiment&lt;/h3&gt;
-&lt;p&gt;At some point I channeled enough willpower to actually achieve at least parts of what an ideal time would look like. I used a &lt;a href=&quot;https://www.youtube.com/watch?v=hbkZrOU1Zag&quot;&gt;motivational alarm clock&lt;/a&gt;, which cut down my standing up time from 20 to three minutes. In the summers, I used to shower cold for extra focus and increased circulation. I’ve done my fair share of watching my calories, eating healthy, and focusing at work. However, it’s always been hard combining multiple of these things at the same time - a few of them at a time are usually not so hard, but combining all of them often leaves me with the problem that while I feel like I’m on the right track, I don’t get things done and use that to (behind my own back) procrastinate once more - just this time in the morning instead of in the afternoon.&lt;/p&gt;
-
-&lt;p&gt;However, what I realised is that it is easier for me to actually be productive for my day job (university) when I do it during the day, not during the afternoon or in the evening. It’s fine to extend longer tasks far into the night, but if I don’t get started in the mornings, on some days it feels like I might have just not started at all - it’s demotivating for me to see that it’s already so late, that the thing I set out to do during the day isn’t going to be done any time before the day is more that 80% done - which is unnecessarily disheartening.&lt;/p&gt;
-
-&lt;h3 id=&quot;formulating-a-new-experiment&quot;&gt;Formulating a new experiment&lt;/h3&gt;
-&lt;p&gt;With christmas coming up, self-control is probably going to be at an all time low: It’s dark outside, it’s cozy under the blankets, hot beverages are available en masse, creating a cozy (and lazy) atmosphere wherever they are up for sale. Long shirts and sweaters make it all to easy to recline into some soft pillows on a chair and just, y’know, &lt;em&gt;chill&lt;/em&gt;. But, I still pledge to do my best to uphold a few new standards that should make it easier on myself to maximise the quality of the next few weeks. In this case, &lt;em&gt;quality&lt;/em&gt; refers to multiple things:&lt;/p&gt;
-
-&lt;h3 id=&quot;goals-for-the-new-strategy&quot;&gt;Goals for the new strategy&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Family Commitments&lt;/strong&gt;: Having a nice Christmas with my family, not being in a stressed out position, seeing things for what they are&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Work&lt;/strong&gt;: Properly preparing myself for the upcoming exams. Dedicating a significant chunk of my &lt;em&gt;good&lt;/em&gt; wake time to further my academic career. This is going to be one of the main goals to achieve, but also, in turn, probably one of the hardest ones.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Motivation&lt;/strong&gt;: While sounding a bit fluffy, when trying to do a medium-term &lt;em&gt;strategy&lt;/em&gt; (as compared to a short-term &lt;em&gt;tactic&lt;/em&gt;), it is important that I can keep motivation on a high level. This facilitates me being able to stay on track with my goals and not burning out (i.e. overthrowing my self-imposed regime)&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Fun&lt;/strong&gt;: Not only because it’s the holidays, it’s an important secondary factor to &lt;em&gt;motivation&lt;/em&gt;. I think it is almost self-explanatory that the more &lt;em&gt;enjoyable&lt;/em&gt; I can make the time for myself, the better it will be. This also means deliberately making room for own projects and the things that I enjoy.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Health&lt;/strong&gt;: Overworking, overeating, and too little sleep are all great short-term ways of &lt;em&gt;getting a thing done&lt;/em&gt;, but always come at the expense of the next day, week, or month. The strategy has to focus on creating a sustainable healthy lifestyle, which I plan to introduce as evolutionary changes.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Social&lt;/strong&gt;: It is important to stay in touch with people, allow time to hang out and exchange, and refill the social life batteries of myself.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;tools-for-the-new-strategy&quot;&gt;Tools for the new strategy&lt;/h3&gt;
-
-&lt;h4 id=&quot;sleep-hygiene&quot;&gt;Sleep Hygiene&lt;/h4&gt;
-&lt;p&gt;For regular days, aim for a &lt;strong&gt;sleep time of 8 hours&lt;/strong&gt; with a &lt;strong&gt;bed time of 9 hours&lt;/strong&gt; (this includes falling asleep and waking up). On a regular day, the recommended sleep time is &lt;strong&gt;23:00 - 7:00&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;Even for New Year’s, try for &lt;strong&gt;2:00 - 9:30&lt;/strong&gt;, as to not turn the whole sleep cycle around.&lt;/p&gt;
-
-&lt;h4 id=&quot;food-intake&quot;&gt;Food Intake&lt;/h4&gt;
-&lt;p&gt;Limit yourself to three regular-sized meals per day. Unless portions are extremely small, refrain from taking seconds or having two meals in one. Feel free to skip dinner if you’re not feeling hungry (this does not apply to breakfast and lunch, as they provide the fuel for your daily work). While meaty dishes are usually appealing, if given the option, take a &lt;em&gt;more veggie approach&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Substitute snacking with chewing gum. The main part why you snack is because your mouth gets bored and you want to chew on something, so let’s take the zero calorie choice. Alternatives are of course frozen grapes or other extremely low-cal snacks.&lt;/p&gt;
-
-&lt;h4 id=&quot;drink-intake&quot;&gt;Drink Intake&lt;/h4&gt;
-&lt;p&gt;Try to limit your intake on wine and other alcoholic beverages to a minimum (that is not to say that &lt;em&gt;social situations&lt;/em&gt; can’t allow you to have a glass of wine). Limiting consumption of alcoholic beverages helps with standing up the next morning (especially if your body for some magical reason is actually trying to &lt;em&gt;burn&lt;/em&gt; the goddamn alcohol).&lt;/p&gt;
-
-&lt;h4 id=&quot;planning-without-overplanning&quot;&gt;Planning without overplanning&lt;/h4&gt;
-&lt;p&gt;For being able to properly lay out what to do, it is important to &lt;em&gt;figure out what there is to do&lt;/em&gt; - that is step zero. From there, make a coarse plan of how much time (in days) which subject gets allocated. The actual day planning is a &lt;em&gt;tactic&lt;/em&gt; - unless studying with other people, adapt this as necessary on a day-to-day basis.&lt;/p&gt;
-
-&lt;h4 id=&quot;meditation-and-mindfulness&quot;&gt;Meditation and Mindfulness&lt;/h4&gt;
-&lt;p&gt;I was contemplating for a long while whether I should include this, but I feel that it is necessary. Keep in mind for yourself that this isn’t the clice “Zen Buddha Om” type of thing. It simply means taking time away from the creation and consumption process, and just being. I’d probably allow music in the background, but staying away from screens, computers, phones is the main point. Introducing boredom, allowing a space for reflection and immediate adjustment is necessary. Try to spend at least 15 minutes per day consciously separated from what you’ve been doing the whole day.&lt;/p&gt;
-
-&lt;h4 id=&quot;reflection&quot;&gt;Reflection&lt;/h4&gt;
-&lt;p&gt;Spend some time writing down things that worked well and things that didn’t go well. Be brutally honest - only if you are aware that a problem exists, you can fix it. This can be either on a blog, in handwriting (like I’ve done a couple of times on my iPad), or somewhere completely different. This is up to you and most likely also depends on the situation.&lt;/p&gt;
-
-&lt;h4 id=&quot;using-the-social-circle&quot;&gt;Using the social circle&lt;/h4&gt;
-&lt;p&gt;Talk to people. Tell them ideas. Be inspired by what they have to say. Ask questions.&lt;/p&gt;
-
-&lt;h4 id=&quot;allowing-time-for-the-things-you-enjoy&quot;&gt;Allowing time for the things you enjoy&lt;/h4&gt;
-&lt;p&gt;It’s not motivating waking up and knowing that the whole day will be spent working on really hard problems that you have a hard time solving. Instead, think of a day as a harmony between the things you have to do and the things you want to do - and hopefully, be able to blur the lines. Find enjoyment in the things for academia, let yourself be consumed by the material at hand, realise and then suppress the upcoming feeling of wanting to do something else.&lt;/p&gt;
-
-&lt;h4 id=&quot;the-role-of-social-events&quot;&gt;The role of social events&lt;/h4&gt;
-&lt;p&gt;I have not touched on the role of social events in this essay, because I believe that that is something for other times. Social events are in a state of flux for me, and until stuff has settled more (which it may or may not do within the near future), I don’t see much of a point in overanalysing stuff.&lt;/p&gt;
-
-&lt;p&gt;I will do my best to use this new strategy in the upcoming weeks. Regardless of the outcome, I shall reflect on this after an implementation attempt sometime in the future.&lt;/p&gt;</content><author><name></name></author><summary type="html">I’ve realised that I’ve been falling for something that I’d like to call a bit of an anti-pattern when it comes to how I consume the internet right now. A vicious cycle of endless refreshing, mindless browsing, with no clear goal, or productivity in mind. Let me elaborate on this for a bit. I’m just gonna note down how a typical day looks like in the matter of internet consumption.</summary></entry><entry><title type="html">Why I write emails</title><link href="http://localhost:4000/general/2017/12/20/why-i-write-emails.html" rel="alternate" type="text/html" title="Why I write emails" /><published>2017-12-20T16:21:41+01:00</published><updated>2017-12-20T16:21:41+01:00</updated><id>http://localhost:4000/general/2017/12/20/why-i-write-emails</id><content type="html" xml:base="http://localhost:4000/general/2017/12/20/why-i-write-emails.html">&lt;p&gt;There’s a thing I do for which sometimes people look at me in a funny way, but I truly believe it’s one of the few, free things you can do to make the world a little better.&lt;/p&gt;
-
-&lt;p&gt;I write emails to people.&lt;/p&gt;
-
-&lt;p&gt;If you are an indie game studio, and I really enjoyed your last game, chances are you’ll find an email from me in your inbox someday. If I saw your talk online or in person and I haven’t had a chance to come to you in person, you can bet that some day afterwards, you’ll find a short message in your inbox either on your YouTube channel, on your Twitter or wherever else I can seem to reach you. If your open source project (that has like 2 stars on GitHub) which I magically came across after a long Google search, on like, page 5, actually helped me, I’ll go out of my way to find your email address (via your commits, via your profile, however) - and I’ll let you know you helped me out.&lt;/p&gt;
-
-&lt;h3 id=&quot;but-why&quot;&gt;But… why?&lt;/h3&gt;
-&lt;p&gt;Now, we all stive to do things for the sake of doing them - because we believe in them, because we think it’s the right thing to do, because it is our civic duty. There’s a ton of reasons why people do it, any many try to steer away from the one subject that you’re not allowed to speak out loud: to get approval by your peers. I always feel like it’s a great confidence boost when somebody stars my repositories on GitHub. It tells me that someone actually looked at my work, maybe downloaded it, and tried it out. It means that whatever I spent my time on, &lt;em&gt;it made an impact&lt;/em&gt;, no matter how little. It gives me a way to rationalise contuining to work on things like this - and I believe that other people must feel the same.&lt;/p&gt;
-
-&lt;p&gt;I’ve been doing this for more than a year now, and I’ve gotten nothing but positive responses - people are overwhelmed that their pet project made it around the whole globe, that somebody decided to reach out, that they inspire others - getting feedback like this is something that not enough people experience, which is why I’ve made it my mission to spend that extra minute and shoot people a short message.&lt;/p&gt;</content><author><name></name></author><summary type="html">There’s a thing I do for which sometimes people look at me in a funny way, but I truly believe it’s one of the few, free things you can do to make the world a little better.</summary></entry><entry><title type="html">Setting up a CUPS / AirPrint Server on Raspberry Pi</title><link href="http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server.html" rel="alternate" type="text/html" title="Setting up a CUPS / AirPrint Server on Raspberry Pi" /><published>2017-12-18T00:00:00+01:00</published><updated>2017-12-18T00:00:00+01:00</updated><id>http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server.html">&lt;p&gt;Even though I’ve switched almost my whole office experience to paperless, my parents are still very much heavy users of the printer. However, with the recent diversification of even their technology, and the growing need to print from a Windows machine, a Macbook and an iPad, I knew it was necessary to find a unified way to print from all those devices. The answer proved to be a &lt;em&gt;CUPS (formerly Common UNIX Printing System)&lt;/em&gt; server on a Raspberry Pi that I had lying around.&lt;/p&gt;
+&lt;p&gt;The only thing left was to install &lt;a href=&quot;https://play.google.com/store/apps/details?id=eu.chainfire.lumen&amp;amp;hl=en&quot;&gt;CF.lumen&lt;/a&gt; for some warm tone colors. Even though it claims it needs some special accessibility options, it’ll work just fine out of the box. However, the actual custom driver requires &lt;em&gt;root&lt;/em&gt; - which is the one thing I haven’t gotten on my Fire HD 10 yet. Still holding out though!&lt;/p&gt;</content><author><name></name></author><summary type="html">T’was the night of the 24th of december, I was sitting together with my family at my grandparent’s house and celebrated Christmas - and the Christkind blessed me with a Fire HD 10 Tablet, freshly made by Amazon (or whoever manufactures these things). It should serve as a replacement device for my Sony Xperia Tablet Z which unfortunately had an unplanned rendezvous with the floor.</summary></entry><entry><title type="html">Setting up a CUPS / AirPrint Server on Raspberry Pi</title><link href="http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server.html" rel="alternate" type="text/html" title="Setting up a CUPS / AirPrint Server on Raspberry Pi" /><published>2017-12-18T00:00:00+01:00</published><updated>2017-12-18T00:00:00+01:00</updated><id>http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/12/18/setting-up-cups-server.html">&lt;p&gt;Even though I’ve switched almost my whole office experience to paperless, my parents are still very much heavy users of the printer. However, with the recent diversification of even their technology, and the growing need to print from a Windows machine, a Macbook and an iPad, I knew it was necessary to find a unified way to print from all those devices. The answer proved to be a &lt;em&gt;CUPS (formerly Common UNIX Printing System)&lt;/em&gt; server on a Raspberry Pi that I had lying around.&lt;/p&gt;
 
 &lt;h3 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h3&gt;
 &lt;p&gt;I set up my Raspberry Pi with the latest version of Raspbian. I made sure the packages &lt;code class=&quot;highlighter-rouge&quot;&gt;vim&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;git&lt;/code&gt; are installed on the device (if they are not, you can simply install them via your old friend &lt;code class=&quot;highlighter-rouge&quot;&gt;apt-get&lt;/code&gt;).&lt;/p&gt;
@@ -350,4 +745,15 @@ ServerAlias *
 &lt;p&gt;Installing the printers under Windows and Mac should be a breeze, iOS devices should autodiscover the devices.&lt;/p&gt;
 
 &lt;h3 id=&quot;advantages-and-drawbacks&quot;&gt;Advantages and Drawbacks&lt;/h3&gt;
-&lt;p&gt;After having deployed this solution for a while, I’ve noticed a few drawbacks, but also advantages. Printing from a Windows machine &lt;em&gt;flies&lt;/em&gt;, it is the same speed as if you would just have the printer attached to the machine directly. From Apple based devices, the CUPS server has to do some recomputations, which take a long time. When printing a page that is only 5 pages long and does not have too many complex SVG shapes, this is fine - so if your main use case is just printing out an email or an excerpt from Wikipedia. However, when printing very complex documents (e.g. a mindmap you drew on your iPad) that has a lot of small individual shapes, or a document that is very long (if you’re on a tree killing spree and print out your ebooks), you’ll have an unfeasibly long wait time.&lt;/p&gt;</content><author><name></name></author><summary type="html">Even though I’ve switched almost my whole office experience to paperless, my parents are still very much heavy users of the printer. However, with the recent diversification of even their technology, and the growing need to print from a Windows machine, a Macbook and an iPad, I knew it was necessary to find a unified way to print from all those devices. The answer proved to be a CUPS (formerly Common UNIX Printing System) server on a Raspberry Pi that I had lying around.</summary></entry></feed>
+&lt;p&gt;After having deployed this solution for a while, I’ve noticed a few drawbacks, but also advantages. Printing from a Windows machine &lt;em&gt;flies&lt;/em&gt;, it is the same speed as if you would just have the printer attached to the machine directly. From Apple based devices, the CUPS server has to do some recomputations, which take a long time. When printing a page that is only 5 pages long and does not have too many complex SVG shapes, this is fine - so if your main use case is just printing out an email or an excerpt from Wikipedia. However, when printing very complex documents (e.g. a mindmap you drew on your iPad) that has a lot of small individual shapes, or a document that is very long (if you’re on a tree killing spree and print out your ebooks), you’ll have an unfeasibly long wait time.&lt;/p&gt;</content><author><name></name></author><summary type="html">Even though I’ve switched almost my whole office experience to paperless, my parents are still very much heavy users of the printer. However, with the recent diversification of even their technology, and the growing need to print from a Windows machine, a Macbook and an iPad, I knew it was necessary to find a unified way to print from all those devices. The answer proved to be a CUPS (formerly Common UNIX Printing System) server on a Raspberry Pi that I had lying around.</summary></entry><entry><title type="html">Muting Macbook after Restart</title><link href="http://localhost:4000/jekyll/update/2017/12/14/muting-macbook-after-startup.html" rel="alternate" type="text/html" title="Muting Macbook after Restart" /><published>2017-12-14T16:52:34+01:00</published><updated>2017-12-14T16:52:34+01:00</updated><id>http://localhost:4000/jekyll/update/2017/12/14/muting-macbook-after-startup</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/12/14/muting-macbook-after-startup.html">&lt;h3 id=&quot;1-install-sleepwatcher--set-up-as-service&quot;&gt;1. Install sleepwatcher &amp;amp; set up as service&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;brew install sleepwatcher&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;brew services start sleepwatcher&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;2-configure-mute-on-wake&quot;&gt;2. Configure mute on wake&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;osascript -e 'set volume output muted true'&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; ~/.wakeup &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;
+chmod +x ~/.wakeup&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Heavily inspired by &lt;a href=&quot;https://www.kodiakskorner.com/log/258&quot;&gt;a post on kodiakskorner&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">1. Install sleepwatcher &amp;amp; set up as service brew install sleepwatcher</summary></entry></feed>
