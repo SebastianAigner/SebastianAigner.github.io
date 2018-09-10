@@ -9,7 +9,7 @@ typora-root-url: ../../my-blog
 
 _(This post is a tutorialized version of the workarounds that I worked out together with Andrey Skladchikov in [this YouTrack issue](https://youtrack.jetbrains.com/issue/CRKA-88) for CRKA.)_
 
-As the name might suggest, `create-react-kotlin-app` is the Kotlin equivalent of JavaScript's `create-react-app`: A wonderful little tool to automate all the webpack and configuration stuff for your React/Kotlin applictation, having you focus completely on the actual application logic.
+As the name might suggest, `create-react-kotlin-app` (CRKA) is the Kotlin equivalent of JavaScript's `create-react-app`: A wonderful little tool to automate all the webpack and configuration stuff for your React/Kotlin application, having you focus completely on the actual application logic.
 
 **Getting create-react-kotlin-app to run on Heroku**, however, is not without its pitfalls. After having struggled through it myself, I'll run you through how you can deploy your CRKA application on Heroku, proper production builds and all.
 
