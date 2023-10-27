@@ -8,7 +8,7 @@ tags: #kotlin #server #devops #hosting
 cover_image: /assets/ktor_on_dokku/m51iknu1540t60kk0zlt.jpg
 ---
 
-In my last article, I talked about “[Publishing server-side Kotlin applications built with Ktor on Heroku](https://dev.to/kotlin/publishing-server-side-kotlin-applications-ktor-on-heroku-2ce4)”. I really like [Heroku](https://www.heroku.com/) as a place to host my Kotlin apps because the time from setting up my application to having it available to the public is very short – I can confidently get my prototype applications running **in the cloud in less than 10 minutes**, and even if I need a database or integration with some other service, it can be **spun up in mere minutes**.
+In my last article, I talked about “[Publishing server-side Kotlin applications built with Ktor on Heroku]({% post_url 2018-08-15-Kotlin-on-heroku %})”. I really like [Heroku](https://www.heroku.com/) as a place to host my Kotlin apps because the time from setting up my application to having it available to the public is very short – I can confidently get my prototype applications running **in the cloud in less than 10 minutes**, and even if I need a database or integration with some other service, it can be **spun up in mere minutes**.
 
 But there are also situations where I want to **_own_ the deployment environment** for my Kotlin (mainly [Ktor](https://ktor.io/)) web applications – for example, when I’m deploying an app that’s running in my home network, or when I want to keep the application running without continuously having to pay for always-on Heroku instances. But even in those situations, I don’t want to give up all the **convenience that I’ve gotten used to** when using Heroku.
 
@@ -37,7 +37,7 @@ With these things out of the way, we can get straight into the actual process!
 
 ### Creating our Ktor application
 
-For simplicity’s sake, we can use the same simple “Hello, World” application shown in the tutorial for [Ktor on Heroku](https://dev.to/kotlin/publishing-server-side-kotlin-applications-ktor-on-heroku-2ce4), so I’m going to keep this section brief. (Should you already have a Ktor project which you want to deploy, you can skip to the next section directly.)
+For simplicity’s sake, we can use the same simple “Hello, World” application shown in the tutorial for [Ktor on Heroku]({% post_url 2018-08-15-Kotlin-on-heroku %}), so I’m going to keep this section brief. (Should you already have a Ktor project which you want to deploy, you can skip to the next section directly.)
 
 We can easily create a new Ktor project either via the online generator available at [https://start.ktor.io/](https://start.ktor.io/), or use the [Ktor IntelliJ IDEA plugin](https://plugins.jetbrains.com/plugin/10823-ktor) (both of which expose the same configuration options). I’m using the Ktor plugin (which can be accessed through File \| New… \| Project once installed). Here, we enable the “Gradle Kotlin DSL” option for the project, and add the “Routing” feature:
 

@@ -134,7 +134,7 @@ val x: Int = listOfNullableItems[0] ?: 0
 
 ### Slicing
 
-Of course, we can go beyond getting individual items out of our list. Because a list is a collection like any other, we have access to the same [`take`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/take.html) and [`drop`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/drop.html) functions that were introduced in the _[Diving into Kotlin collections](https://dev.to/kotlin/diving-into-kotlin-collections-587o)_ post.
+Of course, we can go beyond getting individual items out of our list. Because a list is a collection like any other, we have access to the same [`take`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/take.html) and [`drop`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/drop.html) functions that were introduced in the _[Diving into Kotlin collections]({% post_url 2021-03-29-Diving-into-Kotlin-collections %})_ post.
 
 But lists have a special way of retrieving multiple items - the [`slice`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/slice.html) function!
 
