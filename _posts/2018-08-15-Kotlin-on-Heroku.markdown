@@ -1,394 +1,214 @@
 ---
 layout: post
 title:  "Kotlin, Ktor and Exposed on Heroku"
-date:   2018-08-15T09:16:31+02:00
+date:   2021-01-15T09:16:31+02:00
 categories: general
 typora-root-url: ../../my-blog
 ---
 
-When developing web applications, be it at a hackathon, as a side project or as a business venture, **_getting the application into the hands of people_** and onto the web is one of the key steps for **early success**.
+Getting an application into the hands of the first users is the best feeling. Seeing them try out an app for the first time and collecting feedback from them for future improvement has always felt very rewarding to me. For server-side apps, this usually means getting the app deployed somewhere – published on the web.
 
-Today, I want to show you how you can get your **Kotlin app** powered by **Ktor** and **Exposed** running on the Heroku PaaS in no time, **without having to worry** about updating your JVM, configuring your HTTP server, operating security updates, or doing complex database maintenance tasks. And the best thing: **It's free**.
+Today I want to share one quick way to get Kotlin applications built with Ktor onto the web: Using **Heroku**.
 
-If you haven't heard of **Ktor** and **Exposed** before, they're a way of building server-side applications in a similar fashion as you would in, say, Python using [Flask](http://flask.pocoo.org/), or Ruby using [Sinatra](http://sinatrarb.com/). Ktor being powered by Kotlin however has the wonderful advantage of **static typing** and **sensible error messages**, and with it, some extremely **powerful IDE integration**.
+As a PaaS (Platform as a Service), Heroku takes care of most administrative tasks so that we don't have to. Stuff like keeping their platform up-to-date and secure, managing the networking stack, and more.
 
-Coupled with the simplicity and convenience offered by Heroku's platform and database offerings, we get a wonderful **synergy** that allows you to get **stable and fast web applications** into the hands of your users quickly.
+I personally enjoy Heroku because their **free tier** means I can publish apps at no upfront cost. Plus, I also get to say that my application runs _in the cloud_ from day one! 😉🌩
 
-So, grab a [free Heroku account](https://signup.heroku.com/), grab your [IntelliJ](https://www.jetbrains.com/idea/) installation and let's dive in!
+If you also want to learn how to deploy your Kotlin app directly from a local Git repository, take **10 minutes** and let me guide you through the steps for getting your first Kotlin app online on Heroku!
 
-![log_tail](/assets/kotlin_on_heroku/log_tail.png)
+### Signing up for Heroku & Setting up the Heroku CLI 🛠
 
-![final_app_screenshot](/assets/kotlin_on_heroku/final_app_screenshot.png)
-_<center>The final app chugging along</center>_
+Before we even create our demo Kotlin application, it's a good idea to set up our environment – starting with setting up a Heroku account. We can do that by simply visiting their signup page at [http://signup.heroku.com/](http://signup.heroku.com/). The [free plan](https://www.heroku.com/free) which is provided by default is more than enough for our purposes (even with its [limitations](https://devcenter.heroku.com/articles/free-dyno-hours)), so we don't need to add any payment information.
 
-#### Mini Disclaimer
+![Heroku Signup Page](/assets/kotlin_on_heroku/uo8kcg1wy91v2otti1wo.png)
 
-This is **not** supposed to be **a tutorial on** how to use **Ktor or Exposed**, but _how to deploy your application to the cloud_. You should be able to follow along this tutorial even if you haven't used Ktor and Exposed before, but you are not going to walk away an expert in the two frameworks. I do hope to whet the appetite for these frameworks though, and prove to you that they're worth having an in-depth look at.
+After creating our account, we next install the [Heroku Command Line Interface (CLI)](https://devcenter.heroku.com/articles/heroku-cli), which will allow us to create and manage our Heroku applications.
 
-I strongly encourage you to check out the **great documentation** you can find for [Ktor](http://ktor.io/), and familiarise yourself with the [Exposed Readme](https://github.com/JetBrains/Exposed/blob/master/README.md) as well as their [Wiki](https://github.com/JetBrains/Exposed/wiki/DAO).
+Installation instructions for the Heroku CLI vary slightly between operating systems, so it’s best to follow the official and up-to-date [instructions](https://devcenter.heroku.com/articles/heroku-cli) on Heroku’s website for their setup.
 
-Also, for conciseness, imports are left out when presenting code snippets in this post. When you follow the instructions, all your problems should go away by pressing `⌥⏎` (Alt-Enter) until everything has been auto-resolved by IntelliJ.
+To verify that our installation was successful and to authenticate the CLI with our account which we created a few paragraphs ago, we run the `heroku` command on our terminal once and follow the on-screen instructions.
 
-### What will we build?
+With this one-time setup step out of the way, we are ready to prepare our application!
 
-We will build a **super-simple CRUD app**, the classic _Guestbook_ application that many a PHP developer has built for their first exercise: A simple page with an input form that allows people to submit comments that are then shown in order. This will serve as an example on how to provision an application on the Heroku platform and connect a PostgreSQL database.
+![Heroku CLI](/assets/kotlin_on_heroku/0sk91tjmxtmmykcf6zjt.png)
 
-### Intro to Heroku
+### Creating our Ktor application ✨
 
-Quick and painless deployment and provisioning have made Heroku my platform of choice when it comes to deploying applications in the cloud. Gone are the days of manually configuring `nginx` or `lighttpd` and manually keeping your linux box up to date (power to those who do, but I find it a bit tedious after having gone through it for a few times.)
+Let’s create a quick sample application which we will afterward configure to be deployed. If you already have your own Ktor project which you want to get deployed to Heroku, you can move directly to the next section.
 
-Heroku offers a [**free plan**](https://www.heroku.com/free) to get started, which is more than enough to build your app and deploy it to the cloud – all without adding a credit card or giving up some other payment information. It does come with some [limitations](https://devcenter.heroku.com/articles/limits), especially in regards to the [Free Dyno Hours](https://devcenter.heroku.com/articles/free-dyno-hours). Should your application require more resources than allotted on a free account, upgrading to paid instances is still relatively inexpensive (though you'll obviously pay a slight premium for the no-fuss PaaS in comparison to, say, a self-managed virtual server).
+There are multiple easy ways to create a new Kotlin project with Ktor. For example, we can use the online [Ktor Project Generator](https://start.ktor.io/), or the [Ktor IntelliJ IDEA plugin](https://plugins.jetbrains.com/plugin/10823-ktor) – and in fact, both tools even expose the same configuration options. For this example, we are going to configure our project via the [Ktor IntelliJ IDEA plugin](https://plugins.jetbrains.com/plugin/10823-ktor), which can be accessed through File \| New… \| Project after it has been installed.
 
-A wide variety of [Add-ons](https://elements.heroku.com/addons) is available on the Heroku platform that allow you to **plug-and-play functionality** like OAuth, databases and analytics into your app. Many of these add-ons offer a free tier which is more than enough if you're building an application for a small user base.
+To follow along with the code snippets, enable the “Gradle Kotlin DSL” option for the project, and add the “Routing” feature.
 
-### Set up
+![Ktor Project Wizard](/assets/kotlin_on_heroku/hp1phtyh9sc1nnxcv6av.png)
 
-#### Heroku Command Line Tools
+On the pages that follow, we input a project name and artifact ID of our choice.
 
-In order to work with Heroku locally, we first install the command line tools. Follow the super quick instructions at the [Heroku CLI page](https://devcenter.heroku.com/articles/heroku-cli#download-and-install) to **install the tools locally**. This slightly differs from operating system to operating system, but should be rather straightforward all in all.
+After the Gradle import has finished, we actually already have a ready-to-run “Hello World” project powered by Ktor. We can inspect its source code by navigating to the `Application.kt` file in our `src` directory, where we should see something like this:
 
-Execute the `heroku` command **at least once** so that you get a chance to enter your credentials.
+```kotlin
+fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-#### Local PostgreSQL Database
-
-Since we are going to be building an application that uses a PostgreSQL database, we need to run a **development database instance** on our local machine. The easiest way to achieve this on macOS is to download and run [Postgres.app](https://postgresapp.com/).
-
-Alternative ways include using [Docker](https://hub.docker.com/_/postgres/) (if you are familiar with it) or the [Windows installers](https://www.postgresql.org/download/windows/) available on the official PostgreSQL website – though I have not tried these, so you may have to adapt things like the JDBC connection to your platform.
-
-Once we have a database setup locally, we can finally start by setting up our IntelliJ for success.
-
-#### The Project
-
-The easiest way to create a new Ktor project is by using the [Ktor plugin for IntelliJ](https://plugins.jetbrains.com/plugin/10823-ktor). If you haven't yet, download and install it on your machine. Create a new project using the wizard in IntelliJ. Make sure to **check _HTML DSL_** for templating, as we will be using it later.
-
-![new_project](/assets/kotlin_on_heroku/new_project.png)
-
-I have named my application `herokuBook`. When you see this name, you know it's referring to the project name.
-
-When you finish up, check _Use auto-import_ (you can read what it does [here](https://blog.jetbrains.com/idea/2013/04/gradle-improvements-at-121/)). Wait for the Gradle daemon to set up your application, and launch the app by clicking the green arrow.
-
-![run_app](/assets/kotlin_on_heroku/run_app.png)
-
-Give the application a few moments to start up and be hypnotized by the debug information scrolling by in the console window. Open your local address [http://0.0.0.0:8080](http://0.0.0.0:8080), and marvel at the beauty of what you have just created 🤩:
-
-![hello_world](/assets/kotlin_on_heroku/hello_world.png)
-
-Congratulations, we now have a Ktor web application running on our local machine. Now, it's time to **ascend** into the cloud! 🌥
-
-### Running Ktor in the Cloud
-
-Heroku uses `git` as its primary mechanism to deploy applications. This also means that our **local application** should be **inside a git repository**.
-
-We can use the integrated Version Control functionality of IntelliJ to set up our git repository without ever having to leave our IDE! Simply select "VCS" – "**Enable Version Control Integration**":
-
-![enable_vcs](/assets/kotlin_on_heroku/enable_vcs.png)
-
-We can also directly **commit** our current state. We first add our files and then commit using the context menu:
-
-![commit_directory](/assets/kotlin_on_heroku/commit_directory.png)
-
-![finish_commit](/assets/kotlin_on_heroku/finish_commit.png)
-
-If you'd like to learn more about how to use **git integration in IntelliJ**, I suggest checking out the [official documentation](https://www.jetbrains.com/help/idea/set-up-a-git-repository.html)!
-
-Now that our project has a git repo attached to it, we can finally **create our Heroku application**. Open the built-in terminal (either by clicking _Terminal_  in the bottom of the IDE or hitting `⌥F12` on Mac) or navigate to your project folder using a terminal emulator of your choice. We execute
-
-```bash
-$ heroku create
-```
-
-If you have a name for your project, feel free to execute `heroku create yourName` instead. Keep in mind that **your application will be reachable** at `yourName.herokuapp.com`, though.
-
-If everything went well, you'll see your application on your personal [dashboard](https://dashboard.heroku.com/).
-
-To move your code up into the cloud, all you have to do is _push_ your local repository to _heroku_. You can do this directly from within IntelliJ by hitting `⇧⌘K`, or navigating to "VCS" – "Git" - "Push...". (Alternatively, you can run `git push heroku master` in a terminal):
-
-![initial_push](/assets/kotlin_on_heroku/initial_push.png)
-
-However, due to the nature Heroku handles applications, this push will be **rejected**. We can see what went wrong by opening the **Version Control Tool Window** via the "View" – "Tool Windows" option or by hitting `⌘9`. The error message indicates a missing Gradle `stage` task. If you want to learn more about it, check out the [Heroku DevCenter article](https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku#overview) about it.
-
-![unsuccessful_deploy](/assets/kotlin_on_heroku/unsuccessful_deploy.png)
-
-#### Staging Task & Procfile
-
-So, we still need to make small adjustments to our application for it to run in the cloud. The **stage task must exist**, which is why we add the following line to our `build.gradle`:
-
-```groovy
-task stage(dependsOn: ['installDist'])
-```
-
-Would you commit and push this change, you'd still be faced with an error. This is because Heroku doesn't know **what file to execute as a web process**. To communicate this to the platform, Heroku uses a so-called [Procfile](https://devcenter.heroku.com/articles/procfile), which is pretty simple in our case.
-
-Create a new file named `Procfile` (and also add it to Version Control) in the root of the project and fill it with
-
-```bash
-web: ./build/install/herokuBook/bin/herokuBook
-```
-
-This path is not chosen randomly; if you execute the `stage` task by opening the Gradle Tool Window and selecting "Other" – "**stage**", you can see that this task generates a **startup script** in this exact location:
-
-![stage_script](/assets/kotlin_on_heroku/stage_script.png)
-
-Now, it is time for another commit and push. Back in the Version Control Console, we can see that our build was **successfully deployed** ✅:
-
-![successful_deploy](/assets/kotlin_on_heroku/successful_deploy.png)
-
-Clicking the link will bring us just about as much joy as that first **magical** `HELLO WORLD` **moment** just five minutes ago:
-
-![hello_cloud](/assets/kotlin_on_heroku/hello_cloud.png)
-
-This concludes the first part of this excursion into Kotlin and Ktor on Heroku. 👌🏼 Next, we will cover usage of the **Exposed framework** in conjunction with **Heroku Postgres**.
-
-### Setting up the Exposed SQL Framework
-
-> *Exposed* is a prototype for a lightweight SQL library written over JDBC driver for [Kotlin](https://github.com/JetBrains/kotlin) language. It does have two layers of database access: typesafe SQL wrapping DSL and lightweight data access objects.
-
-We will use the Data Access Objects (DAO) API in this example, hook it up to our local and later on remote PostgreSQL database. This way, we can easily persist data in a structured manner.
-
-#### Required Dependencies
-
-In order to use Exposed with PostgreSQL, we need to add the **Exposed repository**, **Exposed** **itself** as well as the **PostgreSQL JDBC** **driver**. So, in your `build.gradle`, add
-
-```groovy
-repositories {
-    ...
-	maven {
-        url "https://dl.bintray.com/kotlin/exposed"
+@Suppress("unused") // Referenced in application.conf
+@kotlin.jvm.JvmOverloads
+fun Application.module(testing: Boolean = false) {
+    routing {
+        get("/") {
+            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+        }
     }
-	...
-}
-
-...
-    
-dependencies {
-    ...
-    compile 'org.jetbrains.exposed:exposed:0.10.4'
-    compile 'org.postgresql:postgresql:42.2.4.jre7'
-    ...
 }
 ```
 
-_Make sure you grab the **freshest version** of Exposed:_ ![Download](https://api.bintray.com/packages/kotlin/exposed/exposed/images/download.svg)_, and check for any updates of the JDBC driver [here](https://mvnrepository.com/artifact/org.postgresql/postgresql)._
+As we can see, this simple Ktor program defines one [route](https://ktor.io/docs/routing.html), `/`, which responds to HTTP `GET` requests with the words `HELLO WORLD!`.
 
-#### Database Connection
+By pressing the and pressing the “Run” button in the gutter next to the main function, and navigating to `http://localhost:8080/`, we can try the application out locally:
 
-For now, we will keep it simple and run on a **single database connection**. This could potentially become a bottleneck once your application has hundreds of users. If you're interested in tackling this issue, let me refer you to [Connection Pooling](https://github.com/JetBrains/Exposed/issues/135).
+![Hello World](/assets/kotlin_on_heroku/kgeanwt5nm3jrr5aln3a.png)
 
-To connect to the database, we simply add the following line to the top of our `Application.module()` (substituting our own username):
+Now, it's time to set get our little application configured for running on Heroku's cloud!
+
+### Configuring our Ktor application for Heroku deployment ⚙️
+
+To deploy our application to Heroku, our application needs to do three things:
+
+*   It should **respect the `PORT` environment variable**: When starting our app, Heroku [assigns our application a port](https://devcenter.heroku.com/articles/runtime-principles#web-servers) on which to listen for incoming requests, and [Heroku’s routers](https://devcenter.heroku.com/articles/http-routing) then take care of bringing the HTTP traffic to our application on that port.
+*   It should **provide a `stage` task**: When we deploy our application, Heroku runs the Gradle task called `stage` to turn our program into an executable.
+*   It should **provide a `Procfile`**: When Heroku starts our application to handle incoming requests, this file specifies the command(s) which will be run – in our case, starting the compiled application.
+
+
+#### The PORT environment variable
+
+We're in luck here – the application generated by the Ktor wizard already configures our application to respect the `PORT` environment variable. We can see this in the `application.conf` in the `resources` directory of our project. This [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md) file is responsible for the basic behavior of our application. And, as we can see, it sets the default port of our application to 8080, optionally overriding it with the content of the `PORT` environment variable when it is present:
+
+
+```hocon
+ktor {
+   deployment {
+       port = 8080
+       port = ${?PORT}
+   }
+   application {
+       modules = [ io.sebi.ApplicationKt.module ]
+   }
+}
+```
+
+
+This is exactly what we want: When developing locally, our application is always assigned the same port (`8080`), and when deploying to a system where a `PORT` environment variable is set, like Heroku, the platform settings are respected.
+
+#### The `stage` Gradle task
+
+When deploying any type of application to Heroku, the platform runs a so-called [buildpack](https://devcenter.heroku.com/articles/buildpacks) – a tool that turns the source code of our project into the executable which eventually gets run on Heroku’s platform. For [Gradle](https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku#verify-that-your-build-file-is-set-up-correctly) applications, Heroku’s buildpack looks for a `stage` task to create executable artifacts from our code. Luckily for us, the already preconfigured Gradle [application plugin](https://docs.gradle.org/current/userguide/application_plugin.html) already comes with a task called `installDist` which does exactly that.
+
+All we need to do is create an alias for the `installDist` task called `stage`. If you have picked the Gradle Kotlin DSL as was suggested earlier in the tutorial, you can simply add this snippet at the bottom of the project's `build.gradle.kts` file:
+
 
 ```kotlin
-Database.connect(System.getenv("JDBC_DATABASE_URL"), driver = "org.postgresql.Driver")
-```
-
-**Configure local environment variables**
-
-While Heroku will eventually take care of the **JDBC Database URL** in *production*, we still have to set up the **environment variable** for our local *development* machine.
-
-Select the run configuration corresponding to the `main` function (not the one relating to the _stage_ task!) in the top right corner and click `Edit Configuration`. Under `Environment Variables`, add the following.
-
-```
-JDBC_DATABASE_URL		jdbc:postgresql:sebastian?user=sebastian
-```
-
-This environment variable will be set by Heroku once we deploy to production and attach their database backend.
-
-![environment_variables](/assets/kotlin_on_heroku/environment_variables.png)
-
-#### Defining our Database Model
-
-What follows is some basic code for Exposed using the [DAO](https://github.com/JetBrains/Exposed/wiki/DAO) API. I do not want to go to deep into detail here, but: We create a simple **typesafe data model** for our guestbook entries with two columns.
-
-On the top level of our `application.kt` (or in a separate file, if you prefer), add:
-
-```kotlin
-object GuestbookEntries: IntIdTable() {
-	val text = varchar("text", 255)
-	val creation = date("creation")
-}
-
-class GuestbookEntry(id: EntityID<Int>): IntEntity(id) {
-	companion object: IntEntityClass<GuestbookEntry>(GuestbookEntries)
-	var text by GuestbookEntries.text
-	var creation by GuestbookEntries.creation
+tasks.create("stage") {
+   dependsOn("installDist")
 }
 ```
 
-If you'd like to **understand more** about how Exposed works, check out [their repository](https://github.com/JetBrains/Exposed/).
+#### The Procfile
 
-#### Automatic Database Setup
+Heroku’s [Procfile mechanism](https://devcenter.heroku.com/articles/procfile) tells the platform which application should be executed when our application is started.
 
-When we first run the application, we want to **make sure** that our database **schema already exists**. We can do this by adding a simple transaction to our `Application.module()` function (after the database connection has been established), which creates and fills the table with demo data:
+Essentially, we want to point this file at the output generated by the `stage` task, which we set up in the previous step. At the point when the Procfile gets invoked, our `stage` task will have built our application and created a launch script in `build/install/projectName/bin/projectName`. We can simply point to this script to get our application running.
 
-```kotlin
-transaction {
-	create(GuestbookEntries)
-	if(GuestbookEntry.count() == 0) {
-		GuestbookEntry.new {
-			text = "Thank you for stopping by!"
-			creation = DateTime.now()
-		}
-	}
-}
+In the root of our project, let’s create a file called `Procfile` and add the following content to it (substituting `projectName` for, you guessed it, the name of our project):
+
+```
+web: ./build/install/projectName/bin/projectName
 ```
 
-When running the application now, it'll be hard to spot a difference with all the debug info flowing by in the console. However, a keen eye can now spot entries such as the one below, indicating that our **connection and transaction were successful**.
+(If you don't remember the exact name you gave your project, you can peek into `settings.gradle.kts`, or run the `stage` task once, and investigate the folder structure inside `build/install`.)
 
-```sql
-10:34:19.064 [main] DEBUG Exposed - SELECT COUNT(guestbookentries.id) FROM guestbookentries
+Our application is now set up for deployment on Heroku! At this point, the only thing standing between us and a published app is the actual deployment process itself.
+
+
+### Actually deploying our application 📦
+
+
+#### Setting up a local Git repository
+
+The primary method for getting the source code of our application onto Heroku is via Git. The simplest way for this is to use a local Git repository. Using the Heroku CLI, we can then link it to a special `heroku` remote repository, which will trigger the build and deployment process in the cloud.
+
+To link everything up, we first need to create a local repository for our project, which can do directly from IntelliJ IDEA with the command VCS > Enable Version Control Integration...
+
+![Enable VCS integration](/assets/kotlin_on_heroku/bl3hhxyrvh26z8e4y7ty.png)
+
+Next, we commit our project locally. In IntelliJ IDEA, Navigate to the “Commit” tool window on the left side, and commit all unversioned files. (Don’t worry about manually excluding the `/build` or `/idea` folders – the Ktor project wizard already auto-generated a `.gitignore` file for us which takes care of them.)
+
+![IntelliJ IDEA Commit window](/assets/kotlin_on_heroku/69i3yy8vsd41wygjdpu9.png)
+
+#### Creating the Heroku application & Deploying! 🚀
+
+Almost there! The only thing remaining is to create a [Heroku app](https://devcenter.heroku.com/articles/creating-apps) in which our new application will live. We use the Heroku CLI from the builtin terminal in IntelliJ IDEA (or a terminal of our choice) to set up the application, by executing the following command in the root folder of our project:
+
+```
+heroku create myprojectname
 ```
 
-#### Inspecting the Schema
+After a few seconds, the terminal command should exit and confirm the successful creation of our project – including a preview of the URL at which our project will be visible in just a few minutes.
 
-We can check that our database schema has actually been generated correctly by having a look at our local PostgreSQL database. And here's the craziest thing: **We don't even have to leave IntelliJ to do that.**
-
-> Database Tools are an IntelliJ IDEA Ultimate feature. If you're a student, check out [jetbrains.com/student](https://www.jetbrains.com/student/) and grab a free Ultimate license! 👨🏻‍🎓
-
-Let's wire up the local Postgres database. To do this, open the "Database" Tool Window by clicking "View" – "Tool Windows" – "**Database**". Select the context menu option to add a **PostgreSQL database**:
-
-![add_database](/assets/kotlin_on_heroku/add_database.png)
-
-If you haven't used this functionality before, IntelliJ might prompt you to **download missing driver files**, which only takes a single click. Directly plug in the **JDBC connection URL** `jdbc:postgresql:sebastian?user=sebastian` and hit `Test Connection` before closing the window with an `OK` press. Fold open the hierarchy on the right-hand side until you strike gold, and double click!
-
-![database_inspection](/assets/kotlin_on_heroku/database_inspection.png)
-
-As you can see, we have successfully **defined and autogenerated the SQL schema** from a **class definition in Kotlin**. You can from now on use the Data Sources tab to check what your application is doing inside your database 🕵🏻‍♂️
-
-### Making the App Interactive
-
-Before we move our database functionality to the cloud, instead of just rendering a plain `HELLO WORLD` text, let's actually plug in the functionality that allows users to **submit a new guest book entry**. We also want to  **show the existing guest book entries** from the database.
-
-We use **Typesafe HTML Builders** provided by [kotlinx.html](https://github.com/Kotlin/kotlinx.html) to construct our little more complex HTML response. This topic is a bit too large to explain in passing, but the format of the code snippets should be clear enough to read and understand what's going on.
-
-These Typesafe HTML Builders ensure that only properties that are actually valid in their context can be used in our Markup – essentially giving us **all the benefits of a statically typed language for HTML**. Note that it is the typesafety of our HTML templates that **immediately prevent XSS attacks** on our application, as every string is **automatically escaped** instead of being interpreted as HTML.
-
-For more reasoning about why an HTML **DSL in Kotlin** makes sense, check out two minutes of [this talk](https://youtu.be/gPH9XnvpoXE?t=4m6s) by Eugene Petrenko, and read the article on [Type-Safe Builders](https://kotlinlang.org/docs/reference/type-safe-builders.html).
-
-Within `application.kt`, **replace** the existing `routing { ... } ` block with the following:
-
-```kotlin
-routing {
-	get("/") {
-		val entries = transaction { GuestbookEntry.all().toList() }
-		call.respondHtml {
-			body {
-					form("/", FormEncType.multipartFormData, FormMethod.post) {
-					acceptCharset = "utf-8"
-					p {
-						label { +"Add a new entry!" }
-						textInput { name = "entry" }
-					}
-					input {
-						type = InputType.submit
-					}
-				}
-				for(i in entries) {
-				p {
-					+"At ${i.creation}: ${i.text}"
-				}
-			}
-		}
-	}
-}
-
-	post("/") {
-		val multipart = call.receiveMultipart()
-		val formItems = multipart.readAllParts().filterIsInstance<PartData.FormItem>()
-		val myMap = formItems.map { it.name to it.value }.toMap()
-		myMap["entry"]?.let { ent ->
-			transaction {
-				GuestbookEntries.insert {
-					it[text] = ent
-					it[creation] = DateTime.now()
-				}
-			}
-		}
-		call.respondRedirect("/")
-	}
-}
+```
+Creating ⬢ myprojectname... done
+https://myprojectname.herokuapp.com/ | https://git.heroku.com/myprojectname.git
 ```
 
-Take a moment to ponder the code above before moving on. 
+In the background, this command did two things which we should care about:
 
-Since we encode the form using `multipart`, its handling looks a bit odd when you see it the first time. If you would like to learn more about it, check out the [forms example](http://ktor.io/samples/post.html) on the Ktor homepage.
+*   It created a new Heroku application, which we can inspect in our [web dashboard](https://dashboard.heroku.com/apps/)
+*   It added a new [Git remote](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes) called `heroku` to our local Git repository.
 
-To make the typesafe HTML DSL more readable for those folks who haven't gotten in touch with it yet, this is the analogous code that the final site renders:
+Now, we can kick off our deployment: we push the commit we made in the previous section to the newly added `heroku` Git remote. In IntelliJ IDEA, we can do this via VCS | Git | Push….
 
-```html
-<!DOCTYPE html>
-<html>
-  <body>
-    <form action="/" enctype="multipart/form-data" method="post" accept-charset="utf-8">
-      <p><label>Add a new entry!</label><input type="text" name="entry"></p>
-<input type="submit"></form>
-    <p>At 2018-08-15T00:00:00.000Z: Thank you for stopping by!</p>
-    <p>At 2018-08-15T00:00:00.000Z: Welcome to my page!</p>
-  </body>
-</html>
+![Push window in IntelliJ IDEA](/assets/kotlin_on_heroku/jpmvlo4x42f3e99hw7pw.png)
+
+After confirming the push, we can sit back and watch our application ascend to the cloud!
+
+This push is going to take longer than you might be used to, because Heroku actually builds our application remotely while pushing. If you’re interested in following along with the progress, you can open the “Git” tool window at the bottom of IntelliJ IDEA to see what is happening in the background.
+
+If everything has gone according to plan, you will see a confirming message in the logs:
+
+
 ```
-![final_app_screenshot](/assets/kotlin_on_heroku/final_app_screenshot.png)
+remote:        BUILD SUCCESSFUL in 1m 34s
+remote:        6 actionable tasks: 6 executed
+remote: -----> Discovering process types
+remote:        Procfile declares types -> web
+remote:
+remote: -----> Compressing...
+remote:        Done: 64.3M
+remote: -----> Launching...
+remote:        Released v3
+remote:        https://myprojectname.herokuapp.com/ deployed to Heroku
+remote:
+remote: Verifying deploy... done.
+```
 
-_Besides the lack of angle brackets, it becomes obvious pretty quickly that one of them was generated by the other._
+We can see the URL for our project in this log. When navigating to this link, we see our application in all its glory, running in the cloud. Grab your friends, open the link on your phone, and tell your relatives who live across the country to click the link – you’ve just successfully deployed your Kotlin application to the world wide web!
 
-### Working with Heroku Postgres
+![Hello, Heroku!](/assets/kotlin_on_heroku/9cmpkp8lveowc9mm9wi1.png)
 
-Now, let's make our application work with Heroku Postgres.
+### What’s next?
 
-[Heroku Postgres](https://www.heroku.com/postgres) is an easy way to **attach a database to your application running on Heroku**. The free tier does come with some [limitations](https://elements.heroku.com/addons/heroku-postgresql#pricing), most notably a **maximum of 10'000 rows** within the database. For your average hackathon project or private experiment, ten thousand rows should probably still be enough – unless you're scraping all of [Reddit's cat pictures](https://old.reddit.com/r/CatsInSinks/top/?sort=top&t=all). If you're willing to spend $9/mo, you can up yourself to the _Hobby Basic_ tier and store up to 10 million rows – and I'd argue that's enough feline imagery.
+Now that we are done with setting up our Ktor application for deployment on Heroku, we have a simple workflow for publishing new changes to the web:
 
-Getting the database to play nice with our application only requires **a few clicks** on the [dashboard](https://dashboard.heroku.com/apps).
+- Make the change
+- Commit the change
+- Push the change to `heroku master`
 
-#### Provisioning & Connecting to the Database
+...and after just a minute or two, our changes will be published.
 
-Select your application in the dashboard, and click on "Configure Add-ons" in the left column. In the bottom search bar, type and select `Heroku Postgres`. Keep the selection at `Hobby Dev – Free` for now and hit the big **_Provision_ button**.
+If we’re planning to collaborate with others, we might want to share our project on GitHub. In this case, we can simply create an empty repository on GitHub, [add it as a remote](https://docs.github.com/en/free-pro-team@latest/github/using-git/adding-a-remote), and push our changes to it, just as we would normally do.
 
-![provision_db](/assets/kotlin_on_heroku/provision_db.png)
+If we’re feeling particularly fancy, we can use [Heroku’s GitHub integration](https://devcenter.heroku.com/articles/github-integration) to make the deployment of our Kotlin applications happen automatically whenever we push our commits to GitHub. With this, we actually have a convenient way of doing **continuous delivery (CD)**.
 
-**And boom, you're done!** Thanks to us not hardcoding the JDBC connection, but instead using environment variables, our application needs no further setup – and thanks to Exposed, the SQL schema is automatically set up on deployment! 🚀🎉
+And of course, there is a lot more to explore around the Heroku platform and our server-side Kotlin application. Heroku’s [“Add-ons”](https://elements.heroku.com/addons) page allows us to add a ton of different services to your app, which we can use from our code. While many of them are paid add-ons, many popular services also offer a free “developer” tier, so you can experiment to your heart’s content. If you want to explore more fine-grained control about the JVM execution environment available on the platform, you can explore JDK- and JVM related adjustments, such as providing a `system.properties` file to specify a differing Java version to run your app on.
 
-### Bonus: Using GitHub for Automatic Deployments 🤖
 
-When you are **working in a team**, you usually wouldn't host your repository on your local machine. Instead, you would use a service like **GitHub** where the efforts of the team can flow together.
+### Thank you for reading!
 
-Awesomely enough, we can use **GitHub in conjunction with Heroku** to automate our deployments even when **multiple people** are working on the project!
-
-If you've followed along so far and would like to make the conversion to **GitHub**, the **integration in IntelliJ** will make this a breeze. Simply select "VCS" – "Import into Version Control" – "**Share Project on GitHub**". Authenticate yourself against the GitHub platform and create the new repository as prompted in the dialogue. If you're not ready to share your repository with the public yet, make sure to tick _Private_ in the settings.
-
-> If you didn't know yet, you can grab **free private repositories** and much more by getting [GitHub Education](https://education.github.com/pack)!
-
-![share_on_github](/assets/kotlin_on_heroku/share_on_github.png)
-
-Now, all that is left is to tell Heroku that upon a **new commit** to the `master` branch, the application should be **redeployed** with the new version. You can do this by navigating to the "Deploy" tab for your application in the dashboard, and switching from _Heroku Git_ to _GitHub_. If you have few GitHub repositories, pressing Enter when searching for a repo name will show you all your repositories.
-
-Click "Connect" for the correct repository. You can now perform a manual deploy, or **enable automatic deploys** whenever a new commit lands on the `master` branch or a branch of your choice.
-
-> **Important!** As the Heroku page suggests: "be sure that this branch is always in a deployable state and any tests have passed before you push."
->
-> Now would be a great time to introduce and adhere to a **proper branching model** such as [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) – or a [simplified version](https://medium.com/goodtogoat/simplified-git-flow-5dc37ba76ea8).
-
-### Conclusion
-
-So, these instructions might seem long and daunting – but: the final program is **less than 100 lines of code, though**. Throughout this crash course, we've seen:
-
-- How to setup Ktor and Exposed locally
-- How to configure the JDBC connection using environment variables so that they can get used by Heroku
-- How we can use type-safe builders to declare HTML while reaping the benefits of static typing
-- How IntelliJ provides:
-  - Graphical integration with databases
-  - Graphical integration with git
-  - Simple "Publish to GitHub" functionality
-- And of course: How we can use Heroku to deliver value quickly and with high iteration speed to customers and users.
-
-If you don't feel like walking through all the steps above yourself, the **[final project](https://github.com/SebastianAigner/herokuBook)** can be found on my GitHub. You can run it on Heroku by cloning it, creating the application as described in the article, and executing a `git push heroku master`.
-
-There are a lot of topics that were just mentioned in passing, and not fully expanded upon. I hope that this article was interesting enough to make you **seek out more information** about this and adjacent topics.
-
-### Nano Cheat Sheet
-
-1. Run `heroku create` on your local git repo containing your Ktor app
-2. Add staging task: `task stage(dependsOn: ['installDist'])`
-3. Add procfile: `web ./build/install/ktorio/bin/ktorio`
-4. Use `System.getenv("JDBC_DATABASE_URL")` in order to connect to Postgres database.
-
-### Questions? Comments? Hit me up!
-
-Whoa, what a long article. There's a good chance you're not leaving here without a **few questions**. While I of course encourage you to **go out and explore**, if you have any questions regarding my article, or would like to just have a chat, please feel free to **shoot me a Tweet** [@TrueSebi](https://twitter.com/TrueSebi) or **contact me via email**. Cheers! 🙌🏼
+Thanks for sticking around until the end! I hope you found this tutorial helpful. If you have any questions or ideas about what to cover next, please let me know!
