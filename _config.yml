@@ -16,18 +16,18 @@
 title: sebi.io
 email: "[firstname] döt [lastname]@me.com"
 description: >- # this means to ignore newlines until "baseurl:"
-  This is my corner of the internet. Tech makes me happy, so I try to note down and share my adventures here.
-  I don't have a really specific plan on where I am going with this, so I'll use it as my notepad to jot down ideas, concepts, and tutorials,
+  Howdy! 🤠 I'm Seb, and welcome to my corner of the internet. Tech makes me happy, so I try to note down and share my adventures here.
+  I treat  this place as my public notepad to jot down ideas, concepts, and tutorials,
   so that I and others will be able to revisit them whenever they'd like.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: TrueSebi
-github_username:  SebastianAigner
+github_username: SebastianAigner
 
 # Build settings
 markdown: kramdown
 theme: minima
-plugins:
+plugins: 
   - jekyll-feed
 
 # Exclude from processing.

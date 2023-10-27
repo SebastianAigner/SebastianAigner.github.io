@@ -4,4 +4,11 @@ title: About
 permalink: /about/
 ---
 
-My name is Sebastian. I am studying Computer Science at the Technical Universtiy of Munich. Thanks for stopping by!
+Howdy! 🤠
+
+My name is Sebastian. I am a Developer Advocate at JetBrains.
+I give talks, make videos, and write.
+
+I studied Computer Science at the Technical University of Munich.
+
+Thanks for stopping by!
