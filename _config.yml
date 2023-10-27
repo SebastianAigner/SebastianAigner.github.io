@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: sebi.io
+title: Sebastian Aigner
 email: "[firstname] döt [lastname]@me.com"
 description: >- # this means to ignore newlines until "baseurl:"
   Howdy! 🤠 I'm Seb, and welcome to my corner of the internet. Tech makes me happy, so I try to note down and share my adventures here.
