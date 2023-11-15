@@ -1,0 +1,14 @@
+{{- with resources.Get "css/main.css" }}
+  {{- if eq hugo.Environment "development" }}
+{{ $sass := resources.Get "sass/main.scss" }}
+      {{ $style := $sass | resources.ToCSS | resources.Fingerprint }}
+      
+    <link rel="stylesheet" href="{{ $style.RelPermalink }}">
+  {{- else }}
+    {{- with . | minify | fingerprint }}
+      {{ $sass := resources.Get "sass/main.scss" }}
+      {{ $style := $sass | resources.ToCSS | resources.Fingerprint }}
+      <link rel="stylesheet" href="{{ $style.Permalink }}" integrity="{{ $style.Data.Integrity }}" crossorigin="anonymous">
+    {{- end }}
+  {{- end }}
+{{- end }}

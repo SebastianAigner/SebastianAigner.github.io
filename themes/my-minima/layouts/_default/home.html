@@ -1,0 +1,7 @@
+{{ define "main" }}
+  {{ .Content }}
+  {{ range site.RegularPages }}
+    <span class="post-meta">{{time.Format "2006-01-02" .Date}}</span>
+    <h3><a class="post-link" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></h3>
+  {{ end }}
+{{ end }}

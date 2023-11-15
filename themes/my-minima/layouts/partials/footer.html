@@ -1,0 +1,49 @@
+<footer class="site-footer h-card">
+  <data class="u-url" href=""></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+        {{ with .OutputFormats.Get "rss" -}}
+          {{ printf `<a href=%q title=%q>` .Permalink site.Title | safeHTML }}
+        {{ end }}
+            <svg class="svg-icon orange">
+            {{ with resources.Get "assets/minima-social-icons.svg#rss" }}
+            <use xlink:href="{{ .RelPermalink }}"></use>
+            {{ end }}
+
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+
+
+
+        <ul class="contact-list">
+        {{ with .Site.Author }}
+            <li class="p-name">{{ .name }}</li>
+            <li><a class="u-email" href="mailto:{{ .email }}">{{ .email }}</a></li>
+        {{ end }}
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>Thanks for stopping by my corner of the internet :)</p>
+      </div>
+    </div>
+
+    <!--<div class="social-links">-->
+    <!--<li>-->
+    <!--<a rel="me" href="http://twitter.com/sebi_io" target="_blank" title="Twitter">-->
+    <!--      <svg class="svg-icon grey">-->
+    <!--      {{ with resources.Get "assets/minima-social-icons.svg#twitter" }}-->
+    <!--      <use xlink:href="{{ .RelPermalink }}"></use>-->
+    <!--      {{ end }}-->
+    <!--    </svg>-->
+    <!--    </a>-->
+    <!--    </li>-->
+    <!--</div>-->
+
+  </div>
+
+</footer>
