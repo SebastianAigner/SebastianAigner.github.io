@@ -1,0 +1,12 @@
+baseURL = 'https://sebi.io/'
+languageCode = 'en-us'
+title = 'Sebastian Aigner'
+theme = 'my-minima'
+
+
+[markup]
+  [markup.highlight]
+    style = 'gruvbox'
+
+[markup.goldmark.renderer]
+    unsafe = true
