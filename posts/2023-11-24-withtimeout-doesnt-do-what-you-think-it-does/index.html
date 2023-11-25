@@ -2,7 +2,7 @@
 <label for=nav-trigger><span class=menu-icon><svg viewBox="0 0 18 15" width="18" height="15"><path d="M18 1.484c0 .82-.665 1.484-1.484 1.484H1.484C.665 2.969.0 2.304.0 1.484.0.665.665.0 1.484.0h15.032C17.335.0 18 .665 18 1.484zm0 6.032C18 8.335 17.335 9 16.516 9H1.484C.665 9 0 8.335.0 7.516c0-.82.665-1.484 1.484-1.484h15.032C17.335 6.031 18 6.696 18 7.516zm0 6C18 14.335 17.335 15 16.516 15H1.484C.665 15 0 14.335.0 13.516c0-.82.665-1.483 1.484-1.483h15.032C17.335 12.031 18 12.695 18 13.516z"/></svg></span></label><div class=trigger><a class=page-link href=/>Home</a>
 <a class=page-link aria-current=true class=ancestor href=/posts/>Posts</a>
 <a class=page-link href=/tags/>Tags</a></div></nav></div></header><main class=page-content aria-label=Content><div class=wrapper><header class=post-header><h1 class="post-title p-name" itemprop="name headline">Coroutines quirks: withTimeout might not do what you think it does</h1><p class=post-meta><time class=dt-published datetime=2023-11-16T01:53:34+00:00>November 16, 2023</time></p></header><div class="post-content e-content"><p><strong>TLDR</strong>: The <code>withTimeout</code> function doesn&rsquo;t cancel the execution of the <em>block</em> you pass it. It throws
-a <code>TimeoutCancellationException</code>, which, when left uncaught, <strong>It cancels the invoking
+a <code>TimeoutCancellationException</code>, which, when left uncaught, <strong>cancels the invoking
 coroutine</strong>. The <code>withTimeoutOrNull</code> function does not exhibit this behavior.</p><p>The kotlinx.coroutines team is <a href=https://github.com/Kotlin/kotlinx.coroutines/issues/1374>aware of this issue</a>.</p><hr><p>In Kotlin coroutines,
 the <a href=https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/with-timeout.html><code>withTimeout</code> function</a>
 can be used to constrain the execution of your code to a specific timeout. Its signature looks as follows:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span>withTimeout(timeMillis: Long, block: <span style=color:#fe8019>suspend</span> CoroutineScope.() <span style=color:#fe8019>-&gt;</span> T): T
@@ -33,15 +33,15 @@ following code snippet and its output (in its entirety)</p><div class=highlight>
 </span></span><span style=display:flex><span>    }
 </span></span><span style=display:flex><span>}
 </span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#928374;font-style:italic>// Doing some too-long-running-task that will timeout
+</span></span><span style=display:flex><span><span style=color:#928374;font-style:italic>// Doing some too-long-running-task that will time out
 </span></span></span><span style=display:flex><span><span style=color:#928374;font-style:italic>// Alive!
 </span></span></span><span style=display:flex><span><span style=color:#928374;font-style:italic>// Job is completing: kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 500 ms
 </span></span></span><span style=display:flex><span><span style=color:#928374;font-style:italic>// Exception in thread &#34;main&#34; kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 500 ms
-</span></span></span></code></pre></div><p>This demonstrates the part that might clash with your intuition: <strong>It&rsquo;s not the timeout block that gets canceled, it&rsquo;s
+</span></span></span></code></pre></div><p>This demonstrates the part that might clash with your intuition: <strong>It&rsquo;s not the timeout block that gets canceled; it&rsquo;s
 the coroutine scope in which <code>withTimeout</code> was called that is canceled.</strong> In the case of this code snippet, that means
-the application as a whole terminates.</p><h2 id=remedies>Remedies</h2><p>You can of course remedy this by explicitly catching the <code>TimeoutCancellationException</code>:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#fe8019>try</span> {
+the application as a whole terminates.</p><h2 id=fix-1-catch-the-exception>Fix #1: Catch the exception</h2><p>You can remedy this by explicitly catching the <code>TimeoutCancellationException</code>:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#fe8019>try</span> {
 </span></span><span style=display:flex><span>    withTimeout(<span style=color:#d3869b>500</span>) {
-</span></span><span style=display:flex><span>        println(<span style=color:#b8bb26>&#34;Doing some too-long-running-task that will timeout&#34;</span>)
+</span></span><span style=display:flex><span>        println(<span style=color:#b8bb26>&#34;Doing some too-long-running-task that will time out&#34;</span>)
 </span></span><span style=display:flex><span>        delay(<span style=color:#d3869b>2000</span>)
 </span></span><span style=display:flex><span>        <span style=color:#928374;font-style:italic>// won&#39;t reach here
 </span></span></span><span style=display:flex><span><span style=color:#928374;font-style:italic></span>    }
@@ -51,7 +51,7 @@ the application as a whole terminates.</p><h2 id=remedies>Remedies</h2><p>You ca
 </span></span></code></pre></div><p>When catching the exception, other coroutines of the scope from which you called <code>withTimeout</code> will keep running, since
 the <code>CancellationException</code> (or, more precisely, the <code>TimeoutCancellationException</code>) was prevented from reaching the
 scope. Forgetting to wrap the <code>withTimeout</code> function in this try-catch block will cause the surrounding scope to be
-cancelled, which is not what you may have expected!</p><p>Alternatively, you can use the sibling function <code>withTimeoutOrNull</code>. In the typical Kotlin pattern, where <code>withTimeout</code>
+canceled, which is not what you may have expected!</p><h2 id=fix-2-use-the-withtimeoutornull-sibling-function>Fix #2: Use the <code>withTimeoutOrNull</code> sibling function</h2><p>Alternatively, you can use the sibling function <code>withTimeoutOrNull</code>. In the typical Kotlin pattern, where <code>withTimeout</code>
 throws an exception, <code>withTimeoutOrNull</code> returns <code>null</code> if the timeout is exceeded. As such, it doesn&rsquo;t suffer from the
 same trickiness that stems from <code>TimeoutCancellationException</code> being a subtype of <code>CancellationException</code>. If you look
 into
@@ -69,14 +69,16 @@ returns null:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;backgr
 </span></span><span style=display:flex><span>            setupTimeout&lt;T?, T?&gt;(timeoutCoroutine, block)
 </span></span><span style=display:flex><span>        }
 </span></span><span style=display:flex><span>    } <span style=color:#fe8019>catch</span> (e: TimeoutCancellationException) {
-</span></span><span style=display:flex><span>        <span style=color:#928374;font-style:italic>// Return null if it&#39;s our exception, otherwise propagate it upstream (e.g. in case of nested withTimeouts)
+</span></span><span style=display:flex><span>        <span style=color:#928374;font-style:italic>// Return null if it&#39;s our exception, otherwise propagate it upstream (e.g., in case of nested withTimeouts)
 </span></span></span><span style=display:flex><span><span style=color:#928374;font-style:italic></span>        <span style=color:#fe8019>if</span> (e.coroutine <span style=color:#fe8019>===</span> coroutine) {
 </span></span><span style=display:flex><span>            <span style=color:#fe8019>return</span> <span style=color:#fe8019>null</span>
 </span></span><span style=display:flex><span>        }
 </span></span><span style=display:flex><span>        <span style=color:#fe8019>throw</span> e
 </span></span><span style=display:flex><span>    }
 </span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>If you only look at the signature, it&rsquo;s tempting to interpret <code>withTimeout</code> as introducing its own coroutine scope that
-will be cancelled when the timeout expires, but that&rsquo;s not the actual behavior &ndash; the chances are good that you&rsquo;ll have
+</span></span></code></pre></div><p>Personally, I&rsquo;d probably just opt for the <code>withTimeoutOrNull</code> function: It future-proofs me from any changes that might
+be made to the <code>withTimeout</code> function in regards to whether the thrown exception stays a subtype
+of <code>CancellationException</code> or not, and it saves me having to manage a separate try-catch.</p><p>If you only look at the signature, it&rsquo;s tempting to interpret <code>withTimeout</code> as introducing its own coroutine scope that
+will be canceled when the timeout expires, but that&rsquo;s not the actual behavior &ndash; the chances are good that you&rsquo;ll have
 an easier time just using <code>withTimeoutOrNull</code>. Something to look out for the next time
 you&rsquo;re building timeouts into your concurrent code!</p></div></div></main><footer><footer class="site-footer h-card"><data class=u-url href></data><div class=wrapper><div class=footer-col-wrapper><div class=footer-col><p class=feed-subscribe><svg class="svg-icon orange"/><span>Subscribe</span></a></p><ul class=contact-list></ul></div><div class=footer-col><p>Thanks for stopping by my corner of the internet :)</p></div></div></div></footer></footer></body></html>
