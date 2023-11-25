@@ -6,7 +6,10 @@ draft: false
 
 **TLDR**: The `withTimeout` function doesn't cancel the execution of the _block_ you pass it. It throws
 a `TimeoutCancellationException`, which, when left uncaught, **cancels the invoking
-coroutine**. The `withTimeoutOrNull` function does not exhibit this behavior.
+coroutine**.
+
+The `withTimeoutOrNull` behaves as expected, canceling only the block, and returning `null` in case the timeout was
+exceeded.
 
 The kotlinx.coroutines team is [aware of this issue](https://github.com/Kotlin/kotlinx.coroutines/issues/1374).
 
