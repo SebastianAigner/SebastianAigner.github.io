@@ -28,7 +28,7 @@ a subclass
 of [`CancellationException`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-cancellation-exception/).
 
 However, you might see this `TimeoutCancellationException` appear in a place where you wouldn't expect it. Consider the
-following code snippet and its output (in its entirety)
+following code snippet and its output (in its entirety):
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -60,7 +60,8 @@ fun main() {
 
 This demonstrates the part that might clash with your intuition: **It's not the timeout block that gets canceled; it's
 the coroutine scope in which `withTimeout` was called that is canceled.** In the case of this code snippet, that means
-the application as a whole terminates.
+the application as a whole terminates. In the case of a larger application, you might just see your coroutines silently
+cancelled.
 
 ## Fix #1: Catch the `TimeoutCancellationException`
 
