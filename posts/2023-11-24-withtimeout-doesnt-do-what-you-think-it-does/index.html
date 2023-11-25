@@ -40,7 +40,7 @@ following code snippet and its output (in its entirety):</p><div class=highlight
 </span></span></span></code></pre></div><p>This demonstrates the part that might clash with your intuition: <strong>It&rsquo;s not the timeout block that gets canceled; it&rsquo;s
 the coroutine scope in which <code>withTimeout</code> was called that is canceled.</strong> In the case of this code snippet, that means
 the application as a whole terminates. In the case of a larger application, you might just see your coroutines silently
-cancelled.</p><h2 id=fix-1-catch-the-timeoutcancellationexception>Fix #1: Catch the <code>TimeoutCancellationException</code></h2><p>You can remedy this by explicitly catching the <code>TimeoutCancellationException</code>:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#fe8019>try</span> {
+canceled.</p><h2 id=fix-1-catch-the-timeoutcancellationexception>Fix #1: Catch the <code>TimeoutCancellationException</code></h2><p>You can remedy this by explicitly catching the <code>TimeoutCancellationException</code>:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#fe8019>try</span> {
 </span></span><span style=display:flex><span>    withTimeout(<span style=color:#d3869b>500</span>) {
 </span></span><span style=display:flex><span>        println(<span style=color:#b8bb26>&#34;Doing some too-long-running-task that will time out&#34;</span>)
 </span></span><span style=display:flex><span>        delay(<span style=color:#d3869b>2000</span>)
@@ -48,7 +48,8 @@ cancelled.</p><h2 id=fix-1-catch-the-timeoutcancellationexception>Fix #1: Catch 
 </span></span></span><span style=display:flex><span><span style=color:#928374;font-style:italic></span>    }
 </span></span><span style=display:flex><span>} <span style=color:#fe8019>catch</span> (t: TimeoutCancellationException) {
 </span></span><span style=display:flex><span>    println(<span style=color:#b8bb26>&#34;Timed out&#34;</span>)
-</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>    <span style=color:#928374;font-style:italic>// TODO: Special handling for nested `withTimeout` calls?
+</span></span></span><span style=display:flex><span><span style=color:#928374;font-style:italic></span>}
 </span></span></code></pre></div><p>When catching the exception, other coroutines of the scope from which you called <code>withTimeout</code> will keep running, since
 the <code>CancellationException</code> (or, more precisely, the <code>TimeoutCancellationException</code>) was prevented from reaching the
 scope. Forgetting to wrap the <code>withTimeout</code> function in this try-catch block will cause the surrounding scope to be
@@ -58,9 +59,10 @@ throws an exception, <code>withTimeoutOrNull</code> returns <code>null</code> if
 same trickiness that stems from <code>TimeoutCancellationException</code> being a subtype of <code>CancellationException</code>. If you look
 into
 the <a href=https://github.com/Kotlin/kotlinx.coroutines/blob/28ed2cd84a376ec191fd15626624eba1cbd9fe4f/kotlinx-coroutines-core/common/src/Timeout.kt#L103-L115>implementation of <code>withTimeoutOrNull</code></a>,
-you&rsquo;ll recognize that it does the exact same thing we&rsquo;ve done in the
+you&rsquo;ll recognize that it does practically the same thing we&rsquo;ve done in the
 snippet above: It takes care of catching the <code>TimeoutCancellationException</code> to prevent it from propagating further, and
-returns null:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#fe8019>public</span> <span style=color:#fe8019>suspend</span> <span style=color:#fe8019>fun</span> &lt;T&gt; <span style=color:#fabd2f>withTimeoutOrNull</span>(timeMillis: Long, block: <span style=color:#fe8019>suspend</span> CoroutineScope.() <span style=color:#fe8019>-&gt;</span> T): T? {
+returns <code>null</code>. In addition the snippet above, its implementation also ensures that the <code>TimeoutCancellationException</code>
+really came from <em>this</em> specific coroutine, and not from a nested <code>withTimeout</code> call:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#fe8019>public</span> <span style=color:#fe8019>suspend</span> <span style=color:#fe8019>fun</span> &lt;T&gt; <span style=color:#fabd2f>withTimeoutOrNull</span>(timeMillis: Long, block: <span style=color:#fe8019>suspend</span> CoroutineScope.() <span style=color:#fe8019>-&gt;</span> T): T? {
 </span></span><span style=display:flex><span>    <span style=color:#fe8019>if</span> (timeMillis <span style=color:#fe8019>&lt;=</span> <span style=color:#d3869b>0L</span>) <span style=color:#fe8019>return</span> <span style=color:#fe8019>null</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>    <span style=color:#fe8019>var</span> coroutine: TimeoutCoroutine&lt;T?, T?&gt;? = <span style=color:#fe8019>null</span>
