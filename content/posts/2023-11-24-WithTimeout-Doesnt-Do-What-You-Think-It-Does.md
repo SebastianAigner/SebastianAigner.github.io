@@ -61,7 +61,7 @@ fun main() {
 This demonstrates the part that might clash with your intuition: **It's not the timeout block that gets canceled; it's
 the coroutine scope in which `withTimeout` was called that is canceled.** In the case of this code snippet, that means
 the application as a whole terminates. In the case of a larger application, you might just see your coroutines silently
-cancelled.
+canceled.
 
 ## Fix #1: Catch the `TimeoutCancellationException`
 
@@ -76,6 +76,7 @@ try {
     }
 } catch (t: TimeoutCancellationException) {
     println("Timed out")
+    // TODO: Special handling for nested `withTimeout` calls?
 }
 ```
 
@@ -94,9 +95,10 @@ throws an exception, `withTimeoutOrNull` returns `null` if the timeout is exceed
 same trickiness that stems from `TimeoutCancellationException` being a subtype of `CancellationException`. If you look
 into
 the [implementation of `withTimeoutOrNull`](https://github.com/Kotlin/kotlinx.coroutines/blob/28ed2cd84a376ec191fd15626624eba1cbd9fe4f/kotlinx-coroutines-core/common/src/Timeout.kt#L103-L115),
-you'll recognize that it does the exact same thing we've done in the
+you'll recognize that it does practically the same thing we've done in the
 snippet above: It takes care of catching the `TimeoutCancellationException` to prevent it from propagating further, and
-returns null:
+returns `null`. In addition the snippet above, its implementation also ensures that the `TimeoutCancellationException`
+really came from _this_ specific coroutine, and not from a nested `withTimeout` call:
 
 ```kotlin
 public suspend fun <T> withTimeoutOrNull(timeMillis: Long, block: suspend CoroutineScope.() -> T): T? {
