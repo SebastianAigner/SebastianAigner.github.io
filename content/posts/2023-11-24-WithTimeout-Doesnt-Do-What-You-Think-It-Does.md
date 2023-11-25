@@ -62,7 +62,7 @@ This demonstrates the part that might clash with your intuition: **It's not the 
 the coroutine scope in which `withTimeout` was called that is canceled.** In the case of this code snippet, that means
 the application as a whole terminates.
 
-## Fix #1: Catch the exception
+## Fix #1: Catch the `TimeoutCancellationException`
 
 You can remedy this by explicitly catching the `TimeoutCancellationException`:
 
@@ -82,6 +82,9 @@ When catching the exception, other coroutines of the scope from which you called
 the `CancellationException` (or, more precisely, the `TimeoutCancellationException`) was prevented from reaching the
 scope. Forgetting to wrap the `withTimeout` function in this try-catch block will cause the surrounding scope to be
 canceled, which is not what you may have expected!
+
+After repeating the mantra "don't catch `CancellationException` without rethrowing it" to myself for ages, it does feel
+a little bit odd to now catch a subtype of `CancellationException` and not propagate it further. Hence, I prefer fix #2.
 
 ## Fix #2: Use the `withTimeoutOrNull` sibling function
 
@@ -116,7 +119,7 @@ public suspend fun <T> withTimeoutOrNull(timeMillis: Long, block: suspend Corout
 ```
 
 Personally, I'd probably just opt for the `withTimeoutOrNull` function: It future-proofs me from any changes that might
-be made to the `withTimeout` function in regards to whether the thrown exception stays a subtype
+be made to the `withTimeout` function regarding whether the thrown exception stays a subtype
 of `CancellationException` or not, and it saves me having to manage a separate try-catch.
 
 If you only look at the signature, it's tempting to interpret `withTimeout` as introducing its own coroutine scope that
