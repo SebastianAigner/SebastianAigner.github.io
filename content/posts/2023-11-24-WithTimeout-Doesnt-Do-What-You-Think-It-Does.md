@@ -5,7 +5,7 @@ draft: false
 ---
 
 **TLDR**: The `withTimeout` function doesn't cancel the execution of the _block_ you pass it. It throws
-a `TimeoutCancellationException`, which, when left uncaught, **It cancels the invoking
+a `TimeoutCancellationException`, which, when left uncaught, **cancels the invoking
 coroutine**. The `withTimeoutOrNull` function does not exhibit this behavior.
 
 The kotlinx.coroutines team is [aware of this issue](https://github.com/Kotlin/kotlinx.coroutines/issues/1374).
@@ -52,24 +52,24 @@ fun main() {
     }
 }
 
-// Doing some too-long-running-task that will timeout
+// Doing some too-long-running-task that will time out
 // Alive!
 // Job is completing: kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 500 ms
 // Exception in thread "main" kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 500 ms
 ```
 
-This demonstrates the part that might clash with your intuition: **It's not the timeout block that gets canceled, it's
+This demonstrates the part that might clash with your intuition: **It's not the timeout block that gets canceled; it's
 the coroutine scope in which `withTimeout` was called that is canceled.** In the case of this code snippet, that means
 the application as a whole terminates.
 
-## Remedies
+## Fix #1: Catch the exception
 
-You can of course remedy this by explicitly catching the `TimeoutCancellationException`:
+You can remedy this by explicitly catching the `TimeoutCancellationException`:
 
 ```kotlin
 try {
     withTimeout(500) {
-        println("Doing some too-long-running-task that will timeout")
+        println("Doing some too-long-running-task that will time out")
         delay(2000)
         // won't reach here
     }
@@ -81,7 +81,9 @@ try {
 When catching the exception, other coroutines of the scope from which you called `withTimeout` will keep running, since
 the `CancellationException` (or, more precisely, the `TimeoutCancellationException`) was prevented from reaching the
 scope. Forgetting to wrap the `withTimeout` function in this try-catch block will cause the surrounding scope to be
-cancelled, which is not what you may have expected!
+canceled, which is not what you may have expected!
+
+## Fix #2: Use the `withTimeoutOrNull` sibling function
 
 Alternatively, you can use the sibling function `withTimeoutOrNull`. In the typical Kotlin pattern, where `withTimeout`
 throws an exception, `withTimeoutOrNull` returns `null` if the timeout is exceeded. As such, it doesn't suffer from the
@@ -104,7 +106,7 @@ public suspend fun <T> withTimeoutOrNull(timeMillis: Long, block: suspend Corout
             setupTimeout<T?, T?>(timeoutCoroutine, block)
         }
     } catch (e: TimeoutCancellationException) {
-        // Return null if it's our exception, otherwise propagate it upstream (e.g. in case of nested withTimeouts)
+        // Return null if it's our exception, otherwise propagate it upstream (e.g., in case of nested withTimeouts)
         if (e.coroutine === coroutine) {
             return null
         }
@@ -113,7 +115,11 @@ public suspend fun <T> withTimeoutOrNull(timeMillis: Long, block: suspend Corout
 }
 ```
 
+Personally, I'd probably just opt for the `withTimeoutOrNull` function: It future-proofs me from any changes that might
+be made to the `withTimeout` function in regards to whether the thrown exception stays a subtype
+of `CancellationException` or not, and it saves me having to manage a separate try-catch.
+
 If you only look at the signature, it's tempting to interpret `withTimeout` as introducing its own coroutine scope that
-will be cancelled when the timeout expires, but that's not the actual behavior -- the chances are good that you'll have
+will be canceled when the timeout expires, but that's not the actual behavior -- the chances are good that you'll have
 an easier time just using `withTimeoutOrNull`. Something to look out for the next time
 you're building timeouts into your concurrent code!
