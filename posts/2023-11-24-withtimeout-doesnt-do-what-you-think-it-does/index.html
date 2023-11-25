@@ -39,7 +39,7 @@ following code snippet and its output (in its entirety)</p><div class=highlight>
 </span></span></span><span style=display:flex><span><span style=color:#928374;font-style:italic>// Exception in thread &#34;main&#34; kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 500 ms
 </span></span></span></code></pre></div><p>This demonstrates the part that might clash with your intuition: <strong>It&rsquo;s not the timeout block that gets canceled; it&rsquo;s
 the coroutine scope in which <code>withTimeout</code> was called that is canceled.</strong> In the case of this code snippet, that means
-the application as a whole terminates.</p><h2 id=fix-1-catch-the-exception>Fix #1: Catch the exception</h2><p>You can remedy this by explicitly catching the <code>TimeoutCancellationException</code>:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#fe8019>try</span> {
+the application as a whole terminates.</p><h2 id=fix-1-catch-the-timeoutcancellationexception>Fix #1: Catch the <code>TimeoutCancellationException</code></h2><p>You can remedy this by explicitly catching the <code>TimeoutCancellationException</code>:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#fe8019>try</span> {
 </span></span><span style=display:flex><span>    withTimeout(<span style=color:#d3869b>500</span>) {
 </span></span><span style=display:flex><span>        println(<span style=color:#b8bb26>&#34;Doing some too-long-running-task that will time out&#34;</span>)
 </span></span><span style=display:flex><span>        delay(<span style=color:#d3869b>2000</span>)
@@ -51,7 +51,8 @@ the application as a whole terminates.</p><h2 id=fix-1-catch-the-exception>Fix #
 </span></span></code></pre></div><p>When catching the exception, other coroutines of the scope from which you called <code>withTimeout</code> will keep running, since
 the <code>CancellationException</code> (or, more precisely, the <code>TimeoutCancellationException</code>) was prevented from reaching the
 scope. Forgetting to wrap the <code>withTimeout</code> function in this try-catch block will cause the surrounding scope to be
-canceled, which is not what you may have expected!</p><h2 id=fix-2-use-the-withtimeoutornull-sibling-function>Fix #2: Use the <code>withTimeoutOrNull</code> sibling function</h2><p>Alternatively, you can use the sibling function <code>withTimeoutOrNull</code>. In the typical Kotlin pattern, where <code>withTimeout</code>
+canceled, which is not what you may have expected!</p><p>After repeating the mantra &ldquo;don&rsquo;t catch <code>CancellationException</code> without rethrowing it&rdquo; to myself for ages, it does feel
+a little bit odd to now catch a subtype of <code>CancellationException</code> and not propagate it further. Hence, I prefer fix #2.</p><h2 id=fix-2-use-the-withtimeoutornull-sibling-function>Fix #2: Use the <code>withTimeoutOrNull</code> sibling function</h2><p>Alternatively, you can use the sibling function <code>withTimeoutOrNull</code>. In the typical Kotlin pattern, where <code>withTimeout</code>
 throws an exception, <code>withTimeoutOrNull</code> returns <code>null</code> if the timeout is exceeded. As such, it doesn&rsquo;t suffer from the
 same trickiness that stems from <code>TimeoutCancellationException</code> being a subtype of <code>CancellationException</code>. If you look
 into
@@ -77,7 +78,7 @@ returns null:</p><div class=highlight><pre tabindex=0 style=color:#ebdbb2;backgr
 </span></span><span style=display:flex><span>    }
 </span></span><span style=display:flex><span>}
 </span></span></code></pre></div><p>Personally, I&rsquo;d probably just opt for the <code>withTimeoutOrNull</code> function: It future-proofs me from any changes that might
-be made to the <code>withTimeout</code> function in regards to whether the thrown exception stays a subtype
+be made to the <code>withTimeout</code> function regarding whether the thrown exception stays a subtype
 of <code>CancellationException</code> or not, and it saves me having to manage a separate try-catch.</p><p>If you only look at the signature, it&rsquo;s tempting to interpret <code>withTimeout</code> as introducing its own coroutine scope that
 will be canceled when the timeout expires, but that&rsquo;s not the actual behavior &ndash; the chances are good that you&rsquo;ll have
 an easier time just using <code>withTimeoutOrNull</code>. Something to look out for the next time
