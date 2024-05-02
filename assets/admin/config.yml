@@ -3,6 +3,7 @@ backend:
   repo: SebastianAigner/SebastianAigner.github.io # Path to your GitHub repository
   branch: master # Branch to update (optional; defaults to master)
 media_folder: "static/assets"
+public_folder: "assets"
 collections:
   - name: "posts"
     label: "Post"
