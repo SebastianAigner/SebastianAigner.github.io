@@ -1,15 +1,14 @@
 ---
-date: "2023-11-16T01:53:34Z"
 title: "Coroutines quirks: withTimeout might not do what you think it does"
+date: 2023-11-16T01:53:34Z
 draft: false
 ---
-
-**TLDR**: The `withTimeout` function doesn't cancel the execution of the _block_ you pass it. It throws
+**TLDR**: The `withTimeout` function doesn't cancel the execution of the *block* you pass it. It throws
 a `TimeoutCancellationException`, which, when left uncaught, **cancels the invoking
 coroutine**.
 
 The `withTimeoutOrNull` behaves as expected, canceling only the block, and returning `null` in case the timeout was
-exceeded.
+exceeded!
 
 The kotlinx.coroutines team is [aware of this issue](https://github.com/Kotlin/kotlinx.coroutines/issues/1374).
 
@@ -101,7 +100,7 @@ the [implementation of `withTimeoutOrNull`](https://github.com/Kotlin/kotlinx.co
 you'll recognize that it does practically the same thing we've done in the
 snippet above: It takes care of catching the `TimeoutCancellationException` to prevent it from propagating further, and
 returns `null`. In addition the snippet above, its implementation also ensures that the `TimeoutCancellationException`
-really came from _this_ specific coroutine, and not from a nested `withTimeout` call:
+really came from *this* specific coroutine, and not from a nested `withTimeout` call:
 
 ```kotlin
 public suspend fun <T> withTimeoutOrNull(timeMillis: Long, block: suspend CoroutineScope.() -> T): T? {
