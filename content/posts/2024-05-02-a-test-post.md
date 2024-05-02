@@ -1,7 +1,8 @@
 ---
 layout: blog
 title: A Test Post
-date: 2024-05-02T20:01:00.000Z
+draft: false
+date: +0200-05-02T08:28:00+02:00
 ---
 ...please ignore, if you will.
 
