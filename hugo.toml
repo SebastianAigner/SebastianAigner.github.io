@@ -5,8 +5,8 @@ theme = 'my-minima'
 
 
 [markup]
-  [markup.highlight]
-    style = 'gruvbox'
+[markup.highlight]
+style = 'gruvbox'
 
 [markup.goldmark.renderer]
-    unsafe = true
+unsafe = true
