@@ -1,7 +1,7 @@
 ---
 title: "Guide: Cross-compiling Rust from macOS to Raspberry Pi (2024, Apple Silicon)"
 draft: false
-date: 2024-05-02T23:30:00Z
+date: 2024-05-02T23:31:00Z
 ---
 
 > This guide builds
