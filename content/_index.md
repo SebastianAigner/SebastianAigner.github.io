@@ -15,6 +15,6 @@ Hi! I'm **Seb**, Developer Advocate at JetBrains. Nice to meet you! Come hang ou
 - I hang around in the [Kotlin community](https://slack-chats.kotlinlang.org/)
 - I give talks and workshops at conferences all around the world
 - I help out with the [Munich Kotlin User Group](https://www.meetup.com/de-DE/kotlin-user-group-munich/)
-- I'm writing a [book](https://kotl.in/in-action)
+- I wrote a [book](https://kotl.in/in-action)
 
 # Posts
