@@ -1,7 +1,6 @@
 ---
 title: "Generating thumbnails 3.8x faster by using ffmpeg seeking instead of fps filtering"
 draft: false
-images: [thumbnail.jpg]
 date: 2024-12-21T00:00:01Z
 ---
 
