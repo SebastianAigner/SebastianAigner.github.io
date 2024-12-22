@@ -4,7 +4,6 @@ date: "2021-06-14T00:00:00Z"
 description: Level up your Kotlin collection skills, and learn about advanced functionality
   that helps you be more productive when writing Kotlin code working with lists, sets,
   and collections in general!
-published: true
 series: Kotlin Standard Library Safari
 tags: [kotlin, programming, android, productivity]
 title: Advanced Kotlin Collection Functionality

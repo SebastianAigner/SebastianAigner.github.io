@@ -4,7 +4,6 @@ cover_image: /assets/kotlin-js-on-gh-pages/sfpjyr968bufv673zlfg.jpg
 date: "2021-02-05T19:33:57Z"
 description: How to get your Kotlin/JS application available on the web, with free
   Continuous Integration and hosting via GitHub Actions and Pages.
-published: true
 tags: [kotlin, javascript, github, webdev]
 title: Hosting Kotlin/JS on GitHub Pages via GitHub Actions
 ---

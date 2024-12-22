@@ -1,10 +1,9 @@
 ---
 canonical_url: https://blog.jetbrains.com/kotlin/2021/09/validating-input-advent-of-code-in-kotlin/
 cover_image: /assets/idiomatic-kotlin-aoc-password/cbbzu9czcw77cmma8xfs.png
-date: "2021-09-01T00:00:00Z"
+date: 2021-09-01T00:00:01Z
 description: Input sanitization and validation feels like a problem as old as programming
   itself. We'll take a closer look today, as part of the Idiomatic Kotlin series.
-published: true
 tags: [kotlin, adventofcode, codenewbie, 100daysofcode]
 title: 'Idiomatic Kotlin: Solving Advent of Code Puzzles, Passport Validation'
 ---

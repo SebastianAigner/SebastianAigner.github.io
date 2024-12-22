@@ -5,7 +5,6 @@ date: "2021-03-03T15:33:57Z"
 description: Improving your Kotlin skills means exploring code and discovering new
   things you might not have known before. Here are some handy tips to do so on your
   own.
-published: true
 series: Kotlin Standard Library Safari
 tags: [kotlin,productivity,programming,tools]
 title: Tips and tricks for your Kotlin code explorations

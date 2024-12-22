@@ -3,7 +3,6 @@ cover_image: /assets/asteroids-cfd2/it978npuczaugkhr1e2y.jpg
 date: "2021-05-06T00:00:00Z"
 description: Diving deeper into building a sample game with the multiplatform reactive
   UI framework.
-published: true
 series: Building a game with Compose for Desktop
 tags: [gamedev, kotlin, jetpackcompose, android]
 title: Tips & tricks for building a game using Compose for Desktop (Part 2/2)

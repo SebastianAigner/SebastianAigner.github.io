@@ -3,7 +3,6 @@ cover_image: /assets/stdlib-collections/xaxcuqqhjnp77atfahyi.jpeg
 date: "2021-03-29T00:00:00Z"
 description: Kotlin's standard library provides awesome and versatile tools to manage
   groups of items. Let's take a closer look!
-published: true
 series: Kotlin Standard Library Safari
 tags: [kotlin,programming,android,productivity]
 title: Diving into Kotlin collections

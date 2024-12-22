@@ -4,6 +4,8 @@ draft: false
 date: 2024-12-21T00:00:01Z
 ---
 
+![](feature.jpg)
+
 As part of tinkering with [reelchest](https://github.com/SebastianAigner/reelchest), one of the tasks I need to tackle is thumbnail generation.
 
 A few ways to do that are described in the official [ffmpeg documentation](https://trac.ffmpeg.org/wiki/Create%20a%20thumbnail%20image%20every%20X%20seconds%20of%20the%20video). Since I want to create more than one thumbnail per media file (hopefully, so that I can do some kind of cool crossfade effect that makes the entire application feel a bit more lively), I opted for the `fps` video filter. Here's the snippet in my code that creates a thumbnail every 10 seconds into the video. (The snippet here is Kotlin, but they're the literal CLI flags passed to the `ffmpeg` process, so this should be comprehensible.)

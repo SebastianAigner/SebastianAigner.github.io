@@ -4,7 +4,6 @@ date: "2021-03-09T00:00:00Z"
 description: The IR compiler for Kotlin/JS comes with a lot of benefits for your apps,
   but also comes with more restrictions to make sure your code is correct. Let's look
   at some of the changes we had to make to our example app.
-published: true
 tags: [kotlin, javascript]
 title: Migrating our Kotlin/JS app to the new IR compiler
 ---

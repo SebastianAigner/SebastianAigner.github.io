@@ -3,7 +3,6 @@ cover_image: https://dev-to-uploads.s3.amazonaws.com/uploads/articles/it978npucz
 date: "2021-05-06T00:00:00Z"
 description: '...and how you can get started building your own games on top of this
   modern framework.'
-published: true
 series: Building a game with Compose for Desktop
 tags: [gamedev, kotlin, jetpackcompose, android]
 title: How I built an "Asteroids" game using Compose for Desktop (Part 1/2)

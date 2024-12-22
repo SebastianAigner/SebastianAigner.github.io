@@ -4,7 +4,6 @@ date: "2021-07-08T00:00:00Z"
 description: Lists are the most popular collection type in the Kotlin standard library,
   and for a good reason! Learn all about them, and bring your Kotlin skills to the
   next level!
-published: true
 series: Kotlin Standard Library Safari
 tags: [kotlin, programming, android, productivity]
 title: Exploring Kotlin Lists
