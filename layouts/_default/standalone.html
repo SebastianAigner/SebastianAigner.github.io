@@ -26,6 +26,7 @@
             max-height: 300px;
             width: auto;
             height: auto;
+            cursor: pointer;
         }
         img.emote.rainbow {
             animation: hue-rotate-anim 3s linear infinite;
@@ -33,6 +34,9 @@
         @keyframes hue-rotate-anim {
             0% { filter: hue-rotate(0deg); }
             100% { filter: hue-rotate(360deg); }
+        }
+        img.emote.golden {
+            filter: sepia(1) saturate(3) brightness(1.3) hue-rotate(-10deg) drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
         }
         .add-button {
             position: fixed;
@@ -74,6 +78,25 @@
                 #ff0000, #ff7f00, #ffff00, #00ff00,
                 #0000ff, #4b0082, #9400d3);
         }
+        #addGoldenButton {
+            bottom: 190px;
+            right: 30px;
+            background: linear-gradient(135deg, #f9d423 0%, #ff4e50 100%);
+            background: linear-gradient(135deg, #FFD700, #FFA500, #FFD700);
+            background-size: 200% 200%;
+            animation: golden-shimmer 2s ease infinite;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+            display: none;
+        }
+        #addGoldenButton:hover {
+            background: linear-gradient(135deg, #FFE55C, #FFB700, #FFE55C);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.7);
+        }
+        @keyframes golden-shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body>
@@ -90,13 +113,27 @@
             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
         </svg>
     </button>
+    <button id="addGoldenButton" class="add-button">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+    </button>
     <script>
+        function removeEmote(event) {
+            event.target.remove();
+        }
+
         document.getElementById('addButton').addEventListener('click', function() {
             const container = document.getElementById('container');
             const img = document.createElement('img');
-            img.className = 'emote';
+
+            // 1% chance to spawn a golden alien
+            const isGolden = Math.random() < 0.01;
+            img.className = isGolden ? 'emote golden' : 'emote';
+
             img.src = 'https://cdn.frankerfacez.com/emoticon/750593/animated/4';
-            img.alt = 'Emote';
+            img.alt = isGolden ? 'Golden Emote' : 'Emote';
+            img.addEventListener('click', removeEmote);
             container.appendChild(img);
         });
 
@@ -106,7 +143,26 @@
             img.className = 'emote rainbow';
             img.src = 'https://cdn.frankerfacez.com/emoticon/750593/animated/4';
             img.alt = 'Rainbow Emote';
+            img.addEventListener('click', removeEmote);
             container.appendChild(img);
+        });
+
+        document.getElementById('addGoldenButton').addEventListener('click', function() {
+            const container = document.getElementById('container');
+            const img = document.createElement('img');
+            img.className = 'emote golden';
+            img.src = 'https://cdn.frankerfacez.com/emoticon/750593/animated/4';
+            img.alt = 'Golden Emote';
+            img.addEventListener('click', removeEmote);
+            container.appendChild(img);
+        });
+
+        // Add click listener to the initial emote
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialEmote = document.querySelector('.emote');
+            if (initialEmote) {
+                initialEmote.addEventListener('click', removeEmote);
+            }
         });
     </script>
 </body>
