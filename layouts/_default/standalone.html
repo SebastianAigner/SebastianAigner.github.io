@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: #000;
+            position: relative;
+        }
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        img.emote {
+            max-width: 300px;
+            max-height: 300px;
+            width: auto;
+            height: auto;
+        }
+        img.emote.rainbow {
+            animation: hue-rotate-anim 3s linear infinite;
+        }
+        @keyframes hue-rotate-anim {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        .add-button {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s;
+            padding: 0;
+        }
+        .add-button svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+        .add-button:hover {
+            transform: scale(1.1);
+        }
+        .add-button:active {
+            transform: scale(0.95);
+        }
+        #addButton {
+            bottom: 30px;
+            right: 30px;
+            background-color: #4CAF50;
+        }
+        #addButton:hover {
+            background-color: #45a049;
+        }
+        #addRainbowButton {
+            bottom: 110px;
+            right: 30px;
+            background: linear-gradient(45deg,
+                #ff0000, #ff7f00, #ffff00, #00ff00,
+                #0000ff, #4b0082, #9400d3);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <img class="emote" src="https://cdn.frankerfacez.com/emoticon/750593/animated/4" alt="Emote">
+    </div>
+    <button id="addButton" class="add-button">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+    </button>
+    <button id="addRainbowButton" class="add-button">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+    </button>
+    <script>
+        document.getElementById('addButton').addEventListener('click', function() {
+            const container = document.getElementById('container');
+            const img = document.createElement('img');
+            img.className = 'emote';
+            img.src = 'https://cdn.frankerfacez.com/emoticon/750593/animated/4';
+            img.alt = 'Emote';
+            container.appendChild(img);
+        });
+
+        document.getElementById('addRainbowButton').addEventListener('click', function() {
+            const container = document.getElementById('container');
+            const img = document.createElement('img');
+            img.className = 'emote rainbow';
+            img.src = 'https://cdn.frankerfacez.com/emoticon/750593/animated/4';
+            img.alt = 'Rainbow Emote';
+            container.appendChild(img);
+        });
+    </script>
+</body>
+</html>
