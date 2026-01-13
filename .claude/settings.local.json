@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch:*)",
+      "Bash(open:*)",
+      "Bash(git push)",
+      "Bash(git add:*)",
+      "Bash(git commit -m '$\\(cat <<'EOF'\nAdd redirect from /games to Bell Pepper Games Notion page\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)')",
+      "Bash(git commit:*)"
+    ]
+  }
+}
