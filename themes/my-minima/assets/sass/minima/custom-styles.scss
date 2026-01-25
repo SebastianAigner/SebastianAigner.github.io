@@ -17,8 +17,7 @@ $code-font-family: 'JetBrains Mono', monospace;
   border-bottom: 1px solid rgba(255, 115, 0, 0.3);
 }
 
-// Align subscribe with content
-.feed-subscribe {
-  margin-left: 0;
-  padding-left: 0;
+// Align subscribe text with content
+.feed-subscribe .svg-icon {
+  margin-left: -1.5em;
 }

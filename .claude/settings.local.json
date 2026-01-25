@@ -10,7 +10,8 @@
       "Bash(hugo server:*)",
       "Bash(ipconfig getifaddr:*)",
       "Bash(rsvg-convert:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(xargs -I {} curl -s \"http://localhost:1313/sass/{}\")"
     ]
   }
 }
