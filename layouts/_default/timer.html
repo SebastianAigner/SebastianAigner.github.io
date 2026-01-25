@@ -437,11 +437,15 @@
         // Unlock audio on first interaction (iOS requirement)
         function unlockAudio() {
             if (audioUnlocked) return;
+            beepAudio.muted = true;
             beepAudio.play().then(() => {
                 beepAudio.pause();
                 beepAudio.currentTime = 0;
+                beepAudio.muted = false;
                 audioUnlocked = true;
-            }).catch(() => {});
+            }).catch(() => {
+                beepAudio.muted = false;
+            });
         }
 
         document.addEventListener('touchstart', unlockAudio, { once: true });
