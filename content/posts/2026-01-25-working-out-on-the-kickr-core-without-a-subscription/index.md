@@ -26,7 +26,7 @@ Wouldn't it be amazing if we wouldn't have to forego the pre-cooked Zwift workou
 
 Trying to figure out what kinds of workouts even were on Zwift, I browsed the net, until I found a quote that went something like this:
 
-> From Zwift 1.49 (early October 2023), Zwift has decided to reorganize its workout library into new collections. Zwift has provided a ZIP file containing legacy workouts that are no longer available in Zwift after the workout reorganization. This allows you to add them to Zwift as custom workouts. You can find the ZIP file, as well as additional information on how to use them in Zwift, on the official Zwift forum here: Zwift Forums: Workout Refresh [October 2023].
+> From Zwift 1.49 (early October 2023), Zwift has decided to reorganize its workout library into new collections. Zwift has provided a ZIP file containing legacy workouts that are no longer available in Zwift after the workout reorganization. This allows you to add them to Zwift as custom workouts. You can find the ZIP file, as well as additional information on how to use them in Zwift, on the official Zwift forum here: [Zwift Forums: Workout Refresh [October 2023]](https://forums.zwift.com/t/workout-refresh-october-2023/609799).
 
 Zwift has made their historical library of workouts available to download as a bunch of `.zwo` files. Auuki understands how to import `.zwo` files.
 
