@@ -16,7 +16,7 @@ Here's my workout setup, split by levels of involvement.
 
 ![](auuki_base.png)
 
-[Auuki](https://auuki.com/) is a free and, as will be come relevant later, open source training application. It runs entirely in your browser, and (as long as you're visiting it with a browser that exposes the Bluetooth APIs - like Chrome, but unlike Firefox), allows you to directly connect to your Kickr Core.
+[Auuki](https://auuki.com/) is a free and, as will become relevant later, open source training application. It runs entirely in your browser, and (as long as you're visiting it with a browser that exposes the Bluetooth APIs - like Chrome, but unlike Firefox), allows you to directly connect to your Kickr Core.
 
 Set your FTP, connect your Kickr, pick a built-in workout, start biking.
 
@@ -52,7 +52,7 @@ The machine one-shotted it.
 
 After that, I asked the machine to also integrate it with a local TTS service that I have running in my network (which really just proxies requests to Azure for language-learning reasons that are yet to be elaborated on). The machine obliged.
 
-Now, I have [an Auuki](https://github.com/SebastianAigner/aukii-extended) that shows me text events, and even talks to me during my workouts (when the relevant option is enabled). I'll be test-driving this for the foreseeable future. (Nice when you can use "test drive" in the literal sense for once")
+Now, I have [an Auuki](https://github.com/SebastianAigner/aukii-extended) that shows me text events, and even talks to me during my workouts (when the relevant option is enabled). I'll be test-driving this for the foreseeable future. (Nice when you can use "test drive" in the literal sense for once)
 
 I have ideas for some other custom functionality. From an architecture perspective, they're unlikely to land directly in my Auuki though. I've recently come to enjoy a message-broker style architecture where pieces of software simply publish their information into a central service, and my other, independent-ish project ideas can simply consume from there, without the "integration surface" of Auuki itself swelling too large (thus reducing the amount of JavaScript I have to generate, and potentially freeing me from any shackles I might have from living only client-side in a browser.) Perhaps a visualisation with a virtual world of some kind would be nice. But that'd be quite the endeavour, building interesting virtual worlds is no small task. So this may stay a dream for a while.
 
@@ -75,7 +75,7 @@ At least for my use case, it is _a little bit cumbersome_ to work with, which is
 
 Again, to reiterate, most of these absolutely aren't issues with GTBikeV, and it may work perfectly well for your use case (and I do encourage you to try it!). But for getting a quick 30 in before my morning shower, it simply adds a bit of friction that I don't need.
 
-That being said, I do long for being able to biking through a virtual world again, with virtual slopes and beautiful vistas. But... at what cost? 💸
+That being said, I do long for being able to bike through a virtual world again, with virtual slopes and beautiful vistas. But... at what cost? 💸
 
 ## TLDR
 First of all: Rude.
