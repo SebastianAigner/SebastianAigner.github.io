@@ -5,7 +5,7 @@
   "start_url": "/timer/",
   "display": "standalone",
   "background_color": "#0a0a0a",
-  "theme_color": "#ff9500",
+  "theme_color": "#0a0a0a",
   "icons": [
     {
       "src": "/timer-icon-192.png",
