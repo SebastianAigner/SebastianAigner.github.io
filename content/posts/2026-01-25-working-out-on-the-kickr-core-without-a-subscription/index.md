@@ -1,7 +1,7 @@
 ---
 title: "Working out on the Kickr Core without a subscription"
-draft: true
-date: 2025-01-25T00:00:01Z
+draft: false
+date: 2026-01-25T00:00:01Z
 ---
 
 I like cycling. I don't like paying money regularly for an application that varies the resistance on my indoor bike.
