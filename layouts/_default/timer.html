@@ -429,19 +429,19 @@
         // Unlock audio on first interaction (iOS requirement)
         function unlockAudio() {
             if (audioUnlocked) return;
-            beepAudio.muted = true;
-            beepAudio.play().then(() => {
-                beepAudio.pause();
-                beepAudio.currentTime = 0;
-                beepAudio.muted = false;
+            // Create a silent audio context to unlock audio on iOS
+            try {
+                const silentCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const buffer = silentCtx.createBuffer(1, 1, 22050);
+                const source = silentCtx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(silentCtx.destination);
+                source.start(0);
                 audioUnlocked = true;
-            }).catch(() => {
-                beepAudio.muted = false;
-            });
+            } catch (e) {
+                audioUnlocked = true;
+            }
         }
-
-        document.addEventListener('touchstart', unlockAudio, { once: true });
-        document.addEventListener('click', unlockAudio, { once: true });
 
         function playBeep(times = 3) {
             let count = 0;
@@ -501,6 +501,7 @@
         }
 
         function startTimer() {
+            unlockAudio();
             if (isRunning) {
                 // Pause
                 clearInterval(timerInterval);
