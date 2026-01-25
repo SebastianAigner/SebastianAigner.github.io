@@ -601,6 +601,16 @@
             timeInput.select();
         });
 
+        timeInput.addEventListener('blur', () => {
+            // Normalize: convert seconds > 59 into minutes
+            const { mins, secs } = parseTimeInput(timeInput.value);
+            const totalSeconds = mins * 60 + secs;
+            const normalizedMins = Math.floor(totalSeconds / 60);
+            const normalizedSecs = totalSeconds % 60;
+            timeInput.value = formatTimeInput(normalizedMins, normalizedSecs);
+            saveTimerDuration();
+        });
+
         // Local storage keys
         const STORAGE_TIME = 'timer_time';
         const STORAGE_SETS = 'timer_sets';
