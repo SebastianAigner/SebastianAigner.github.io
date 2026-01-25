@@ -10,3 +10,15 @@ $code-font-family: 'JetBrains Mono', monospace;
 .footer-col-wrapper {
   align-items: center;
 }
+
+// Orange accent lines
+.site-header {
+  border-top: 5px solid #ff7300;
+  border-bottom: 1px solid rgba(255, 115, 0, 0.3);
+}
+
+// Align subscribe with content
+.feed-subscribe {
+  margin-left: 0;
+  padding-left: 0;
+}
