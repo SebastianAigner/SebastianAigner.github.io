@@ -3,6 +3,7 @@ title = 'Microblah'
 date = 2023-01-01T08:30:00-07:00
 draft = false
 hideDate = true
+hideFromList = true
 +++
 
 ## Adding more Checkvist to my life (2024-05-03)
