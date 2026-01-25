@@ -81,13 +81,13 @@
         .time-setter {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
         }
 
         .time-input {
-            width: 80px;
+            width: 140px;
             padding: 14px;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 600;
             text-align: center;
             background: #1a1a1a;
@@ -97,17 +97,12 @@
             font-variant-numeric: tabular-nums;
             -webkit-appearance: none;
             appearance: none;
+            letter-spacing: 2px;
         }
 
         .time-input:focus {
             outline: none;
             border-color: #ff9500;
-        }
-
-        .time-separator {
-            font-size: 24px;
-            font-weight: 700;
-            color: #666;
         }
 
         .timer-controls {
@@ -294,9 +289,7 @@
             <div class="section-label">Rest Timer</div>
             <div class="timer-display" id="timerDisplay">1:30</div>
             <div class="time-setter">
-                <input type="number" id="minutesInput" class="time-input" value="1" min="0" max="99" inputmode="numeric" pattern="[0-9]*">
-                <span class="time-separator">:</span>
-                <input type="number" id="secondsInput" class="time-input" value="30" min="0" max="59" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" id="timeInput" class="time-input" value="1:30" inputmode="numeric" pattern="[0-9]*" placeholder="0:00">
             </div>
             <div class="timer-controls">
                 <button class="btn btn-secondary" id="resetBtn">
@@ -341,8 +334,7 @@
 
         // Elements
         const timerDisplay = document.getElementById('timerDisplay');
-        const minutesInput = document.getElementById('minutesInput');
-        const secondsInput = document.getElementById('secondsInput');
+        const timeInput = document.getElementById('timeInput');
         const startBtn = document.getElementById('startBtn');
         const startIcon = document.getElementById('startIcon');
         const resetBtn = document.getElementById('resetBtn');
@@ -481,9 +473,24 @@
             }
         }
 
+        function parseTimeInput(value) {
+            // Remove all non-digits
+            const digits = value.replace(/\D/g, '');
+            if (!digits) return { mins: 0, secs: 0 };
+
+            // Last 2 digits are seconds, rest are minutes
+            const num = parseInt(digits) || 0;
+            const secs = num % 100;
+            const mins = Math.floor(num / 100);
+            return { mins, secs };
+        }
+
+        function formatTimeInput(mins, secs) {
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
         function getTargetSeconds() {
-            const mins = parseInt(minutesInput.value) || 0;
-            const secs = parseInt(secondsInput.value) || 0;
+            const { mins, secs } = parseTimeInput(timeInput.value);
             return mins * 60 + secs;
         }
 
@@ -576,23 +583,26 @@
         counterResetBtn.addEventListener('click', resetCounter);
 
         // Update display when inputs change
-        minutesInput.addEventListener('input', () => {
+        timeInput.addEventListener('input', (e) => {
+            // Format as user types
+            const digits = e.target.value.replace(/\D/g, '');
+            const num = parseInt(digits) || 0;
+            const secs = num % 100;
+            const mins = Math.floor(num / 100);
+            e.target.value = formatTimeInput(mins, secs);
+
             if (!isRunning) {
                 remainingSeconds = getTargetSeconds();
                 updateTimerDisplay();
             }
         });
 
-        secondsInput.addEventListener('input', () => {
-            if (!isRunning) {
-                remainingSeconds = getTargetSeconds();
-                updateTimerDisplay();
-            }
+        timeInput.addEventListener('focus', () => {
+            timeInput.select();
         });
 
         // Local storage keys
-        const STORAGE_MINUTES = 'timer_minutes';
-        const STORAGE_SECONDS = 'timer_seconds';
+        const STORAGE_TIME = 'timer_time';
         const STORAGE_SETS = 'timer_sets';
         const STORAGE_SETS_DATE = 'timer_sets_date';
 
@@ -605,10 +615,10 @@
         // Load saved values from localStorage
         function loadSavedValues() {
             // Load timer duration
-            const savedMinutes = localStorage.getItem(STORAGE_MINUTES);
-            const savedSeconds = localStorage.getItem(STORAGE_SECONDS);
-            if (savedMinutes !== null) minutesInput.value = savedMinutes;
-            if (savedSeconds !== null) secondsInput.value = savedSeconds;
+            const savedTime = localStorage.getItem(STORAGE_TIME);
+            if (savedTime !== null) {
+                timeInput.value = savedTime;
+            }
 
             // Load sets (reset if it's a new day)
             const savedDate = localStorage.getItem(STORAGE_SETS_DATE);
@@ -628,8 +638,7 @@
 
         // Save timer duration
         function saveTimerDuration() {
-            localStorage.setItem(STORAGE_MINUTES, minutesInput.value);
-            localStorage.setItem(STORAGE_SECONDS, secondsInput.value);
+            localStorage.setItem(STORAGE_TIME, timeInput.value);
         }
 
         // Save sets count
@@ -639,8 +648,7 @@
         }
 
         // Update input listeners to save duration
-        minutesInput.addEventListener('change', saveTimerDuration);
-        secondsInput.addEventListener('change', saveTimerDuration);
+        timeInput.addEventListener('change', saveTimerDuration);
 
         // Check for midnight reset
         function checkMidnightReset() {
