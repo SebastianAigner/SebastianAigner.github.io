@@ -3,6 +3,31 @@ languageCode = 'en-us'
 title = 'Sebastian Aigner'
 theme = 'my-minima'
 
+[[menus.main]]
+name = 'Home'
+pageRef = '/'
+weight = 10
+
+[[menus.main]]
+name = 'Microblah'
+pageRef = '/micro'
+weight = 15
+
+[[menus.main]]
+name = 'Posts'
+pageRef = '/posts'
+weight = 20
+
+[[menus.main]]
+name = 'Stuff'
+pageRef = '/stuff'
+weight = 25
+
+[[menus.main]]
+name = 'Tags'
+pageRef = '/tags'
+weight = 30
+
 
 [markup]
 [markup.highlight]

@@ -1,0 +1,15 @@
+{{ define "main" }}
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+  <div class="stuff-list">
+  {{ range .Pages }}
+    <div class="stuff-item">
+      <h2>{{ .Title }}</h2>
+      <p>{{ .Params.description }}</p>
+      {{ with .Params.link }}
+      <a href="{{ . }}" class="stuff-button">Visit</a>
+      {{ end }}
+    </div>
+  {{ end }}
+  </div>
+{{ end }}

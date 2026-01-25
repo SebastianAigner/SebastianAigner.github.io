@@ -20,3 +20,56 @@ a {
   color: #00e;
   text-decoration: none;
 }
+
+.stuff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.stuff-item {
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: #fafafa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.stuff-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stuff-item h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.stuff-item p {
+  margin: 0 0 1.25rem 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.stuff-button {
+  display: inline-block;
+  padding: 0.6rem 1.5rem;
+  background: #222;
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.stuff-button:hover {
+  background: #444;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.stuff-button:active {
+  transform: translateY(0);
+}
