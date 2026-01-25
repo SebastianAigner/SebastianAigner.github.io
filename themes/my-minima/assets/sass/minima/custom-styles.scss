@@ -5,3 +5,8 @@ $base-font-family: 'IBM Plex Sans', sans-serif;
 $code-font-family: 'JetBrains Mono', monospace;
 
 @import "stuff";
+
+// Footer alignment fix
+.footer-col-wrapper {
+  align-items: center;
+}
