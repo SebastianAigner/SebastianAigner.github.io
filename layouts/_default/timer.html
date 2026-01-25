@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>{{ .Title }}</title>
+    <link rel="icon" type="image/svg+xml" href="/timer-icon.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="/timer-icon-192.png">
+    <link rel="apple-touch-icon" href="/timer-icon-192.png">
+    <link rel="manifest" href="/timer-manifest.json">
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #0a0a0a;
+            color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        /* Timer Section */
+        .timer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .timer-display {
+            font-size: 72px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -1px;
+            color: #fff;
+            min-width: 220px;
+            text-align: center;
+            transition: transform 0.15s ease-out, color 0.3s;
+        }
+
+        .timer-display.tick {
+            transform: scale(1.05);
+        }
+
+        .timer-display.running {
+            color: #ff9500;
+        }
+
+        .timer-display.finished {
+            color: #ff453a;
+            animation: pulse 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.7; transform: scale(1.02); }
+        }
+
+        .time-setter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .time-input {
+            width: 80px;
+            padding: 14px;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #ff9500;
+        }
+
+        .time-separator {
+            font-size: 24px;
+            font-weight: 700;
+            color: #666;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 18px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .btn-primary {
+            background: #ff9500;
+            color: #0a0a0a;
+        }
+
+        .btn-primary:active {
+            background: #e08600;
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .btn-secondary:active {
+            background: #3a3a3a;
+        }
+
+        .btn-secondary svg {
+            fill: #888;
+        }
+
+        /* Divider */
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #333, transparent);
+        }
+
+        /* Counter Section */
+        .counter-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .section-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .counter-display {
+            font-size: 100px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: #fff;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s ease-out;
+        }
+
+        .counter-display.bump-up {
+            animation: bumpUp 0.2s ease-out;
+        }
+
+        .counter-display.bump-down {
+            animation: bumpDown 0.2s ease-out;
+        }
+
+        @keyframes bumpUp {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15) translateY(-5px); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bumpDown {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9) translateY(5px); }
+            100% { transform: scale(1); }
+        }
+
+        .counter-controls {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .counter-btn {
+            flex: 1;
+            padding: 28px;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .counter-btn:active {
+            transform: scale(0.93);
+        }
+
+        .counter-btn svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .counter-btn-minus {
+            background: #2a2a2a;
+        }
+
+        .counter-btn-minus svg {
+            fill: #fff;
+        }
+
+        .counter-btn-plus {
+            background: #ff9500;
+        }
+
+        .counter-btn-plus svg {
+            fill: #0a0a0a;
+        }
+
+        .counter-reset {
+            padding: 14px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            background: transparent;
+            border: 2px solid #333;
+            border-radius: 10px;
+            color: #666;
+            cursor: pointer;
+            transition: transform 0.1s, border-color 0.2s, color 0.2s;
+        }
+
+        .counter-reset:active {
+            transform: scale(0.95);
+            border-color: #555;
+            color: #888;
+        }
+
+        /* Hide number input spinners */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="timer-section">
+            <div class="section-label">Rest Timer</div>
+            <div class="timer-display" id="timerDisplay">1:30</div>
+            <div class="time-setter">
+                <input type="number" id="minutesInput" class="time-input" value="1" min="0" max="99" inputmode="numeric" pattern="[0-9]*">
+                <span class="time-separator">:</span>
+                <input type="number" id="secondsInput" class="time-input" value="30" min="0" max="59" inputmode="numeric" pattern="[0-9]*">
+            </div>
+            <div class="timer-controls">
+                <button class="btn btn-secondary" id="resetBtn">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                    </svg>
+                </button>
+                <button class="btn btn-primary" id="startBtn">
+                    <svg viewBox="0 0 24 24" fill="currentColor" id="startIcon">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="counter-section">
+            <div class="section-label">Sets</div>
+            <div class="counter-display" id="counterDisplay">0</div>
+            <div class="counter-controls">
+                <button class="counter-btn counter-btn-minus" id="decrementBtn">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="4" y="10" width="16" height="4" rx="2"/>
+                    </svg>
+                </button>
+                <button class="counter-btn counter-btn-plus" id="incrementBtn">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M11 4a1 1 0 0 1 2 0v6h6a1 1 0 0 1 0 2h-6v6a1 1 0 0 1-2 0v-6H5a1 1 0 0 1 0-2h6V4z"/>
+                    </svg>
+                </button>
+            </div>
+            <button class="counter-reset" id="counterResetBtn">Reset Sets</button>
+        </div>
+    </div>
+
+    <script>
+        // Timer state
+        let timerInterval = null;
+        let remainingSeconds = 0;
+        let isRunning = false;
+
+        // Elements
+        const timerDisplay = document.getElementById('timerDisplay');
+        const minutesInput = document.getElementById('minutesInput');
+        const secondsInput = document.getElementById('secondsInput');
+        const startBtn = document.getElementById('startBtn');
+        const startIcon = document.getElementById('startIcon');
+        const resetBtn = document.getElementById('resetBtn');
+        const counterDisplay = document.getElementById('counterDisplay');
+        const incrementBtn = document.getElementById('incrementBtn');
+        const decrementBtn = document.getElementById('decrementBtn');
+        const counterResetBtn = document.getElementById('counterResetBtn');
+
+        // SVG paths
+        const playPath = 'M8 5v14l11-7z';
+        const pausePath = 'M6 4h4v16H6V4zm8 0h4v16h-4V4z';
+
+        // Counter state
+        let count = 0;
+
+        // Audio - using HTML5 Audio with base64 encoded beep for iOS compatibility
+        let audioUnlocked = false;
+
+        // Pre-generated beep sound (three tones) as base64 WAV
+        // This is more reliable on iOS than Web Audio API
+        const beepDataUrl = createBeepDataUrl();
+
+        function createBeepDataUrl() {
+            // Generate a simple beep WAV file
+            const sampleRate = 44100;
+            const duration = 0.8;
+            const numSamples = Math.floor(sampleRate * duration);
+
+            // WAV header
+            const buffer = new ArrayBuffer(44 + numSamples * 2);
+            const view = new DataView(buffer);
+
+            // "RIFF" chunk
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + numSamples * 2, true);
+            writeString(view, 8, 'WAVE');
+
+            // "fmt " chunk
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); // PCM
+            view.setUint16(22, 1, true); // mono
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+
+            // "data" chunk
+            writeString(view, 36, 'data');
+            view.setUint32(40, numSamples * 2, true);
+
+            // Generate beep tones
+            for (let i = 0; i < numSamples; i++) {
+                const t = i / sampleRate;
+                let sample = 0;
+
+                // Three beeps at different times
+                if (t < 0.15) {
+                    sample = Math.sin(2 * Math.PI * 880 * t) * Math.max(0, 1 - t / 0.15);
+                } else if (t >= 0.2 && t < 0.35) {
+                    const localT = t - 0.2;
+                    sample = Math.sin(2 * Math.PI * 880 * t) * Math.max(0, 1 - localT / 0.15);
+                } else if (t >= 0.4 && t < 0.6) {
+                    const localT = t - 0.4;
+                    sample = Math.sin(2 * Math.PI * 1100 * t) * Math.max(0, 1 - localT / 0.2);
+                }
+
+                // Convert to 16-bit integer
+                const intSample = Math.max(-32768, Math.min(32767, Math.floor(sample * 32767 * 0.5)));
+                view.setInt16(44 + i * 2, intSample, true);
+            }
+
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+
+            // Convert to base64
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return 'data:audio/wav;base64,' + btoa(binary);
+        }
+
+        // Create audio element
+        const beepAudio = new Audio(beepDataUrl);
+        beepAudio.preload = 'auto';
+
+        // Unlock audio on first interaction (iOS requirement)
+        function unlockAudio() {
+            if (audioUnlocked) return;
+            beepAudio.play().then(() => {
+                beepAudio.pause();
+                beepAudio.currentTime = 0;
+                audioUnlocked = true;
+            }).catch(() => {});
+        }
+
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('click', unlockAudio, { once: true });
+
+        function playBeep(times = 3) {
+            let count = 0;
+            function playOnce() {
+                if (count >= times) return;
+                beepAudio.currentTime = 0;
+                beepAudio.play().catch(e => console.log('Audio play failed:', e));
+                count++;
+            }
+            beepAudio.onended = () => {
+                if (count < times) {
+                    setTimeout(playOnce, 100);
+                }
+            };
+            playOnce();
+        }
+
+        function formatTime(totalSeconds) {
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay(animate = false) {
+            timerDisplay.textContent = formatTime(remainingSeconds);
+            if (animate) {
+                timerDisplay.classList.add('tick');
+                setTimeout(() => timerDisplay.classList.remove('tick'), 150);
+            }
+        }
+
+        function getTargetSeconds() {
+            const mins = parseInt(minutesInput.value) || 0;
+            const secs = parseInt(secondsInput.value) || 0;
+            return mins * 60 + secs;
+        }
+
+        function updateStartIcon() {
+            startIcon.innerHTML = isRunning
+                ? '<path d="' + pausePath + '"/>'
+                : '<path d="' + playPath + '"/>';
+        }
+
+        function startTimer() {
+            if (isRunning) {
+                // Pause
+                clearInterval(timerInterval);
+                isRunning = false;
+                updateStartIcon();
+                timerDisplay.classList.remove('running');
+                return;
+            }
+
+            // If timer is at 0 or finished, reset to target time
+            if (remainingSeconds <= 0) {
+                remainingSeconds = getTargetSeconds();
+                timerDisplay.classList.remove('finished');
+            }
+
+            if (remainingSeconds <= 0) return;
+
+            isRunning = true;
+            updateStartIcon();
+            updateTimerDisplay();
+            timerDisplay.classList.add('running');
+            timerDisplay.classList.remove('finished');
+
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay(true);
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    updateStartIcon();
+                    timerDisplay.classList.remove('running');
+                    timerDisplay.classList.add('finished');
+                    playBeep();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            remainingSeconds = getTargetSeconds();
+            updateTimerDisplay();
+            updateStartIcon();
+            timerDisplay.classList.remove('running', 'finished');
+        }
+
+        // Counter functions
+        function updateCounterDisplay(direction) {
+            counterDisplay.textContent = count;
+            if (direction) {
+                counterDisplay.classList.remove('bump-up', 'bump-down');
+                void counterDisplay.offsetWidth; // Force reflow
+                counterDisplay.classList.add(direction === 'up' ? 'bump-up' : 'bump-down');
+            }
+        }
+
+        function increment() {
+            count++;
+            updateCounterDisplay('up');
+        }
+
+        function decrement() {
+            if (count > 0) {
+                count--;
+                updateCounterDisplay('down');
+            }
+        }
+
+        function resetCounter() {
+            count = 0;
+            updateCounterDisplay('down');
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', startTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        incrementBtn.addEventListener('click', increment);
+        decrementBtn.addEventListener('click', decrement);
+        counterResetBtn.addEventListener('click', resetCounter);
+
+        // Update display when inputs change
+        minutesInput.addEventListener('input', () => {
+            if (!isRunning) {
+                remainingSeconds = getTargetSeconds();
+                updateTimerDisplay();
+            }
+        });
+
+        secondsInput.addEventListener('input', () => {
+            if (!isRunning) {
+                remainingSeconds = getTargetSeconds();
+                updateTimerDisplay();
+            }
+        });
+
+        // Local storage keys
+        const STORAGE_MINUTES = 'timer_minutes';
+        const STORAGE_SECONDS = 'timer_seconds';
+        const STORAGE_SETS = 'timer_sets';
+        const STORAGE_SETS_DATE = 'timer_sets_date';
+
+        // Get today's date string (YYYY-MM-DD)
+        function getTodayString() {
+            const now = new Date();
+            return now.toISOString().split('T')[0];
+        }
+
+        // Load saved values from localStorage
+        function loadSavedValues() {
+            // Load timer duration
+            const savedMinutes = localStorage.getItem(STORAGE_MINUTES);
+            const savedSeconds = localStorage.getItem(STORAGE_SECONDS);
+            if (savedMinutes !== null) minutesInput.value = savedMinutes;
+            if (savedSeconds !== null) secondsInput.value = savedSeconds;
+
+            // Load sets (reset if it's a new day)
+            const savedDate = localStorage.getItem(STORAGE_SETS_DATE);
+            const today = getTodayString();
+            if (savedDate === today) {
+                const savedSets = localStorage.getItem(STORAGE_SETS);
+                if (savedSets !== null) {
+                    count = parseInt(savedSets) || 0;
+                }
+            } else {
+                // New day - reset sets
+                count = 0;
+                localStorage.setItem(STORAGE_SETS_DATE, today);
+                localStorage.setItem(STORAGE_SETS, '0');
+            }
+        }
+
+        // Save timer duration
+        function saveTimerDuration() {
+            localStorage.setItem(STORAGE_MINUTES, minutesInput.value);
+            localStorage.setItem(STORAGE_SECONDS, secondsInput.value);
+        }
+
+        // Save sets count
+        function saveSets() {
+            localStorage.setItem(STORAGE_SETS, count.toString());
+            localStorage.setItem(STORAGE_SETS_DATE, getTodayString());
+        }
+
+        // Update input listeners to save duration
+        minutesInput.addEventListener('change', saveTimerDuration);
+        secondsInput.addEventListener('change', saveTimerDuration);
+
+        // Check for midnight reset
+        function checkMidnightReset() {
+            const savedDate = localStorage.getItem(STORAGE_SETS_DATE);
+            const today = getTodayString();
+            if (savedDate && savedDate !== today) {
+                count = 0;
+                updateCounterDisplay();
+                localStorage.setItem(STORAGE_SETS_DATE, today);
+                localStorage.setItem(STORAGE_SETS, '0');
+            }
+        }
+
+        // Check every minute for midnight
+        setInterval(checkMidnightReset, 60000);
+
+        // Wrap counter functions to save
+        const originalIncrement = increment;
+        increment = function() {
+            originalIncrement();
+            saveSets();
+        };
+
+        const originalDecrement = decrement;
+        decrement = function() {
+            originalDecrement();
+            saveSets();
+        };
+
+        const originalResetCounter = resetCounter;
+        resetCounter = function() {
+            originalResetCounter();
+            saveSets();
+        };
+
+        // Initialize
+        loadSavedValues();
+        remainingSeconds = getTargetSeconds();
+        updateTimerDisplay();
+        updateCounterDisplay();
+    </script>
+</body>
+</html>
