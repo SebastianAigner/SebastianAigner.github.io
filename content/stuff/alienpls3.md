@@ -5,4 +5,5 @@ link = '/alienpls3'
 weight = 10
 [_build]
 render = 'never'
+list = 'local'
 +++
