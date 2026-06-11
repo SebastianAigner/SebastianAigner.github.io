@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>alienpls3 – DJ</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-width: 280px;
+            min-height: 200px;
+        }
+        h2 {
+            margin: 20px 0 24px 0;
+            font-size: 24px;
+            text-align: center;
+            color: #e0b0ff;
+        }
+        .dj-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 24px 24px;
+        }
+        .dj-row {
+            display: flex;
+            gap: 8px;
+        }
+        .dj-row .dj-btn {
+            flex: 1;
+        }
+        .dj-btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            color: #fff;
+        }
+        .dj-btn:hover {
+            transform: scale(1.03);
+        }
+        .dj-btn:active {
+            transform: scale(0.97);
+        }
+        .dj-btn.rotate {
+            background-color: #2196F3;
+        }
+        .dj-btn.rotate:hover {
+            background-color: #1976D2;
+        }
+        .dj-btn.rotate.active {
+            background-color: #f44336;
+            outline: 2px solid #4CAF50;
+            border-radius: 0;
+        }
+        .dj-btn.rotate.active:hover {
+            background-color: #d32f2f;
+        }
+        .dj-btn.rotate.alt {
+            background-color: #1565C0;
+        }
+        .dj-btn.rotate.alt:hover {
+            background-color: #0D47A1;
+        }
+        .dj-btn.rotate.alt.active {
+            background-color: #f44336;
+            outline: 2px solid #4CAF50;
+            border-radius: 0;
+        }
+        .dj-btn.rotate.alt.active:hover {
+            background-color: #d32f2f;
+        }
+        .dj-btn.y-spin {
+            background-color: #FF9800;
+        }
+        .dj-btn.y-spin:hover {
+            background-color: #F57C00;
+        }
+        .dj-btn.y-spin.active {
+            background-color: #f44336;
+            outline: 2px solid #4CAF50;
+            border-radius: 0;
+        }
+        .dj-btn.y-spin.active:hover {
+            background-color: #d32f2f;
+        }
+        .dj-btn.y-spin.alt {
+            background-color: #E65100;
+        }
+        .dj-btn.y-spin.alt:hover {
+            background-color: #BF360C;
+        }
+        .dj-btn.y-spin.alt.active {
+            background-color: #f44336;
+            outline: 2px solid #4CAF50;
+            border-radius: 0;
+        }
+        .dj-btn.y-spin.alt.active:hover {
+            background-color: #d32f2f;
+        }
+        .dj-speed-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dj-speed-row label {
+            font-size: 13px;
+            color: #aaa;
+            white-space: nowrap;
+        }
+        .dj-speed-row input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #2a2a3e;
+            color: #fff;
+            font-size: 14px;
+            text-align: center;
+        }
+        .dj-speed-row input:focus {
+            outline: none;
+            border-color: #9C27B0;
+        }
+        .dj-presets {
+            display: flex;
+            gap: 4px;
+        }
+        .dj-presets button {
+            padding: 4px 8px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background: #2a2a3e;
+            color: #ccc;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .dj-presets button:hover {
+            background: #3a3a5e;
+            border-color: #9C27B0;
+        }
+        .dj-btn.laola {
+            background-color: #8BC34A;
+            width: 100%;
+        }
+        .dj-btn.laola:hover {
+            background-color: #689F38;
+        }
+        .dj-btn.laola:active {
+            background-color: #558B2F;
+        }
+        .dj-btn.global-rainbow {
+            background-color: #E91E63;
+            background: linear-gradient(90deg,
+                #ff0000, #ff7f00, #ffff00, #00ff00,
+                #0000ff, #4b0082, #9400d3);
+            width: 100%;
+        }
+        .dj-btn.global-rainbow:hover {
+            filter: brightness(1.15);
+        }
+        .dj-btn.global-rainbow.active {
+            outline: 2px solid #4CAF50;
+            border-radius: 0;
+        }
+        .dj-btn.global-rainbow.active:hover {
+            filter: brightness(1.15);
+        }
+    </style>
+</head>
+<body>
+    <h2>DJ Controls</h2>
+    <div class="dj-controls">
+        <div class="dj-row">
+            <button id="djRotateBtn" class="dj-btn rotate">Rotate</button>
+            <button id="djRotateAltBtn" class="dj-btn rotate alt">Rotate (alt.)</button>
+        </div>
+        <div class="dj-speed-row">
+            <label for="djRotateRPS">RPS</label>
+            <input id="djRotateRPS" type="number" min="0.1" max="20" step="0.1" value="1">
+            <div class="dj-presets">
+                <button data-rps="0.5" data-target="rotateRPS">.5</button>
+                <button data-rps="1" data-target="rotateRPS">1</button>
+                <button data-rps="2" data-target="rotateRPS">2</button>
+                <button data-rps="3" data-target="rotateRPS">3</button>
+            </div>
+        </div>
+        <div class="dj-row">
+            <button id="djYSpinBtn" class="dj-btn y-spin">Spin</button>
+            <button id="djYSpinAltBtn" class="dj-btn y-spin alt">Spin (alt.)</button>
+        </div>
+        <div class="dj-speed-row">
+            <label for="djSpinRPS">RPS</label>
+            <input id="djSpinRPS" type="number" min="0.1" max="20" step="0.1" value="1">
+            <div class="dj-presets">
+                <button data-rps="0.5" data-target="spinRPS">.5</button>
+                <button data-rps="1" data-target="spinRPS">1</button>
+                <button data-rps="2" data-target="spinRPS">2</button>
+                <button data-rps="3" data-target="spinRPS">3</button>
+            </div>
+        </div>
+
+        <button id="djLaolaBtn" class="dj-btn laola">Laola</button>
+        <button id="djGlobalRainbowBtn" class="dj-btn global-rainbow">Global Rainbow</button>
+    </div>
+    <script>
+        (function() {
+            var main = window.opener;
+
+            function syncState() {
+                if (!main) return;
+                var s = main.alienpls3State;
+                document.getElementById('djRotateBtn').classList.toggle('active', s.spinning);
+                document.getElementById('djRotateAltBtn').classList.toggle('active', s.spinAlt);
+                document.getElementById('djYSpinBtn').classList.toggle('active', s.ySpinning);
+                document.getElementById('djYSpinAltBtn').classList.toggle('active', s.ySpinAlt);
+                document.getElementById('djRotateRPS').value = s.rotateRPS;
+                document.getElementById('djSpinRPS').value = s.spinRPS;
+                document.getElementById('djGlobalRainbowBtn').classList.toggle('active', s.globalRainbow);
+            }
+
+            function toggle(prop, altProp) {
+                var s = main.alienpls3State;
+                if (!s[prop]) {
+                    s[prop] = true;
+                    s[altProp] = false;
+                } else {
+                    s[prop] = false;
+                }
+                main.alienpls3Recompose();
+                syncState();
+            }
+
+            document.getElementById('djRotateBtn').addEventListener('click', function() {
+                toggle('spinning', 'spinAlt');
+            });
+            document.getElementById('djRotateAltBtn').addEventListener('click', function() {
+                toggle('spinAlt', 'spinning');
+            });
+            document.getElementById('djYSpinBtn').addEventListener('click', function() {
+                toggle('ySpinning', 'ySpinAlt');
+            });
+            document.getElementById('djYSpinAltBtn').addEventListener('click', function() {
+                toggle('ySpinAlt', 'ySpinning');
+            });
+
+            document.getElementById('djRotateRPS').addEventListener('input', function() {
+                var v = parseFloat(this.value);
+                if (isNaN(v) || v < 0.1) v = 0.1;
+                main.alienpls3State.rotateRPS = v;
+                main.alienpls3Recompose();
+            });
+
+            document.getElementById('djSpinRPS').addEventListener('input', function() {
+                var v = parseFloat(this.value);
+                if (isNaN(v) || v < 0.1) v = 0.1;
+                main.alienpls3State.spinRPS = v;
+                main.alienpls3Recompose();
+            });
+
+            document.getElementById('djLaolaBtn').addEventListener('click', function() {
+                main.alienpls3TriggerWave();
+            });
+
+            document.getElementById('djGlobalRainbowBtn').addEventListener('click', function() {
+                var active = !main.alienpls3State.globalRainbow;
+                main.alienpls3ApplyGlobalRainbow(active);
+                syncState();
+            });
+
+            window.addEventListener('load', syncState);
+
+            document.querySelectorAll('.dj-presets button').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var rps = parseFloat(this.dataset.rps);
+                    var target = this.dataset.target;
+                    var inputId = target === 'rotateRPS' ? 'djRotateRPS' : 'djSpinRPS';
+                    main.alienpls3State[target] = rps;
+                    document.getElementById(inputId).value = rps;
+                    main.alienpls3Recompose();
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
