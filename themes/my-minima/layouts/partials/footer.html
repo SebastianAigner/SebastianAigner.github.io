@@ -21,7 +21,7 @@
 
 
         <ul class="contact-list">
-        {{ with .Site.Author }}
+        {{ with site.Params.author }}
             <li class="p-name">{{ .name }}</li>
             <li><a class="u-email" href="mailto:{{ .email }}">{{ .email }}</a></li>
         {{ end }}
