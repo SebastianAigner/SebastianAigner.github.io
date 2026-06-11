@@ -173,6 +173,57 @@
         .dj-btn.global-rainbow.active:hover {
             filter: brightness(1.15);
         }
+        .dj-btn.global-spinning-rainbow {
+            background: conic-gradient(
+                #ff0000, #ff7f00, #ffff00, #00ff00,
+                #0000ff, #4b0082, #9400d3, #ff0000);
+            width: 100%;
+            animation: spin-rainbow-btn 2s linear infinite;
+        }
+        @keyframes spin-rainbow-btn {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        .dj-btn.global-spinning-rainbow:hover {
+            filter: brightness(1.15);
+        }
+        .dj-btn.global-spinning-rainbow.active {
+            outline: 2px solid #4CAF50;
+            border-radius: 0;
+        }
+        .dj-btn.global-spinning-rainbow.active:hover {
+            filter: brightness(1.15);
+        }
+        .dj-btn.spinning-rainbow {
+            background: linear-gradient(90deg,
+                #ff0000, #ff7f00, #ffff00, #00ff00,
+                #0000ff, #4b0082, #9400d3);
+        }
+        .dj-btn.spinning-rainbow:hover {
+            filter: brightness(1.15);
+        }
+        .dj-btn.spinning-rainbow.active {
+            outline: 2px solid #4CAF50;
+            border-radius: 0;
+        }
+        .dj-btn.spinning-rainbow.active:hover {
+            filter: brightness(1.15);
+        }
+        .dj-btn.spinning-rainbow.alt {
+            background: linear-gradient(270deg,
+                #9400d3, #4b0082, #0000ff, #00ff00,
+                #ffff00, #ff7f00, #ff0000);
+        }
+        .dj-btn.spinning-rainbow.alt:hover {
+            filter: brightness(1.15);
+        }
+        .dj-btn.spinning-rainbow.alt.active {
+            outline: 2px solid #4CAF50;
+            border-radius: 0;
+        }
+        .dj-btn.spinning-rainbow.alt.active:hover {
+            filter: brightness(1.15);
+        }
     </style>
 </head>
 <body>
@@ -209,6 +260,32 @@
 
         <button id="djLaolaBtn" class="dj-btn laola">Laola</button>
         <button id="djGlobalRainbowBtn" class="dj-btn global-rainbow">Global Rainbow</button>
+        <button id="djGlobalSpinningRainbowBtn" class="dj-btn global-spinning-rainbow">Global Spinning Rainbow</button>
+        <div class="dj-speed-row">
+            <label for="djSpinningRainbowRPS">RPS</label>
+            <input id="djSpinningRainbowRPS" type="number" min="0.1" max="20" step="0.1" value="1">
+            <div class="dj-presets">
+                <button data-rps="0.5" data-target="globalSpinningRainbowRPS">.5</button>
+                <button data-rps="1" data-target="globalSpinningRainbowRPS">1</button>
+                <button data-rps="2" data-target="globalSpinningRainbowRPS">2</button>
+                <button data-rps="3" data-target="globalSpinningRainbowRPS">3</button>
+            </div>
+        </div>
+
+        <div class="dj-row">
+            <button id="djEmoteSpinningRainbowBtn" class="dj-btn spinning-rainbow">Spinning Rainbow</button>
+            <button id="djEmoteSpinningRainbowAltBtn" class="dj-btn spinning-rainbow alt">Spinning Rainbow (alt.)</button>
+        </div>
+        <div class="dj-speed-row">
+            <label for="djEmoteSpinningRainbowRPS">RPS</label>
+            <input id="djEmoteSpinningRainbowRPS" type="number" min="0.1" max="20" step="0.1" value="1">
+            <div class="dj-presets">
+                <button data-rps="0.5" data-target="emoteSpinningRainbowRPS">.5</button>
+                <button data-rps="1" data-target="emoteSpinningRainbowRPS">1</button>
+                <button data-rps="2" data-target="emoteSpinningRainbowRPS">2</button>
+                <button data-rps="3" data-target="emoteSpinningRainbowRPS">3</button>
+            </div>
+        </div>
     </div>
     <script>
         (function() {
@@ -224,6 +301,11 @@
                 document.getElementById('djRotateRPS').value = s.rotateRPS;
                 document.getElementById('djSpinRPS').value = s.spinRPS;
                 document.getElementById('djGlobalRainbowBtn').classList.toggle('active', s.globalRainbow);
+                document.getElementById('djGlobalSpinningRainbowBtn').classList.toggle('active', s.globalSpinningRainbow);
+                document.getElementById('djSpinningRainbowRPS').value = s.globalSpinningRainbowRPS;
+                document.getElementById('djEmoteSpinningRainbowBtn').classList.toggle('active', s.emoteSpinningRainbow);
+                document.getElementById('djEmoteSpinningRainbowAltBtn').classList.toggle('active', s.emoteSpinningRainbowAlt);
+                document.getElementById('djEmoteSpinningRainbowRPS').value = s.emoteSpinningRainbowRPS;
             }
 
             function toggle(prop, altProp) {
@@ -275,13 +357,38 @@
                 syncState();
             });
 
+            document.getElementById('djGlobalSpinningRainbowBtn').addEventListener('click', function() {
+                var active = !main.alienpls3State.globalSpinningRainbow;
+                main.alienpls3ApplyGlobalSpinningRainbow(active);
+                syncState();
+            });
+
+            document.getElementById('djSpinningRainbowRPS').addEventListener('input', function() {
+                var v = parseFloat(this.value);
+                if (isNaN(v) || v < 0.1) v = 0.1;
+                main.alienpls3State.globalSpinningRainbowRPS = v;
+            });
+
+            document.getElementById('djEmoteSpinningRainbowBtn').addEventListener('click', function() {
+                toggle('emoteSpinningRainbow', 'emoteSpinningRainbowAlt');
+            });
+            document.getElementById('djEmoteSpinningRainbowAltBtn').addEventListener('click', function() {
+                toggle('emoteSpinningRainbowAlt', 'emoteSpinningRainbow');
+            });
+
+            document.getElementById('djEmoteSpinningRainbowRPS').addEventListener('input', function() {
+                var v = parseFloat(this.value);
+                if (isNaN(v) || v < 0.1) v = 0.1;
+                main.alienpls3State.emoteSpinningRainbowRPS = v;
+            });
+
             window.addEventListener('load', syncState);
 
             document.querySelectorAll('.dj-presets button').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var rps = parseFloat(this.dataset.rps);
                     var target = this.dataset.target;
-                    var inputId = target === 'rotateRPS' ? 'djRotateRPS' : 'djSpinRPS';
+                    var inputId = target === 'rotateRPS' ? 'djRotateRPS' : target === 'spinRPS' ? 'djSpinRPS' : target === 'globalSpinningRainbowRPS' ? 'djSpinningRainbowRPS' : 'djEmoteSpinningRainbowRPS';
                     main.alienpls3State[target] = rps;
                     document.getElementById(inputId).value = rps;
                     main.alienpls3Recompose();
