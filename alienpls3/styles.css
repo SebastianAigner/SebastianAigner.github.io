@@ -15,6 +15,25 @@ body {
     gap: 20px;
     padding: 20px;
     min-height: 100vh;
+    position: relative;
+}
+
+#rainbowOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: color;
+    z-index: 10;
+}
+
+.emote-rainbow-overlay {
+    position: absolute;
+    pointer-events: none;
+    mix-blend-mode: color;
+    z-index: 5;
 }
 
 img.emote {
