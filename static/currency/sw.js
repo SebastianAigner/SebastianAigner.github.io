@@ -1,9 +1,10 @@
 // Bump this version whenever a shell asset changes so installed copies refresh.
-const CACHE_NAME = 'currency-shell-v10';
+const CACHE_NAME = 'currency-shell-v11';
 const SHELL = [
     '/currency/',
     '/currency/style.css',
     '/currency/app.js',
+    '/currency/imask.min.js',
     '/currency/converter.mjs',
     '/currency/manifest.webmanifest',
     '/currency/icon.svg?v=2',

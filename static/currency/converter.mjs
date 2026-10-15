@@ -42,44 +42,6 @@ export function parseAmount(value) {
     return Number.isFinite(parsed) ? parsed : null;
 }
 
-const GROUP_SPACES = /[ \u00a0\u202f]/g;
-
-function positionWithoutGeneratedSpaces(value, position) {
-    return value.slice(0, position).replace(/\u202f/g, '').length;
-}
-
-// Remove only separators the app generated before a native edit. In particular,
-// Backspace immediately after a separator must delete a digit, not the separator.
-export function ungroupForEdit(value, start, end = start) {
-    return {
-        text: value.replace(/\u202f/g, ''),
-        start: positionWithoutGeneratedSpaces(value, start),
-        end: positionWithoutGeneratedSpaces(value, end)
-    };
-}
-
-function positionInGroupedText(value, logicalPosition) {
-    if (logicalPosition === 0) return 0;
-    let seen = 0;
-    for (let i = 0; i < value.length; i++) {
-        if (value[i] !== '\u202f') seen++;
-        if (seen === logicalPosition) return i + 1;
-    }
-    return value.length;
-}
-
-// Preserve exactly what was typed after the decimal mark, including a trailing
-// mark or zeros. Bad pasted grouping stays visible and invalid for correction.
-export function groupEditableAmount(value, start = value.length, end = start) {
-    const match = /^([+-]?)(\d+|\d{1,3}(?:[ \u00a0\u202f]\d{3})+)?([.,]\d*)?$/.exec(value);
-    if (!match) return { text: value, start, end };
-    const integer = (match[2] || '').replace(GROUP_SPACES, '');
-    const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
-    const text = match[1] + grouped + (match[3] || '');
-    const map = position => positionInGroupedText(text, value.slice(0, position).replace(GROUP_SPACES, '').length);
-    return { text, start: map(start), end: map(end) };
-}
-
 export function convert(amount, from, to, data) {
     if (!CURRENCIES.includes(from) || !CURRENCIES.includes(to) || !validRates(data)) return null;
     const perEuro = code => code === 'EUR' ? 1 : data.rates[code];

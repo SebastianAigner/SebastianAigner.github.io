@@ -1,8 +1,18 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { runInNewContext } from 'node:vm';
-import { BUNDLED_RATES, convert, formatAmount, groupEditableAmount, normalizeLatestRates, parseAmount, ungroupForEdit, validRates } from '../static/currency/converter.mjs';
+import { createContext, runInContext, runInNewContext } from 'node:vm';
+import { BUNDLED_RATES, convert, formatAmount, normalizeLatestRates, parseAmount, validRates } from '../static/currency/converter.mjs';
+
+function fakeIMask(field) {
+    let accept = () => {};
+    field.addEventListener('input', () => accept());
+    return {
+        get value() { return field.value; },
+        set value(value) { field.value = value; accept(); },
+        on(type, listener) { if (type === 'accept') accept = listener; }
+    };
+}
 
 test('comma and dot decimals convert from any field', () => {
     assert.equal(parseAmount('1,5'), 1.5);
@@ -27,32 +37,24 @@ test('comma and dot decimals convert from any field', () => {
     assert.equal(formatAmount(.00000001, 'EUR'), '0.00000001');
 });
 
-test('live grouping keeps caret, typed decimals, and invalid paste intact', () => {
-    assert.deepEqual(groupEditableAmount('15000', 5), { text: '15\u202f000', start: 6, end: 6 });
-    assert.deepEqual(groupEditableAmount('123456.00', 4, 6), { text: '123\u202f456.00', start: 5, end: 7 });
-    assert.deepEqual(groupEditableAmount('-00015,00', 6), { text: '-00\u202f015,00', start: 7, end: 7 });
-    assert.deepEqual(groupEditableAmount('1000,', 5), { text: '1\u202f000,', start: 6, end: 6 });
-    assert.deepEqual(groupEditableAmount('+.', 2), { text: '+.', start: 2, end: 2 });
-    assert.deepEqual(groupEditableAmount('12 34', 5), { text: '12 34', start: 5, end: 5 });
-    assert.deepEqual(groupEditableAmount('1,234.56', 8), { text: '1,234.56', start: 8, end: 8 });
-
-    // Mirror the browser's edit sequence: generated spaces disappear before the
-    // native edit, then grouping is reapplied after the input event.
-    function edit(grouped, start, end, inserted) {
-        const raw = ungroupForEdit(grouped, start, end);
-        return groupEditableAmount(raw.text.slice(0, raw.start) + inserted + raw.text.slice(raw.end),
-            raw.start + inserted.length);
-    }
-    let value = '';
-    for (const digit of '15000') value = edit(value, value.length, value.length, digit).text;
-    assert.equal(value, '15\u202f000');
-    assert.deepEqual(ungroupForEdit(value, 3), { text: '15000', start: 2, end: 2 });
-    const backspace = ungroupForEdit(value, 3);
-    assert.equal(groupEditableAmount(backspace.text.slice(0, backspace.start - 1) +
-        backspace.text.slice(backspace.start), backspace.start - 1).text, '1\u202f000');
-    assert.equal(edit('12\u202f345', 2, 2, '9').text, '129\u202f345', 'mid-string insertion regroups');
-    assert.equal(edit('12\u202f345', 2, 5, '6').text, '1\u202f265', 'range replacement regroups');
-    assert.equal(edit('', 0, 0, '12 34').text, '12 34', 'malformed pasted spaces remain invalid');
+test('vendored IMask groups numbers without trimming typed fractional zeros', () => {
+    const bundle = readFileSync(new URL('../static/currency/imask.min.js', import.meta.url), 'utf8');
+    const template = readFileSync(new URL('../layouts/_default/currency.html', import.meta.url), 'utf8');
+    assert.ok(template.indexOf('/currency/imask.min.js') < template.indexOf('/currency/app.js'));
+    assert.match(readFileSync(new URL('../static/currency/IMask-LICENSE.txt', import.meta.url), 'utf8'), /MIT License/);
+    const context = createContext({});
+    runInContext(bundle, context);
+    const results = runInContext(`(() => {
+        const options = { mask: Number, scale: 20, thousandsSeparator: '\\u202f', radix: '.',
+            prepareChar: char => char === ',' ? '.' : char, normalizeZeros: false,
+            padFractionalZeros: false, min: -Infinity, max: Infinity };
+        return ['15000', '1,5', '1000.00', '1,234'].map(text => {
+            const mask = IMask.createMask(options);
+            mask.resolve(text);
+            return mask.value;
+        });
+    })()`, context);
+    assert.deepEqual(Array.from(results), ['15\u202f000', '1.5', '1\u202f000.00', '1.234']);
 });
 
 test('bad data never qualifies as stored or fetched rates', () => {
@@ -100,7 +102,7 @@ test('the scoped service worker caches the entire shell for offline navigation',
     const caches = {
         async open() { return cache; },
         async match() { throw Error('global cache lookup would mix versions'); },
-        async keys() { return ['currency-shell-v10']; },
+        async keys() { return ['currency-shell-v11']; },
         async delete() { return true; }
     };
     const self = {
@@ -118,7 +120,7 @@ test('the scoped service worker caches the entire shell for offline navigation',
     listeners.install({ waitUntil(promise) { installation = promise; } });
     await installation;
     assert.equal(skipWaitingCalls, 0, 'install does not replace a running version');
-    for (const path of ['/currency/', '/currency/style.css', '/currency/app.js', '/currency/converter.mjs', '/currency/manifest.webmanifest', '/currency/icon-192.png', '/currency/icon-512.png']) {
+    for (const path of ['/currency/', '/currency/style.css', '/currency/app.js', '/currency/imask.min.js', '/currency/converter.mjs', '/currency/manifest.webmanifest', '/currency/icon-192.png', '/currency/icon-512.png']) {
         assert.ok(entries.has(path), `${path} is cached`);
     }
     let response;
@@ -136,7 +138,10 @@ test('focus, blur rounding, and rate refresh keep the last typed amount', async 
         .map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
     const fields = Object.fromEntries(['JPY', 'EUR', 'USD', 'SEK'].map(code => [code, {
         value: '', selectionStart: 0, selectionEnd: 0, listeners: {},
-        addEventListener(type, listener) { this.listeners[type] = listener; },
+        addEventListener(type, listener) {
+            const previous = this.listeners[type];
+            this.listeners[type] = previous ? (...args) => { previous(...args); listener(...args); } : listener;
+        },
         setAttribute() {},
         setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
         select() { this.setSelectionRange(0, this.value.length); },
@@ -162,7 +167,7 @@ test('focus, blur rounding, and rate refresh keep the last typed amount', async 
     const replacements = {
         document,
         navigator: { onLine: true },
-        window: { addEventListener(type, listener) { windowListeners[type] = listener; } },
+        window: { IMask: fakeIMask, addEventListener(type, listener) { windowListeners[type] = listener; } },
         localStorage: { getItem() { return JSON.stringify(stored); }, setItem() { throw Error('Storage blocked'); } },
         fetch: () => fetched,
         requestAnimationFrame: callback => callback()
@@ -191,32 +196,27 @@ test('focus, blur rounding, and rate refresh keep the last typed amount', async 
         });
         assert.match(status.textContent, /Updates not saved/);
         fields.JPY.focus();
+        fields.USD.listeners.pointerdown();
+        fields.USD.focus();
+        fields.USD.setSelectionRange(2, 2);
+        fields.USD.listeners.click();
+        assert.equal(fields.USD.selectionStart, 0, 'first pointer click reselects converted amount');
+        assert.equal(fields.USD.selectionEnd, fields.USD.value.length);
+        fields.USD.listeners.pointerdown();
+        fields.USD.setSelectionRange(1, 1);
+        fields.USD.listeners.click();
+        assert.equal(fields.USD.selectionStart, 1, 'later pointer click can place the caret');
+        fields.JPY.focus();
         assert.equal(fields.JPY.value, '100.49', 'original input precision returns for editing');
-        fields.JPY.value = '15000,00';
+        fields.JPY.value = '15\u202f000.00';
         fields.JPY.listeners.input();
-        assert.equal(fields.JPY.value, '15\u202f000,00', 'source groups while typing without dropping trailing zeros');
         fields.JPY.listeners.blur();
         fields.JPY.focus();
-        assert.equal(fields.JPY.value, '15\u202f000,00', 'focus restores the precise grouped source');
-        fields.JPY.value = '1\u202f234';
-        fields.JPY.setSelectionRange(5, 5);
-        fields.JPY.listeners.compositionstart();
-        assert.equal(fields.JPY.value, '1234', 'IME starts on ungrouped text');
-        assert.equal(fields.JPY.selectionStart, 4);
-        fields.JPY.value += '5';
-        fields.JPY.setSelectionRange(5, 5);
-        fields.JPY.listeners.input({ isComposing: true });
-        fields.JPY.listeners.compositionend();
-        assert.equal(fields.JPY.value, '12\u202f345', 'committed composition regroups');
-        const undoKey = { key: 'z', metaKey: true, altKey: false, shiftKey: false, preventDefault() {} };
-        fields.JPY.listeners.keydown(undoKey);
-        assert.equal(fields.JPY.value, '1\u202f234', 'Undo restores the text before composition');
-        fields.JPY.listeners.keydown({ ...undoKey, shiftKey: true });
-        assert.equal(fields.JPY.value, '12\u202f345', 'Redo restores grouped composition');
+        assert.equal(fields.JPY.value, '15\u202f000.00', 'focus restores the precise source text');
         fields.USD.focus();
         fields.USD.listeners.compositionstart();
         fields.USD.value = '2';
-        fields.USD.listeners.input({ isComposing: true });
+        fields.USD.listeners.input();
         windowListeners.online();
         await new Promise(resolve => setImmediate(resolve));
         assert.equal(fields.USD.value, '2', 'rate refresh leaves an in-progress IME edit untouched');
@@ -265,7 +265,7 @@ test('a failed first service-worker install is reported after registration succe
                 ready: new Promise(() => {})
             }
         },
-        window: { addEventListener() {} },
+        window: { IMask: fakeIMask, addEventListener() {} },
         localStorage: { getItem() { return null; } },
         requestAnimationFrame: callback => callback()
     };
@@ -294,7 +294,10 @@ test('automatic checks show one status line, throttle foreground checks, and off
     const original = Object.fromEntries(names.map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
     const fields = Object.fromEntries(['JPY', 'EUR', 'USD', 'SEK'].map(code => [code, {
         value: '', listeners: {},
-        addEventListener(type, listener) { this.listeners[type] = listener; },
+        addEventListener(type, listener) {
+            const previous = this.listeners[type];
+            this.listeners[type] = previous ? (...args) => { previous(...args); listener(...args); } : listener;
+        },
         setAttribute() {}, select() {}, focus() {}
     }]));
     const buttons = Object.fromEntries(['clear-button', 'apply-update-button'].map(id => [id, {
@@ -340,11 +343,12 @@ test('automatic checks show one status line, throttle foreground checks, and off
             }
         },
         window: {
+            IMask: fakeIMask,
             caches: {}, location: { reload() { reloads++; } },
             addEventListener(type, listener) { (windowListeners[type] ??= []).push(listener); }
         },
         caches: {
-            async keys() { return ['currency-shell-v10']; },
+            async keys() { return ['currency-shell-v11']; },
             async open() { return { async match() { return {}; } }; }
         },
         fetch: async () => { throw Error('Rates offline'); },
@@ -368,7 +372,7 @@ test('automatic checks show one status line, throttle foreground checks, and off
         await new Promise(resolve => setImmediate(resolve));
         assert.equal(updateMessage.textContent, 'App is current');
         assert.equal(buttons['apply-update-button'].hidden, true);
-        fields.JPY.value = '12 345,67';
+        fields.JPY.value = '12\u202f345.67';
         fields.JPY.listeners.input();
         swListeners.controllerchange();
         assert.equal(reloads, 0, 'ordinary controller changes do not reload');
@@ -382,7 +386,7 @@ test('automatic checks show one status line, throttle foreground checks, and off
         assert.equal(updateCalls, 2, 'reconnect retries despite throttle');
         assert.equal(buttons['apply-update-button'].hidden, true);
         assert.equal(updateMessage.textContent, 'Couldn’t check for updates');
-        assert.equal(fields.JPY.value, '12\u202f345,67', 'failed check does not alter grouped input');
+        assert.equal(fields.JPY.value, '12\u202f345.67', 'failed check does not alter grouped input');
         await Promise.all(windowListeners.online.map(listener => listener()));
         assert.equal(updateCalls, 3);
         assert.equal(buttons['apply-update-button'].hidden, false);
@@ -396,7 +400,7 @@ test('automatic checks show one status line, throttle foreground checks, and off
         assert.equal(reloads, 0, 'button waits for the new controller');
         swListeners.controllerchange();
         assert.equal(reloads, 1);
-        assert.deepEqual(JSON.parse(storage.get('currency-update-input-v1')), { code: 'JPY', text: '12\u202f345,67', amount: 12345.67 });
+        assert.deepEqual(JSON.parse(storage.get('currency-update-input-v1')), { code: 'JPY', text: '12\u202f345.67', amount: 12345.67 });
     } finally {
         for (const [name, descriptor] of Object.entries(original)) {
             if (descriptor) Object.defineProperty(globalThis, name, descriptor);
