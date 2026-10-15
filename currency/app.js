@@ -1,9 +1,9 @@
-import { BUNDLED_RATES, CURRENCIES, convert, formatAmount, normalizeLatestRates, parseAmount, validRates } from './converter.mjs';
+import { BUNDLED_RATES, CURRENCIES, convert, formatAmount, groupEditableAmount, normalizeLatestRates, parseAmount, ungroupForEdit, validRates } from './converter.mjs';
 
 const RATE_URL = 'https://api.frankfurter.dev/v2/providers/ecb/rates?base=EUR&quotes=JPY,USD,SEK';
 const STORAGE_KEY = 'currency-rates-v1';
 const RESTORE_KEY = 'currency-update-input-v1';
-const SHELL_CACHE = 'currency-shell-v9';
+const SHELL_CACHE = 'currency-shell-v10';
 const fields = Object.fromEntries(CURRENCIES.map(code => [code, document.querySelector(`[data-currency="${code}"]`)]));
 const status = document.getElementById('rate-status');
 const clearButton = document.getElementById('clear-button');
@@ -29,6 +29,8 @@ let offlineInstallFailed = false;
 let statusNote = navigator.onLine ? '' : 'Offline';
 let invalidAmount = false;
 let restoredCode = null;
+const resetEditHistory = {};
+const composingFields = new Set();
 
 function setAppUpdateMessage(message) {
     appUpdateMessage.textContent = message;
@@ -68,28 +70,106 @@ function showStatus() {
 
 function updateOthers() {
     for (const code of CURRENCIES) {
-        if (code === lastTyped.code) continue;
+        if (code === lastTyped.code || composingFields.has(code)) continue;
         const amount = lastTyped.amount;
         const converted = amount === null ? '' : formatAmount(convert(amount, lastTyped.code, code, rates), code);
         const focused = document.activeElement === fields[code];
-        fields[code].value = focused ? converted.replace(/\u202f/g, '') : converted;
+        fields[code].value = converted;
         fields[code].setAttribute('aria-invalid', 'false');
-        if (focused) fields[code].select();
+        if (focused) {
+            fields[code].select();
+            resetEditHistory[code]?.();
+        }
     }
 }
 
 for (const code of CURRENCIES) {
     const field = fields[code];
+    let composing = false;
+    let history = [];
+    let historyIndex = -1;
+    const snapshot = () => ({ text: field.value, start: field.selectionStart ?? field.value.length,
+        end: field.selectionEnd ?? field.value.length });
+    const resetHistory = () => { history = [snapshot()]; historyIndex = 0; };
+    resetEditHistory[code] = resetHistory;
+    resetHistory();
+    const syncHistory = () => {
+        if (history[historyIndex]?.text === field.value) history[historyIndex] = snapshot();
+        else resetHistory();
+    };
+    const recordHistory = () => {
+        const next = snapshot();
+        if (history[historyIndex]?.text === next.text) return;
+        history = history.slice(0, historyIndex + 1);
+        history.push(next);
+        if (history.length > 100) history.shift();
+        historyIndex = history.length - 1;
+    };
+    const removeGeneratedSpaces = () => {
+        if (!field.value.includes('\u202f') || typeof field.setSelectionRange !== 'function') return;
+        const ungrouped = ungroupForEdit(field.value, field.selectionStart, field.selectionEnd);
+        field.value = ungrouped.text;
+        field.setSelectionRange(ungrouped.start, ungrouped.end);
+    };
     field.addEventListener('focus', () => {
-        field.value = code === lastTyped.code ? lastTyped.text : field.value.replace(/\u202f/g, '');
+        if (code === lastTyped.code) field.value = lastTyped.text;
         field.select();
+        syncHistory();
     });
-    field.addEventListener('input', () => {
+    field.addEventListener('beforeinput', event => {
+        if (!composing && !event.isComposing &&
+            (event.inputType === 'historyUndo' || event.inputType === 'historyRedo')) {
+            event.preventDefault();
+            restoreHistory(event.inputType === 'historyUndo' ? -1 : 1);
+            return;
+        }
+        if (!composing && !event.isComposing && historyIndex >= 0) history[historyIndex] = snapshot();
+        if (composing || event.isComposing || !/^(insert|delete)/.test(event.inputType || '') ||
+            !field.value.includes('\u202f')) return;
+        removeGeneratedSpaces();
+    });
+    const handleInput = (record = true) => {
+        const grouped = groupEditableAmount(field.value, field.selectionStart, field.selectionEnd);
+        if (grouped.text !== field.value) {
+            field.value = grouped.text;
+            if (typeof field.setSelectionRange === 'function') field.setSelectionRange(grouped.start, grouped.end);
+        }
         lastTyped = { code, text: field.value, amount: parseAmount(field.value) };
         invalidAmount = lastTyped.amount === null && field.value.trim() !== '';
         field.setAttribute('aria-invalid', invalidAmount ? 'true' : 'false');
         updateOthers();
         showStatus();
+        if (record) recordHistory();
+    };
+    const restoreHistory = direction => {
+        const next = historyIndex + direction;
+        if (next < 0 || next >= history.length) return;
+        historyIndex = next;
+        const saved = history[next];
+        field.value = saved.text;
+        if (typeof field.setSelectionRange === 'function') field.setSelectionRange(saved.start, saved.end);
+        handleInput(false);
+    };
+    field.addEventListener('keydown', event => {
+        if (composing || event.isComposing || !(event.metaKey || event.ctrlKey) || event.altKey) return;
+        const key = event.key.toLowerCase();
+        if (key !== 'z' && key !== 'y') return;
+        event.preventDefault();
+        restoreHistory(key === 'y' || event.shiftKey ? 1 : -1);
+    });
+    field.addEventListener('compositionstart', () => {
+        composing = true;
+        composingFields.add(code);
+        if (historyIndex >= 0) history[historyIndex] = snapshot();
+        removeGeneratedSpaces();
+    });
+    field.addEventListener('compositionend', () => {
+        composing = false;
+        composingFields.delete(code);
+        handleInput();
+    });
+    field.addEventListener('input', event => {
+        if (!composing && !event?.isComposing) handleInput();
     });
     field.addEventListener('blur', () => {
         if (code === lastTyped.code && lastTyped.amount !== null) field.value = formatAmount(lastTyped.amount, code);
@@ -106,6 +186,7 @@ clearButton.addEventListener('click', () => {
         field.value = '';
         field.setAttribute('aria-invalid', 'false');
     }
+    for (const reset of Object.values(resetEditHistory)) reset();
     showStatus();
     try { sessionStorage.removeItem(RESTORE_KEY); } catch { /* Storage may be unavailable. */ }
     fields.JPY.focus();
