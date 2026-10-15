@@ -35,7 +35,7 @@ test('the scoped service worker caches the entire shell for offline navigation',
     const caches = {
         async open() { return cache; },
         async match(request) { return cache.match(request); },
-        async keys() { return ['currency-shell-v2']; },
+        async keys() { return ['currency-shell-v3']; },
         async delete() { return true; }
     };
     const self = {
