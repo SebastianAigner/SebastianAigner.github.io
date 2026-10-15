@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { runInNewContext } from 'node:vm';
-import { BUNDLED_RATES, convert, formatAmount, normalizeLatestRates, parseAmount, validRates } from '../static/currency/converter.mjs';
+import { BUNDLED_RATES, convert, formatAmount, groupEditableAmount, normalizeLatestRates, parseAmount, ungroupForEdit, validRates } from '../static/currency/converter.mjs';
 
 test('comma and dot decimals convert from any field', () => {
     assert.equal(parseAmount('1,5'), 1.5);
@@ -25,6 +25,34 @@ test('comma and dot decimals convert from any field', () => {
     assert.equal(formatAmount(.001, 'EUR'), '0.001');
     assert.equal(formatAmount(.001, 'JPY'), '0.001');
     assert.equal(formatAmount(.00000001, 'EUR'), '0.00000001');
+});
+
+test('live grouping keeps caret, typed decimals, and invalid paste intact', () => {
+    assert.deepEqual(groupEditableAmount('15000', 5), { text: '15\u202f000', start: 6, end: 6 });
+    assert.deepEqual(groupEditableAmount('123456.00', 4, 6), { text: '123\u202f456.00', start: 5, end: 7 });
+    assert.deepEqual(groupEditableAmount('-00015,00', 6), { text: '-00\u202f015,00', start: 7, end: 7 });
+    assert.deepEqual(groupEditableAmount('1000,', 5), { text: '1\u202f000,', start: 6, end: 6 });
+    assert.deepEqual(groupEditableAmount('+.', 2), { text: '+.', start: 2, end: 2 });
+    assert.deepEqual(groupEditableAmount('12 34', 5), { text: '12 34', start: 5, end: 5 });
+    assert.deepEqual(groupEditableAmount('1,234.56', 8), { text: '1,234.56', start: 8, end: 8 });
+
+    // Mirror the browser's edit sequence: generated spaces disappear before the
+    // native edit, then grouping is reapplied after the input event.
+    function edit(grouped, start, end, inserted) {
+        const raw = ungroupForEdit(grouped, start, end);
+        return groupEditableAmount(raw.text.slice(0, raw.start) + inserted + raw.text.slice(raw.end),
+            raw.start + inserted.length);
+    }
+    let value = '';
+    for (const digit of '15000') value = edit(value, value.length, value.length, digit).text;
+    assert.equal(value, '15\u202f000');
+    assert.deepEqual(ungroupForEdit(value, 3), { text: '15000', start: 2, end: 2 });
+    const backspace = ungroupForEdit(value, 3);
+    assert.equal(groupEditableAmount(backspace.text.slice(0, backspace.start - 1) +
+        backspace.text.slice(backspace.start), backspace.start - 1).text, '1\u202f000');
+    assert.equal(edit('12\u202f345', 2, 2, '9').text, '129\u202f345', 'mid-string insertion regroups');
+    assert.equal(edit('12\u202f345', 2, 5, '6').text, '1\u202f265', 'range replacement regroups');
+    assert.equal(edit('', 0, 0, '12 34').text, '12 34', 'malformed pasted spaces remain invalid');
 });
 
 test('bad data never qualifies as stored or fetched rates', () => {
@@ -72,7 +100,7 @@ test('the scoped service worker caches the entire shell for offline navigation',
     const caches = {
         async open() { return cache; },
         async match() { throw Error('global cache lookup would mix versions'); },
-        async keys() { return ['currency-shell-v9']; },
+        async keys() { return ['currency-shell-v10']; },
         async delete() { return true; }
     };
     const self = {
@@ -107,9 +135,11 @@ test('focus, blur rounding, and rate refresh keep the last typed amount', async 
     const original = Object.fromEntries(['document', 'navigator', 'window', 'localStorage', 'fetch', 'requestAnimationFrame']
         .map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
     const fields = Object.fromEntries(['JPY', 'EUR', 'USD', 'SEK'].map(code => [code, {
-        value: '', listeners: {},
+        value: '', selectionStart: 0, selectionEnd: 0, listeners: {},
         addEventListener(type, listener) { this.listeners[type] = listener; },
-        setAttribute() {}, select() {},
+        setAttribute() {},
+        setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
+        select() { this.setSelectionRange(0, this.value.length); },
         focus() { document.activeElement = this; this.listeners.focus?.(); }
     }]));
     const buttons = Object.fromEntries(['clear-button', 'apply-update-button'].map(id => [id, {
@@ -127,11 +157,12 @@ test('focus, blur rounding, and rate refresh keep the last typed amount', async 
     };
     let completeFetch;
     const fetched = new Promise(resolve => { completeFetch = resolve; });
+    const windowListeners = {};
     const stored = { base: 'EUR', date: '2026-10-14', rates: { JPY: 100, USD: 2, SEK: 10 } };
     const replacements = {
         document,
         navigator: { onLine: true },
-        window: { addEventListener() {} },
+        window: { addEventListener(type, listener) { windowListeners[type] = listener; } },
         localStorage: { getItem() { return JSON.stringify(stored); }, setItem() { throw Error('Storage blocked'); } },
         fetch: () => fetched,
         requestAnimationFrame: callback => callback()
@@ -161,6 +192,36 @@ test('focus, blur rounding, and rate refresh keep the last typed amount', async 
         assert.match(status.textContent, /Updates not saved/);
         fields.JPY.focus();
         assert.equal(fields.JPY.value, '100.49', 'original input precision returns for editing');
+        fields.JPY.value = '15000,00';
+        fields.JPY.listeners.input();
+        assert.equal(fields.JPY.value, '15\u202f000,00', 'source groups while typing without dropping trailing zeros');
+        fields.JPY.listeners.blur();
+        fields.JPY.focus();
+        assert.equal(fields.JPY.value, '15\u202f000,00', 'focus restores the precise grouped source');
+        fields.JPY.value = '1\u202f234';
+        fields.JPY.setSelectionRange(5, 5);
+        fields.JPY.listeners.compositionstart();
+        assert.equal(fields.JPY.value, '1234', 'IME starts on ungrouped text');
+        assert.equal(fields.JPY.selectionStart, 4);
+        fields.JPY.value += '5';
+        fields.JPY.setSelectionRange(5, 5);
+        fields.JPY.listeners.input({ isComposing: true });
+        fields.JPY.listeners.compositionend();
+        assert.equal(fields.JPY.value, '12\u202f345', 'committed composition regroups');
+        const undoKey = { key: 'z', metaKey: true, altKey: false, shiftKey: false, preventDefault() {} };
+        fields.JPY.listeners.keydown(undoKey);
+        assert.equal(fields.JPY.value, '1\u202f234', 'Undo restores the text before composition');
+        fields.JPY.listeners.keydown({ ...undoKey, shiftKey: true });
+        assert.equal(fields.JPY.value, '12\u202f345', 'Redo restores grouped composition');
+        fields.USD.focus();
+        fields.USD.listeners.compositionstart();
+        fields.USD.value = '2';
+        fields.USD.listeners.input({ isComposing: true });
+        windowListeners.online();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(fields.USD.value, '2', 'rate refresh leaves an in-progress IME edit untouched');
+        fields.USD.listeners.compositionend();
+        assert.equal(fields.JPY.value, '133', 'committed IME edit uses the latest rates');
         clear.click();
         assert.ok(Object.values(fields).every(field => field.value === ''), 'Clear empties all amounts');
         assert.equal(document.activeElement, fields.JPY, 'Clear returns focus to yen');
@@ -283,7 +344,7 @@ test('automatic checks show one status line, throttle foreground checks, and off
             addEventListener(type, listener) { (windowListeners[type] ??= []).push(listener); }
         },
         caches: {
-            async keys() { return ['currency-shell-v9']; },
+            async keys() { return ['currency-shell-v10']; },
             async open() { return { async match() { return {}; } }; }
         },
         fetch: async () => { throw Error('Rates offline'); },
@@ -321,7 +382,7 @@ test('automatic checks show one status line, throttle foreground checks, and off
         assert.equal(updateCalls, 2, 'reconnect retries despite throttle');
         assert.equal(buttons['apply-update-button'].hidden, true);
         assert.equal(updateMessage.textContent, 'Couldn’t check for updates');
-        assert.equal(fields.JPY.value, '12 345,67', 'failed check does not alter input');
+        assert.equal(fields.JPY.value, '12\u202f345,67', 'failed check does not alter grouped input');
         await Promise.all(windowListeners.online.map(listener => listener()));
         assert.equal(updateCalls, 3);
         assert.equal(buttons['apply-update-button'].hidden, false);
@@ -335,7 +396,7 @@ test('automatic checks show one status line, throttle foreground checks, and off
         assert.equal(reloads, 0, 'button waits for the new controller');
         swListeners.controllerchange();
         assert.equal(reloads, 1);
-        assert.deepEqual(JSON.parse(storage.get('currency-update-input-v1')), { code: 'JPY', text: '12 345,67', amount: 12345.67 });
+        assert.deepEqual(JSON.parse(storage.get('currency-update-input-v1')), { code: 'JPY', text: '12\u202f345,67', amount: 12345.67 });
     } finally {
         for (const [name, descriptor] of Object.entries(original)) {
             if (descriptor) Object.defineProperty(globalThis, name, descriptor);
