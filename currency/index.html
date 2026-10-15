@@ -1,0 +1,13 @@
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="black-translucent"><meta name=theme-color content="#0a0a0a"><meta name=description content="A quick offline currency converter for JPY, EUR, USD, and SEK."><title>Currency Converter</title>
+<link rel=icon type=image/png sizes=192x192 href=/currency/icon-192.png><link rel=apple-touch-icon href=/currency/icon-192.png><link rel=manifest href=/currency/manifest.webmanifest><link rel=stylesheet href=/currency/style.css><script type=module src=/currency/app.js></script></head><body><main class=container><header><div class=eyebrow>Quick conversion</div><h1>Currency Converter</h1></header><div class=currencies aria-label="Currency amounts"><label class=currency-row for=amount-jpy><span class=currency-code>JPY</span>
+<span class=currency-name>Japanese yen</span>
+<input id=amount-jpy data-currency=JPY type=text inputmode=decimal autocomplete=off spellcheck=false aria-label="Japanese yen amount" placeholder=0 autofocus>
+</label><label class=currency-row for=amount-eur><span class=currency-code>EUR</span>
+<span class=currency-name>Euro</span>
+<input id=amount-eur data-currency=EUR type=text inputmode=decimal autocomplete=off spellcheck=false aria-label="Euro amount" placeholder=0>
+</label><label class=currency-row for=amount-usd><span class=currency-code>USD</span>
+<span class=currency-name>US dollar</span>
+<input id=amount-usd data-currency=USD type=text inputmode=decimal autocomplete=off spellcheck=false aria-label="US dollar amount" placeholder=0>
+</label><label class=currency-row for=amount-sek><span class=currency-code>SEK</span>
+<span class=currency-name>Swedish krona</span>
+<input id=amount-sek data-currency=SEK type=text inputmode=decimal autocomplete=off spellcheck=false aria-label="Swedish krona amount" placeholder=0></label></div><p class=rate-status id=rate-status role=status aria-live=polite></p></main></body></html>
