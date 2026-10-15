@@ -1,5 +1,5 @@
 // Bump this version whenever a shell asset changes so installed copies refresh.
-const CACHE_NAME = 'currency-shell-v3';
+const CACHE_NAME = 'currency-shell-v8';
 const SHELL = [
     '/currency/',
     '/currency/style.css',
@@ -15,22 +15,27 @@ const SHELL = [
 ];
 
 self.addEventListener('install', event => {
-    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
+    // Bypass the browser HTTP cache so a new worker always stores the current shell.
+    event.waitUntil(caches.open(CACHE_NAME).then(cache =>
+        cache.addAll(SHELL.map(url => new Request(url, { cache: 'reload' })))
+    ));
 });
 
 self.addEventListener('activate', event => {
-    event.waitUntil(Promise.all([
-        caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('currency-shell-') && key !== CACHE_NAME).map(key => caches.delete(key)))),
-        self.clients.claim()
-    ]));
+    // Keep older shell caches for tabs still controlled by older workers.
+    event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('message', event => {
+    if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
     if (event.request.method !== 'GET' || url.origin !== self.location.origin || !url.pathname.startsWith('/currency/')) return;
     if (event.request.mode === 'navigate') {
-        event.respondWith(caches.match('/currency/').then(cached => cached || fetch(event.request)));
+        event.respondWith(caches.open(CACHE_NAME).then(cache => cache.match('/currency/')).then(cached => cached || fetch(event.request)));
         return;
     }
-    event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
+    event.respondWith(caches.open(CACHE_NAME).then(cache => cache.match(event.request)).then(cached => cached || fetch(event.request)));
 });
