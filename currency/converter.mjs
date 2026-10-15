@@ -20,9 +20,12 @@ export function validRates(data, today = new Date()) {
 }
 
 export function parseAmount(value) {
-    const trimmed = value.trim();
-    if (!/^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/.test(trimmed)) return null;
-    const parsed = Number(trimmed.replace(',', '.'));
+    const trimmed = value.trim().replace(/[\u00a0\u202f]/g, ' ');
+    // A single comma is always a decimal mark: 1,234 means 1.234, never 1234.
+    // Spaces are accepted as thousands separators only in complete groups of three.
+    if (!/^[+-]?(?:\d+|\d{1,3}(?: \d{3})+)?(?:[.,]\d*)?$/.test(trimmed) ||
+        !/\d/.test(trimmed)) return null;
+    const parsed = Number(trimmed.replace(/ /g, '').replace(',', '.'));
     return Number.isFinite(parsed) ? parsed : null;
 }
 
@@ -34,8 +37,9 @@ export function convert(amount, from, to, data) {
 
 export function formatAmount(amount, code) {
     if (!Number.isFinite(amount)) return '';
+    const small = amount !== 0 && Math.abs(amount) < (code === 'JPY' ? .5 : .005);
     return new Intl.NumberFormat('en-US', {
-        useGrouping: false,
-        maximumFractionDigits: code === 'JPY' ? 2 : 4
-    }).format(amount);
+        useGrouping: true,
+        ...(small ? { maximumSignificantDigits: 2 } : { maximumFractionDigits: code === 'JPY' ? 0 : 2 })
+    }).format(amount).replace(/,/g, '\u202f');
 }
