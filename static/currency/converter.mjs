@@ -19,6 +19,19 @@ export function validRates(data, today = new Date()) {
     );
 }
 
+export function normalizeLatestRates(rows) {
+    if (!Array.isArray(rows) || rows.length !== 3) return null;
+    const date = rows[0]?.date;
+    const rates = {};
+    for (const row of rows) {
+        if (!row || row.base !== 'EUR' || row.date !== date ||
+            !['JPY', 'USD', 'SEK'].includes(row.quote) || row.quote in rates) return null;
+        rates[row.quote] = row.rate;
+    }
+    const normalized = { base: 'EUR', date, rates };
+    return validRates(normalized) ? normalized : null;
+}
+
 export function parseAmount(value) {
     const trimmed = value.trim().replace(/[\u00a0\u202f]/g, ' ');
     // A single comma is always a decimal mark: 1,234 means 1.234, never 1234.

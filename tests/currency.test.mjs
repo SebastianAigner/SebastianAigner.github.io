@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { runInNewContext } from 'node:vm';
-import { BUNDLED_RATES, convert, formatAmount, parseAmount, validRates } from '../static/currency/converter.mjs';
+import { BUNDLED_RATES, convert, formatAmount, normalizeLatestRates, parseAmount, validRates } from '../static/currency/converter.mjs';
 
 test('comma and dot decimals convert from any field', () => {
     assert.equal(parseAmount('1,5'), 1.5);
@@ -36,6 +36,23 @@ test('bad data never qualifies as stored or fetched rates', () => {
     assert.equal(validRates({ ...BUNDLED_RATES, base: 'USD' }), false);
 });
 
+test('Frankfurter v2 rows must be complete, unique, and from one EUR date', () => {
+    const rows = [
+        { date: '2026-10-14', base: 'EUR', quote: 'JPY', rate: 177.39 },
+        { date: '2026-10-14', base: 'EUR', quote: 'SEK', rate: 11.158 },
+        { date: '2026-10-14', base: 'EUR', quote: 'USD', rate: 1.1195 }
+    ];
+    assert.deepEqual(normalizeLatestRates(rows), {
+        base: 'EUR', date: '2026-10-14', rates: { JPY: 177.39, SEK: 11.158, USD: 1.1195 }
+    });
+    assert.equal(normalizeLatestRates(rows.slice(0, 2)), null);
+    assert.equal(normalizeLatestRates([...rows.slice(0, 2), rows[0]]), null);
+    assert.equal(normalizeLatestRates(rows.map((row, i) => i === 1 ? { ...row, date: '2026-10-13' } : row)), null);
+    assert.equal(normalizeLatestRates(rows.map((row, i) => i === 1 ? { ...row, base: 'USD' } : row)), null);
+    assert.equal(normalizeLatestRates(rows.map((row, i) => i === 1 ? { ...row, rate: null } : row)), null);
+    assert.equal(normalizeLatestRates([...rows, { date: '2026-10-14', base: 'EUR', quote: 'GBP', rate: .9 }]), null);
+});
+
 test('the scoped service worker caches the entire shell for offline navigation', async () => {
     const appSource = readFileSync(new URL('../static/currency/app.js', import.meta.url), 'utf8');
     const workerSource = readFileSync(new URL('../static/currency/sw.js', import.meta.url), 'utf8');
@@ -55,7 +72,7 @@ test('the scoped service worker caches the entire shell for offline navigation',
     const caches = {
         async open() { return cache; },
         async match() { throw Error('global cache lookup would mix versions'); },
-        async keys() { return ['currency-shell-v8']; },
+        async keys() { return ['currency-shell-v9']; },
         async delete() { return true; }
     };
     const self = {
@@ -95,16 +112,17 @@ test('focus, blur rounding, and rate refresh keep the last typed amount', async 
         setAttribute() {}, select() {},
         focus() { document.activeElement = this; this.listeners.focus?.(); }
     }]));
-    const buttons = Object.fromEntries(['clear-button', 'check-update-button', 'apply-update-button'].map(id => [id, {
+    const buttons = Object.fromEntries(['clear-button', 'apply-update-button'].map(id => [id, {
         addEventListener(type, listener) { this[type] = listener; }
     }]));
     const clear = buttons['clear-button'];
     const status = { textContent: '' };
+    const updateMessage = { textContent: '', hidden: false };
     const body = {};
     const document = {
         body, activeElement: body, hidden: false,
         querySelector(selector) { return fields[selector.match(/"([A-Z]+)"/)[1]]; },
-        getElementById(id) { return id === 'rate-status' ? status : buttons[id]; },
+        getElementById(id) { return id === 'rate-status' ? status : id === 'app-update-message' ? updateMessage : buttons[id]; },
         addEventListener() {}
     };
     let completeFetch;
@@ -130,7 +148,11 @@ test('focus, blur rounding, and rate refresh keep the last typed amount', async 
         assert.equal(fields.JPY.value, '100');
         fields.USD.focus();
         completeFetch({ ok: true, async json() {
-            return { base: 'EUR', date: '2026-10-15', rates: { JPY: 200, USD: 3, SEK: 20 } };
+            return [
+                { date: '2026-10-15', base: 'EUR', quote: 'JPY', rate: 200 },
+                { date: '2026-10-15', base: 'EUR', quote: 'USD', rate: 3 },
+                { date: '2026-10-15', base: 'EUR', quote: 'SEK', rate: 20 }
+            ];
         } });
         await new Promise(resolve => setImmediate(resolve));
         assert.deepEqual(Object.fromEntries(Object.entries(fields).map(([code, field]) => [code, field.value])), {
@@ -157,7 +179,8 @@ test('a failed first service-worker install is reported after registration succe
         value: '', addEventListener() {}, select() {}, focus() {}, setAttribute() {}
     }]));
     const status = { textContent: '' };
-    const buttons = Object.fromEntries(['clear-button', 'check-update-button', 'apply-update-button'].map(id => [id, {
+    const updateMessage = { textContent: '', hidden: false };
+    const buttons = Object.fromEntries(['clear-button', 'apply-update-button'].map(id => [id, {
         addEventListener() {}
     }]));
     let stateChange;
@@ -169,7 +192,7 @@ test('a failed first service-worker install is reported after registration succe
         document: {
             body: {}, activeElement: null, hidden: false,
             querySelector(selector) { return fields[selector.match(/"([A-Z]+)"/)[1]]; },
-            getElementById(id) { return id === 'rate-status' ? status : buttons[id]; },
+            getElementById(id) { return id === 'rate-status' ? status : id === 'app-update-message' ? updateMessage : buttons[id]; },
             addEventListener() {}
         },
         navigator: {
@@ -195,6 +218,7 @@ test('a failed first service-worker install is reported after registration succe
         worker.state = 'redundant';
         stateChange();
         assert.match(status.textContent, /Offline setup unavailable/);
+        assert.match(updateMessage.textContent, /Offline setup unavailable/);
         assert.doesNotMatch(status.textContent, /Offline ready/);
     } finally {
         for (const [name, descriptor] of Object.entries(original)) {
@@ -204,29 +228,36 @@ test('a failed first service-worker install is reported after registration succe
     }
 });
 
-test('failed update leaves inputs intact, ready update waits for click, and reload follows controller change', async () => {
-    const names = ['document', 'navigator', 'window', 'localStorage', 'sessionStorage', 'caches', 'requestAnimationFrame'];
+test('automatic checks show one status line, throttle foreground checks, and offer a ready update on reconnect', async () => {
+    const names = ['document', 'navigator', 'window', 'localStorage', 'sessionStorage', 'caches', 'fetch', 'requestAnimationFrame'];
     const original = Object.fromEntries(names.map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
     const fields = Object.fromEntries(['JPY', 'EUR', 'USD', 'SEK'].map(code => [code, {
         value: '', listeners: {},
         addEventListener(type, listener) { this.listeners[type] = listener; },
         setAttribute() {}, select() {}, focus() {}
     }]));
-    const buttons = Object.fromEntries(['clear-button', 'check-update-button', 'apply-update-button'].map(id => [id, {
+    const buttons = Object.fromEntries(['clear-button', 'apply-update-button'].map(id => [id, {
         hidden: id === 'apply-update-button', disabled: false,
         addEventListener(type, listener) { this[type] = listener; }
     }]));
     const status = { textContent: '' };
+    const updateMessage = { textContent: '', hidden: false };
     const swListeners = {};
+    const windowListeners = {};
+    const documentListeners = {};
     const sent = [];
     const waiting = { postMessage(message) { sent.push(message); } };
-    let failUpdate = true;
+    let updateCalls = 0;
+    let finishFirstCheck;
+    const firstCheck = new Promise(resolve => { finishFirstCheck = resolve; });
     const registration = {
         active: {}, waiting: null, installing: null,
         addEventListener() {},
         async update() {
-            if (failUpdate) { failUpdate = false; throw Error('Offline'); }
-            this.waiting = waiting;
+            updateCalls++;
+            if (updateCalls === 1) return firstCheck;
+            if (updateCalls === 2) throw Error('Offline');
+            if (updateCalls === 3) this.waiting = waiting;
         }
     };
     const storage = new Map();
@@ -235,11 +266,11 @@ test('failed update leaves inputs intact, ready update waits for click, and relo
         document: {
             body: {}, activeElement: null, hidden: false,
             querySelector(selector) { return fields[selector.match(/"([A-Z]+)"/)[1]]; },
-            getElementById(id) { return id === 'rate-status' ? status : buttons[id]; },
-            addEventListener() {}
+            getElementById(id) { return id === 'rate-status' ? status : id === 'app-update-message' ? updateMessage : buttons[id]; },
+            addEventListener(type, listener) { documentListeners[type] = listener; }
         },
         navigator: {
-            onLine: false,
+            onLine: true,
             serviceWorker: {
                 controller: {},
                 async register() { return registration; },
@@ -247,11 +278,15 @@ test('failed update leaves inputs intact, ready update waits for click, and relo
                 ready: Promise.resolve(registration)
             }
         },
-        window: { caches: {}, location: { reload() { reloads++; } }, addEventListener() {} },
+        window: {
+            caches: {}, location: { reload() { reloads++; } },
+            addEventListener(type, listener) { (windowListeners[type] ??= []).push(listener); }
+        },
         caches: {
-            async keys() { return ['currency-shell-v8']; },
+            async keys() { return ['currency-shell-v9']; },
             async open() { return { async match() { return {}; } }; }
         },
+        fetch: async () => { throw Error('Rates offline'); },
         localStorage: { getItem() { return null; } },
         sessionStorage: {
             getItem(key) { return storage.get(key) ?? null; },
@@ -266,25 +301,36 @@ test('failed update leaves inputs intact, ready update waits for click, and relo
         }
         await import(`../static/currency/app.js?update-flow=${Date.now()}`);
         await new Promise(resolve => setImmediate(resolve));
+        assert.equal(updateCalls, 1, 'startup checks automatically');
+        assert.equal(updateMessage.textContent, 'Checking for updates…');
+        finishFirstCheck();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(updateMessage.textContent, 'App is current');
+        assert.equal(buttons['apply-update-button'].hidden, true);
         fields.JPY.value = '12 345,67';
         fields.JPY.listeners.input();
         swListeners.controllerchange();
         assert.equal(reloads, 0, 'ordinary controller changes do not reload');
-        await buttons['check-update-button'].click();
-        assert.match(status.textContent, /Check when online/);
-        assert.equal(buttons['check-update-button'].disabled, false);
+        documentListeners.visibilitychange();
+        assert.equal(updateCalls, 1, 'foreground checks are throttled');
+        navigator.onLine = false;
+        windowListeners.offline.forEach(listener => listener());
+        assert.equal(updateMessage.textContent, 'Offline — using saved app');
         navigator.onLine = true;
-        await buttons['check-update-button'].click();
-        assert.equal(buttons['check-update-button'].disabled, false);
+        await Promise.all(windowListeners.online.map(listener => listener()));
+        assert.equal(updateCalls, 2, 'reconnect retries despite throttle');
         assert.equal(buttons['apply-update-button'].hidden, true);
-        assert.match(status.textContent, /App update unavailable/);
+        assert.equal(updateMessage.textContent, 'Couldn’t check for updates');
         assert.equal(fields.JPY.value, '12 345,67', 'failed check does not alter input');
-        await buttons['check-update-button'].click();
+        await Promise.all(windowListeners.online.map(listener => listener()));
+        assert.equal(updateCalls, 3);
         assert.equal(buttons['apply-update-button'].hidden, false);
-        assert.match(status.textContent, /Update ready/);
+        assert.match(buttons['apply-update-button'].textContent, /Update available/);
+        assert.equal(updateMessage.hidden, true);
         assert.equal(reloads, 0);
         buttons['apply-update-button'].click();
         assert.deepEqual(sent, [{ type: 'SKIP_WAITING' }]);
+        assert.equal(updateMessage.textContent, 'Applying update…');
         assert.equal(storage.has('currency-update-input-v1'), false, 'input is saved only when reload is imminent');
         assert.equal(reloads, 0, 'button waits for the new controller');
         swListeners.controllerchange();

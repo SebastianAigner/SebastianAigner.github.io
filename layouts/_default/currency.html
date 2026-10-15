@@ -44,11 +44,13 @@
             </label>
         </div>
         <div class="actions">
-            <button id="check-update-button" type="button">Check for updates</button>
-            <button id="apply-update-button" type="button" hidden>Update now</button>
             <button id="clear-button" type="button">Clear</button>
         </div>
         <p class="rate-status" id="rate-status" role="status" aria-live="polite"></p>
+        <p class="app-update-status" role="status" aria-live="polite">
+            <span id="app-update-message">Checking for updates…</span>
+            <button id="apply-update-button" type="button" hidden>Update available — tap to update</button>
+        </p>
     </main>
 </body>
 </html>

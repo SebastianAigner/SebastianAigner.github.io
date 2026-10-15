@@ -1,15 +1,14 @@
-import { BUNDLED_RATES, CURRENCIES, convert, formatAmount, parseAmount, validRates } from './converter.mjs';
+import { BUNDLED_RATES, CURRENCIES, convert, formatAmount, normalizeLatestRates, parseAmount, validRates } from './converter.mjs';
 
-const RATE_URL = 'https://api.frankfurter.dev/v1/latest?base=EUR&symbols=JPY,USD,SEK';
+const RATE_URL = 'https://api.frankfurter.dev/v2/providers/ecb/rates?base=EUR&quotes=JPY,USD,SEK';
 const STORAGE_KEY = 'currency-rates-v1';
 const RESTORE_KEY = 'currency-update-input-v1';
-const SHELL_CACHE = 'currency-shell-v8';
+const SHELL_CACHE = 'currency-shell-v9';
 const fields = Object.fromEntries(CURRENCIES.map(code => [code, document.querySelector(`[data-currency="${code}"]`)]));
 const status = document.getElementById('rate-status');
 const clearButton = document.getElementById('clear-button');
-const checkUpdateButton = document.getElementById('check-update-button');
 const applyUpdateButton = document.getElementById('apply-update-button');
-checkUpdateButton.disabled = true;
+const appUpdateMessage = document.getElementById('app-update-message');
 let ratesNotSaved = false;
 
 function readStoredRates() {
@@ -29,8 +28,20 @@ let offlineReady = false;
 let offlineInstallFailed = false;
 let statusNote = navigator.onLine ? '' : 'Offline';
 let invalidAmount = false;
-let appUpdateNote = '';
 let restoredCode = null;
+
+function setAppUpdateMessage(message) {
+    appUpdateMessage.textContent = message;
+    appUpdateMessage.hidden = false;
+    applyUpdateButton.hidden = true;
+}
+
+function showReadyUpdate(retry = false) {
+    applyUpdateButton.textContent = retry ? 'Couldn’t apply update — tap to retry' : 'Update available — tap to update';
+    applyUpdateButton.disabled = false;
+    applyUpdateButton.hidden = false;
+    appUpdateMessage.hidden = true;
+}
 
 try {
     const saved = JSON.parse(sessionStorage.getItem(RESTORE_KEY));
@@ -48,7 +59,6 @@ function showStatus() {
     const parts = [isBundled ? 'Approx. rates' : 'Rates', rates.date];
     if (Date.now() - Date.parse(`${rates.date}T00:00:00Z`) > 7 * 86400000) parts.push('Old rates');
     if (statusNote) parts.push(statusNote);
-    if (appUpdateNote) parts.push(appUpdateNote);
     if (invalidAmount) parts.push('Check amount');
     if (ratesNotSaved) parts.push('Updates not saved');
     if (offlineReady) parts.push('Offline ready');
@@ -103,6 +113,7 @@ clearButton.addEventListener('click', () => {
 
 if (restoredCode) updateOthers();
 showStatus();
+if (!navigator.onLine) setAppUpdateMessage('Offline — using saved app');
 
 let refreshing = false;
 async function refreshRates() {
@@ -113,11 +124,8 @@ async function refreshRates() {
     try {
         const response = await fetch(RATE_URL, { cache: 'no-store', signal: controller.signal });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const candidate = await response.json();
-        if (!validRates(candidate) || candidate.date < rates.date) throw new Error('Invalid or older rates');
-        const next = { base: 'EUR', date: candidate.date, rates: {
-            JPY: candidate.rates.JPY, USD: candidate.rates.USD, SEK: candidate.rates.SEK
-        } };
+        const next = normalizeLatestRates(await response.json());
+        if (!next || next.date < rates.date) throw new Error('Invalid or older rates');
         rates = next;
         isBundled = false;
         try {
@@ -128,7 +136,7 @@ async function refreshRates() {
         statusNote = '';
         showStatus();
     } catch {
-        statusNote = navigator.onLine ? 'Update unavailable' : 'Offline';
+        statusNote = navigator.onLine ? 'Rate refresh unavailable' : 'Offline';
         showStatus();
     } finally {
         clearTimeout(timeout);
@@ -149,6 +157,9 @@ if ('serviceWorker' in navigator) {
     let watchedWorker = null;
     let reloadAfterUpdate = false;
     let reloadTimeout = null;
+    let lastUpdateCheck = 0;
+    let updateCheckInFlight = false;
+    const UPDATE_CHECK_INTERVAL = 5 * 60 * 1000;
 
     const checkOfflineReady = async () => {
         if (!serviceWorker.controller) return;
@@ -175,11 +186,10 @@ if ('serviceWorker' in navigator) {
 
     const showWaitingUpdate = () => {
         const ready = Boolean(registration?.waiting && serviceWorker.controller);
-        applyUpdateButton.hidden = !ready;
-        checkUpdateButton.hidden = ready;
-        if (ready) appUpdateNote = 'Update ready';
-        else if (appUpdateNote === 'Update ready') appUpdateNote = '';
-        showStatus();
+        if (ready && !reloadAfterUpdate) showReadyUpdate();
+        else if (!ready && appUpdateMessage.hidden) {
+            setAppUpdateMessage(navigator.onLine ? 'App is current' : 'Offline — using saved app');
+        }
     };
 
     const watchWorker = worker => {
@@ -189,9 +199,12 @@ if ('serviceWorker' in navigator) {
             if (worker.state === 'installed') {
                 showWaitingUpdate();
                 if (!registration?.waiting && !serviceWorker.controller) checkOfflineReady();
+                else if (!registration?.waiting && serviceWorker.controller) setAppUpdateMessage('App is current');
             } else if (worker.state === 'redundant') {
                 if (!serviceWorker.controller) offlineInstallFailed = true;
-                if (!registration?.waiting) appUpdateNote = 'App update unavailable';
+                showWaitingUpdate();
+                if (!registration?.waiting) setAppUpdateMessage(serviceWorker.controller ?
+                    'Couldn’t check for updates' : 'Offline setup unavailable');
                 showStatus();
             } else if (worker.state === 'activated') {
                 checkOfflineReady();
@@ -201,16 +214,14 @@ if ('serviceWorker' in navigator) {
         onStateChange();
     };
 
-    checkUpdateButton.addEventListener('click', async () => {
-        if (!registration || checkUpdateButton.disabled) return;
-        if (!navigator.onLine) {
-            appUpdateNote = 'Check when online';
-            showStatus();
-            return;
-        }
-        checkUpdateButton.disabled = true;
-        appUpdateNote = 'Checking app…';
-        showStatus();
+    const checkForAppUpdate = async (force = false) => {
+        if (!registration || !serviceWorker.controller || !navigator.onLine ||
+            registration.waiting || updateCheckInFlight) return;
+        const now = Date.now();
+        if (!force && now - lastUpdateCheck < UPDATE_CHECK_INTERVAL) return;
+        lastUpdateCheck = now;
+        updateCheckInFlight = true;
+        setAppUpdateMessage('Checking for updates…');
         let timeout;
         try {
             await Promise.race([
@@ -218,39 +229,40 @@ if ('serviceWorker' in navigator) {
                 new Promise((_, reject) => { timeout = setTimeout(() => reject(Error('Update timed out')), 12000); })
             ]);
             watchWorker(registration.installing);
-            if (registration.waiting && serviceWorker.controller) showWaitingUpdate();
-            else appUpdateNote = registration.installing ? 'Downloading update…' : 'App is current';
+            if (registration.waiting) showWaitingUpdate();
+            else if (!registration.installing) setAppUpdateMessage('App is current');
         } catch {
-            appUpdateNote = 'App update unavailable';
+            setAppUpdateMessage(navigator.onLine ? 'Couldn’t check for updates' : 'Offline — using saved app');
         } finally {
             clearTimeout(timeout);
-            checkUpdateButton.disabled = false;
-            showStatus();
+            updateCheckInFlight = false;
         }
+    };
+
+    window.addEventListener('online', () => checkForAppUpdate(true));
+    window.addEventListener('offline', () => {
+        if (!registration?.waiting) setAppUpdateMessage('Offline — using saved app');
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) checkForAppUpdate();
     });
 
     applyUpdateButton.addEventListener('click', () => {
         const waiting = registration?.waiting;
         if (!waiting || !serviceWorker.controller || reloadAfterUpdate) return;
         reloadAfterUpdate = true;
-        applyUpdateButton.disabled = true;
-        appUpdateNote = 'Applying update…';
-        showStatus();
+        setAppUpdateMessage('Applying update…');
         try {
             waiting.postMessage({ type: 'SKIP_WAITING' });
         } catch {
             reloadAfterUpdate = false;
-            applyUpdateButton.disabled = false;
-            appUpdateNote = 'App update unavailable';
-            showStatus();
+            showReadyUpdate(true);
             return;
         }
         reloadTimeout = setTimeout(() => {
             if (!reloadAfterUpdate) return;
             reloadAfterUpdate = false;
-            applyUpdateButton.disabled = false;
-            appUpdateNote = 'App update unavailable';
-            showStatus();
+            showReadyUpdate(true);
         }, 15000);
     });
 
@@ -264,11 +276,11 @@ if ('serviceWorker' in navigator) {
         }
         checkOfflineReady();
         showWaitingUpdate();
+        checkForAppUpdate();
     });
 
     serviceWorker.register('/currency/sw.js', { scope: '/currency/', updateViaCache: 'none' }).then(result => {
         registration = result;
-        checkUpdateButton.disabled = false;
         registration.addEventListener('updatefound', () => watchWorker(registration.installing));
         watchWorker(registration.installing);
         if (!registration.installing && !registration.active && !registration.waiting && !serviceWorker.controller) {
@@ -276,18 +288,19 @@ if ('serviceWorker' in navigator) {
         }
         showWaitingUpdate();
         serviceWorker.ready.then(checkOfflineReady).catch(() => {
-            offlineInstallFailed = true;
+            if (!serviceWorker.controller) offlineInstallFailed = true;
+            if (!serviceWorker.controller) setAppUpdateMessage('Offline setup unavailable');
             showStatus();
         });
         checkOfflineReady();
+        checkForAppUpdate();
     }).catch(() => {
-        offlineInstallFailed = true;
-        appUpdateNote = 'App update unavailable';
-        checkUpdateButton.hidden = true;
+        if (!serviceWorker.controller) offlineInstallFailed = true;
+        setAppUpdateMessage(serviceWorker.controller ? 'Couldn’t check for updates' : 'Offline setup unavailable');
         showStatus();
     });
 } else {
-    checkUpdateButton.hidden = true;
+    setAppUpdateMessage('Offline setup unavailable');
 }
 
 // iOS may require a direct tap before it opens the keyboard, even when installed.

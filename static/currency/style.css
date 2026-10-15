@@ -54,7 +54,7 @@ h1 { margin: 10px 0 0; color: #fff; font-size: 30px; letter-spacing: -.6px; }
     appearance: none;
 }
 .currency-row input::placeholder { color: #555; }
-.actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
 .actions button {
     min-width: 72px;
     min-height: 44px;
@@ -67,11 +67,22 @@ h1 { margin: 10px 0 0; color: #fff; font-size: 30px; letter-spacing: -.6px; }
     cursor: pointer;
 }
 .actions button[hidden] { display: none; }
-.actions #apply-update-button { background: #ff9500; border-color: #ff9500; color: #0a0a0a; }
 .actions button:disabled { opacity: .55; cursor: default; }
 .actions button:active { background: #333; }
 .actions button:focus-visible { outline: 2px solid #ff9500; outline-offset: 2px; }
-.rate-status { min-height: 20px; margin: 12px 4px 0; color: #888; font-size: 12px; line-height: 1.4; text-align: center; }
+.rate-status { min-height: 20px; margin: 10px 4px 0; color: #888; font-size: 12px; line-height: 1.4; text-align: center; }
+.app-update-status { margin: 0 4px; color: #888; font-size: 12px; line-height: 1.4; text-align: center; }
+.app-update-status [hidden] { display: none; }
+.app-update-status button {
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 0;
+    background: transparent;
+    color: #ff9500;
+    font: 600 12px -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    cursor: pointer;
+}
+.app-update-status button:focus-visible { outline: 2px solid #ff9500; outline-offset: 2px; border-radius: 6px; }
 @media (max-width: 360px) { .currency-row input { font-size: 23px; } }
 @media (max-height: 620px) {
     body { align-items: flex-start; }
